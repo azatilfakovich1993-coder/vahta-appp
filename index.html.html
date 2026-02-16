@@ -3,1425 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ВахтаПоиск</title>
+    <title>Вахта Работа</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --success: #10b981;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #0f172a;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 0; margin: 0;
         }
-
-        .container {
-            max-width: 100%;
-            min-height: 100vh;
-            padding-bottom: 80px;
+        .container { padding: 16px; padding-bottom: 80px; }
+        .header {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            padding: 20px 16px; margin: -16px -16px 20px -16px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #e0e0e0);
         }
-
-        /* Навигация */
-        .nav-bar {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        .role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .role-btn {
+            padding: 16px; border: 2px solid var(--tg-theme-button-color, #3390ec);
+            border-radius: 12px; background: transparent;
+            color: var(--tg-theme-button-color, #3390ec); font-weight: 500; cursor: pointer;
         }
-
-        .nav-title {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .icon-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            position: relative;
-        }
-
-        .badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--danger);
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        /* Главный экран */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 50px 20px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 36px;
-            margin-bottom: 12px;
-            font-weight: 800;
-        }
-
-        .hero p {
-            font-size: 16px;
-            opacity: 0.95;
-        }
-
-        .role-cards {
-            padding: 20px 16px;
-            display: grid;
-            gap: 16px;
-        }
-
-        .role-card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 28px 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .role-card:active {
-            transform: scale(0.98);
-        }
-
-        .role-card-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-        }
-
-        .role-card-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text);
-        }
-
-        .role-card-desc {
-            color: var(--text-light);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* Вкладки */
-        .tabs {
-            display: flex;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 90;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 14px 8px;
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* Поиск */
-        .search-section {
-            padding: 16px;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .search-box {
-            position: relative;
-            margin-bottom: 12px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 16px 12px 44px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-size: 15px;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: var(--text-light);
-        }
-
-        .filters {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .filter-chip {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: var(--bg);
-            border: 2px solid transparent;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-
-        .filter-chip.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Карточки */
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 12px 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .card:active {
-            transform: translateY(2px);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 12px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .card-company {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .favorite-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .card-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .tag {
-            background: var(--bg);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
-        .tag-primary {
-            background: #dbeafe;
-            color: var(--primary);
-        }
-
-        .tag-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .card-salary {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--success);
-            margin: 12px 0;
-        }
-
-        .card-info {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-
-        /* Кнопки */
+        .role-btn.active { background: var(--tg-theme-button-color, #3390ec); color: #fff; }
         .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none; padding: 14px; border-radius: 10px; width: 100%; font-size: 16px; cursor: pointer;
         }
-
-        .btn:active {
-            opacity: 0.8;
+        .card {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 12px; padding: 16px; margin-bottom: 12px;
         }
-
-        .btn-success {
-            background: var(--success);
-        }
-
-        .btn-lg {
-            padding: 16px 32px;
-            font-size: 18px;
-        }
-
-        /* FAB */
-        .fab {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, #f59e0b 100%);
-            color: white;
-            border: none;
-            font-size: 32px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-            cursor: pointer;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 300;
-        }
-
-        /* Нижняя навигация */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            z-index: 100;
-        }
-
-        .bottom-nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px;
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .bottom-nav-item.active {
-            color: var(--primary);
-        }
-
-        .bottom-nav-icon {
-            font-size: 24px;
-        }
-
-        /* Модальное окно */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: flex-end;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--card);
-            border-radius: 20px 20px 0 0;
-            padding: 24px;
-            max-height: 85vh;
-            overflow-y: auto;
-            width: 100%;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 32px;
-            cursor: pointer;
-            color: var(--text-light);
-            padding: 0;
-            line-height: 1;
-        }
-
-        /* Формы */
-        .form-section {
-            padding: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .form-label-required::after {
-            content: '*';
-            color: var(--danger);
-            margin-left: 4px;
-        }
-
+        .form-group { margin-bottom: 12px; }
         .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 15px;
-            font-family: inherit;
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-top: 5px;
         }
-
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        /* Детали */
-        .detail-section {
-            margin-bottom: 24px;
-        }
-
-        .detail-section-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-light);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--bg);
-            border-radius: 10px;
-        }
-
-        .detail-item-icon {
-            font-size: 24px;
-        }
-
-        .detail-item-text {
-            flex: 1;
-        }
-
-        .detail-item-label {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 2px;
-        }
-
-        .detail-item-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        /* Пустое состояние */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .empty-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .empty-text {
-            color: var(--text-light);
-            margin-bottom: 24px;
-        }
-
-        /* Уведомления */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--text);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 2000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        /* Утилиты */
-        .hidden {
-            display: none !important;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-light);
+        .hidden { display: none !important; }
+        .badge { padding: 4px 8px; border-radius: 8px; font-size: 12px; }
+        .badge-pending { background: #ffeaa7; }
+        .badge-approved { background: #55efc4; }
+        .notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #3390ec; color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <!-- Экран приветствия -->
+    <div class="container">
         <div id="welcomeScreen">
-            <div class="hero">
-                <h1>🏗️ ВахтаПоиск</h1>
-                <p>Найди работу или работника мечты</p>
+            <div class="header">
+                <h1>🏗️ Вахта Работа</h1>
+                <p>Выберите вашу роль</p>
             </div>
-            <div class="role-cards">
-                <div class="role-card" onclick="selectRole('employer')">
-                    <div class="role-card-icon">👔</div>
-                    <div class="role-card-title">Я работодатель</div>
-                    <div class="role-card-desc">Найти квалифицированных специалистов для работы вахтовым методом</div>
-                </div>
-                <div class="role-card" onclick="selectRole('worker')">
-                    <div class="role-card-icon">👷</div>
-                    <div class="role-card-title">Я ищу работу</div>
-                    <div class="role-card-desc">Найти высокооплачиваемую работу вахтовым методом</div>
-                </div>
+            <div class="role-selector">
+                <button class="role-btn" onclick="selectRole('employer')">👔 Работодатель</button>
+                <button class="role-btn" onclick="selectRole('worker')">👷 Соискатель</button>
             </div>
+            <button class="btn" style="background: gray;" onclick="showScreen('adminScreen'); loadAdminData();">🔐 Админ</button>
         </div>
 
-        <!-- Экран работодателя -->
         <div id="employerScreen" class="hidden">
-            <div class="nav-bar">
-                <div class="nav-title">ВахтаПоиск</div>
-                <button class="icon-btn" onclick="showFavorites()">
-                    ❤️
-                    <span class="badge" id="favCount">0</span>
-                </button>
-            </div>
-
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('vacancies')">Мои вакансии</button>
-                <button class="tab" onclick="switchTab('candidates')">Кандидаты</button>
-                <button class="tab" onclick="switchTab('responses')">Отклики</button>
-                <button class="tab" onclick="switchTab('profile')">Профиль</button>
-            </div>
-
-            <div id="vacanciesTab">
-                <div id="vacanciesList"></div>
-            </div>
-
-            <div id="candidatesTab" class="hidden">
-                <div class="search-section">
-                    <div class="search-box">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" class="search-input" placeholder="Поиск по специальности..." id="searchInput">
-                    </div>
-                </div>
-                <div id="candidatesList"></div>
-            </div>
-
-            <div id="responsesTab" class="hidden">
-                <div id="responsesList"></div>
-            </div>
-
-            <div id="profileTab" class="hidden">
-                <div id="profileView"></div>
-            </div>
-
-            <button class="fab" onclick="showCreateVacancy()">+</button>
-
-            <div class="bottom-nav">
-                <button class="bottom-nav-item" onclick="backToWelcome()">
-                    <span class="bottom-nav-icon">🏠</span>
-                    <span>Главная</span>
-                </button>
-                <button class="bottom-nav-item active">
-                    <span class="bottom-nav-icon">💼</span>
-                    <span>Работа</span>
-                </button>
-            </div>
+            <button onclick="showScreen('welcomeScreen')">← Назад</button>
+            <h2>Кабинет работодателя</h2>
+            <button class="btn" onclick="showScreen('createVacancyScreen')">+ Создать вакансию</button>
+            <div id="myVacanciesList"></div>
         </div>
 
-        <!-- Экран соискателя -->
-        <div id="workerScreen" class="hidden">
-            <div class="nav-bar">
-                <div class="nav-title">ВахтаПоиск</div>
-                <button class="icon-btn" onclick="showFavorites()">
-                    ❤️
-                    <span class="badge" id="workerFavCount">0</span>
-                </button>
-            </div>
-
-            <div class="tabs">
-                <button class="tab active" onclick="switchWorkerTab('vacancies')">Вакансии</button>
-                <button class="tab" onclick="switchWorkerTab('responses')">Мои отклики</button>
-                <button class="tab" onclick="switchWorkerTab('profile')">Профиль</button>
-            </div>
-
-            <div id="workerVacanciesTab">
-                <div class="search-section">
-                    <div class="search-box">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" class="search-input" placeholder="Поиск вакансий..." id="workerSearchInput">
-                    </div>
+        <div id="createVacancyScreen" class="hidden">
+            <button onclick="showScreen('employerScreen')">← Отмена</button>
+            <form onsubmit="saveVacancy(event)">
+                <div class="form-group">
+                    <label>Должность</label>
+                    <input type="text" id="v_pos" class="form-input" required>
                 </div>
-                <div id="workerVacanciesList"></div>
-            </div>
+                <div class="form-group">
+                    <label>Зарплата</label>
+                    <input type="number" id="v_sal" class="form-input" required>
+                </div>
+                <button type="submit" class="btn">Опубликовать</button>
+            </form>
+        </div>
 
-            <div id="workerResponsesTab" class="hidden">
-                <div id="workerResponsesList"></div>
-            </div>
+        <div id="workerScreen" class="hidden">
+            <button onclick="showScreen('welcomeScreen')">← Назад</button>
+            <h2>Доступные вакансии</h2>
+            <div id="allVacanciesList"></div>
+        </div>
 
-            <div id="workerProfileTab" class="hidden">
-                <div id="workerProfileView"></div>
-            </div>
-
-            <div class="bottom-nav">
-                <button class="bottom-nav-item" onclick="backToWelcome()">
-                    <span class="bottom-nav-icon">🏠</span>
-                    <span>Главная</span>
-                </button>
-                <button class="bottom-nav-item active">
-                    <span class="bottom-nav-icon">💼</span>
-                    <span>Работа</span>
-                </button>
-            </div>
+        <div id="adminScreen" class="hidden">
+            <button onclick="showScreen('welcomeScreen')">← Назад</button>
+            <h2>Модерация</h2>
+            <div id="adminVacanciesList"></div>
         </div>
     </div>
 
     <script>
-        // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
 
-        let currentRole = null;
-        let currentUserId = tg.initDataUnsafe?.user?.id || 'user_' + Date.now();
-        let currentUserName = tg.initDataUnsafe?.user?.first_name || 'Пользователь';
-        
-        const specialties = [
-            'Сварщик', 'Монтажник', 'Электрик', 'Слесарь', 'Токарь',
-            'Фрезеровщик', 'Маляр', 'Штукатур', 'Каменщик', 'Бетонщик',
-            'Арматурщик', 'Крановщик', 'Стропальщик', 'Оператор станков'
-        ];
+        // Имитация БД через localStorage
+        const db = {
+            save: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+            get: (key) => JSON.parse(localStorage.getItem(key)) || null,
+            list: (prefix) => Object.keys(localStorage)
+                .filter(k => k.startsWith(prefix))
+                .map(k => JSON.parse(localStorage.getItem(k)))
+        };
 
-        // Выбор роли
+        function showScreen(id) {
+            document.querySelectorAll('.container > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
         function selectRole(role) {
-            currentRole = role;
-            hideAll();
-            if (role === 'employer') {
-                document.getElementById('employerScreen').classList.remove('hidden');
-                loadVacancies();
+            if(role === 'employer') {
+                showScreen('employerScreen');
+                renderEmployerVacancies();
             } else {
-                document.getElementById('workerScreen').classList.remove('hidden');
-                loadWorkerVacancies();
+                showScreen('workerScreen');
+                renderWorkerVacancies();
             }
         }
 
-        function backToWelcome() {
-            hideAll();
-            document.getElementById('welcomeScreen').classList.remove('hidden');
-            currentRole = null;
-        }
-
-        function hideAll() {
-            document.querySelectorAll('.container > div').forEach(div => {
-                div.classList.add('hidden');
-            });
-        }
-
-        // Работодатель - переключение вкладок
-        function switchTab(tab) {
-            document.querySelectorAll('#employerScreen .tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('vacanciesTab').classList.add('hidden');
-            document.getElementById('candidatesTab').classList.add('hidden');
-            document.getElementById('responsesTab').classList.add('hidden');
-            document.getElementById('profileTab').classList.add('hidden');
-            
-            if (tab === 'vacancies') {
-                document.getElementById('vacanciesTab').classList.remove('hidden');
-                loadVacancies();
-            } else if (tab === 'candidates') {
-                document.getElementById('candidatesTab').classList.remove('hidden');
-                loadCandidates();
-            } else if (tab === 'responses') {
-                document.getElementById('responsesTab').classList.remove('hidden');
-                loadResponses();
-            } else if (tab === 'profile') {
-                document.getElementById('profileTab').classList.remove('hidden');
-                loadProfile();
-            }
-        }
-
-        // Соискатель - переключение вкладок
-        function switchWorkerTab(tab) {
-            document.querySelectorAll('#workerScreen .tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('workerVacanciesTab').classList.add('hidden');
-            document.getElementById('workerResponsesTab').classList.add('hidden');
-            document.getElementById('workerProfileTab').classList.add('hidden');
-            
-            if (tab === 'vacancies') {
-                document.getElementById('workerVacanciesTab').classList.remove('hidden');
-                loadWorkerVacancies();
-            } else if (tab === 'responses') {
-                document.getElementById('workerResponsesTab').classList.remove('hidden');
-                loadWorkerResponses();
-            } else if (tab === 'profile') {
-                document.getElementById('workerProfileTab').classList.remove('hidden');
-                loadWorkerProfile();
-            }
-        }
-
-        // Создание вакансии
-        function showCreateVacancy() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">Создать вакансию</h2>
-                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-                    </div>
-                    <form onsubmit="submitVacancy(event)">
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Специальность</label>
-                                <select class="form-select" id="vacancySpecialty" required>
-                                    <option value="">Выберите специальность</option>
-                                    ${specialties.map(s => '<option value="'+s+'">'+s+'</option>').join('')}
-                                    <option value="custom">Другое</option>
-                                </select>
-                            </div>
-                            <div class="form-group hidden" id="customSpecialtyGroup">
-                                <label class="form-label form-label-required">Укажите специальность</label>
-                                <input type="text" class="form-input" id="customSpecialty">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Объект</label>
-                                <input type="text" class="form-input" id="vacancyObject" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Регион</label>
-                                <input type="text" class="form-input" id="vacancyRegion" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Зарплата (₽)</label>
-                                <input type="number" class="form-input" id="vacancySalary" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">График</label>
-                                <input type="text" class="form-input" id="vacancySchedule" placeholder="30/30" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Требования</label>
-                                <textarea class="form-textarea" id="vacancyDescription"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Проживание</label>
-                                <textarea class="form-textarea" id="vacancyHousing"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Питание</label>
-                                <textarea class="form-textarea" id="vacancyFood"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Спецодежда</label>
-                                <textarea class="form-textarea" id="vacancyClothing"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Проезд</label>
-                                <textarea class="form-textarea" id="vacancyTransport"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-lg">Опубликовать вакансию</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            document.getElementById('vacancySpecialty').onchange = function() {
-                const custom = document.getElementById('customSpecialtyGroup');
-                if (this.value === 'custom') {
-                    custom.classList.remove('hidden');
-                    document.getElementById('customSpecialty').required = true;
-                } else {
-                    custom.classList.add('hidden');
-                    document.getElementById('customSpecialty').required = false;
-                }
-            };
-        }
-
-        async function submitVacancy(event) {
-            event.preventDefault();
-            
-            let specialty = document.getElementById('vacancySpecialty').value;
-            if (specialty === 'custom') {
-                specialty = document.getElementById('customSpecialty').value;
-            }
-            
+        function saveVacancy(e) {
+            e.preventDefault();
+            const id = 'vac_' + Date.now();
             const vacancy = {
-                id: 'vac_' + Date.now(),
-                employerId: currentUserId,
-                employerName: currentUserName,
-                specialty: specialty,
-                object: document.getElementById('vacancyObject').value,
-                region: document.getElementById('vacancyRegion').value,
-                salary: parseInt(document.getElementById('vacancySalary').value),
-                schedule: document.getElementById('vacancySchedule').value,
-                description: document.getElementById('vacancyDescription').value,
-                housing: document.getElementById('vacancyHousing').value,
-                food: document.getElementById('vacancyFood').value,
-                clothing: document.getElementById('vacancyClothing').value,
-                transport: document.getElementById('vacancyTransport').value,
-                createdAt: new Date().toISOString()
+                id,
+                position: document.getElementById('v_pos').value,
+                salary: document.getElementById('v_sal').value,
+                status: 'pending' // По умолчанию ждет модерации
             };
-            
-            await saveData('vacancy_' + vacancy.id, vacancy);
-            showToast('Вакансия успешно опубликована! ✅');
-            document.querySelector('.modal').remove();
-            loadVacancies();
+            db.save(id, vacancy);
+            alert('Вакансия отправлена на модерацию!');
+            showScreen('employerScreen');
+            renderEmployerVacancies();
         }
 
-        // Загрузка вакансий работодателя
-        async function loadVacancies() {
-            const list = document.getElementById('vacanciesList');
-            list.innerHTML = '<div class="loading">Загрузка...</div>';
-            
-            const vacancies = await getAllData('vacancy_');
-            const myVacancies = vacancies.filter(v => v.employerId === currentUserId);
-            
-            if (myVacancies.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <div class="empty-title">Нет вакансий</div>
-                        <div class="empty-text">Создайте первую вакансию, нажав на кнопку +</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            list.innerHTML = myVacancies.map(v => `
-                <div class="card" onclick="showVacancyDetail('${v.id}')">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">${v.specialty}</div>
-                            <div class="card-company">${v.employerName}</div>
-                        </div>
-                        <button class="favorite-btn" onclick="event.stopPropagation()">🤍</button>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag tag-primary">📍 ${v.region}</span>
-                        <span class="tag">📅 ${v.schedule}</span>
-                    </div>
-                    <div class="card-salary">💰 ${v.salary.toLocaleString()} ₽</div>
-                    <div class="card-info">🏢 ${v.object}</div>
+        function renderEmployerVacancies() {
+            const list = document.getElementById('myVacanciesList');
+            const vacs = db.list('vac_');
+            list.innerHTML = vacs.map(v => `
+                <div class="card">
+                    <b>${v.position}</b> — ${v.salary}₽
+                    <div class="badge badge-${v.status}">${v.status === 'pending' ? 'На проверке' : 'Одобрено'}</div>
                 </div>
             `).join('');
         }
 
-        // Загрузка кандидатов
-        async function loadCandidates() {
-            const list = document.getElementById('candidatesList');
-            list.innerHTML = '<div class="loading">Загрузка...</div>';
-            
-            const profiles = await getAllData('profile_');
-            
-            if (profiles.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">👥</div>
-                        <div class="empty-title">Кандидаты не найдены</div>
-                    </div>
-                `;
+        function renderWorkerVacancies() {
+            const list = document.getElementById('allVacanciesList');
+            const vacs = db.list('vac_').filter(v => v.status === 'approved');
+            if(vacs.length === 0) {
+                list.innerHTML = '<p>Пока нет одобренных вакансий</p>';
                 return;
             }
-            
-            list.innerHTML = profiles.map(p => `
-                <div class="card" onclick="showProfileDetail('${p.userId}')">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">${p.name}</div>
-                            <div class="card-company">${p.specialty}</div>
-                        </div>
-                        <button class="favorite-btn" onclick="event.stopPropagation()">🤍</button>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag tag-success">📊 ${p.experience} лет</span>
-                        <span class="tag">📍 ${p.region}</span>
-                    </div>
-                    <div class="card-info">📞 ${p.phone}</div>
+            list.innerHTML = vacs.map(v => `
+                <div class="card">
+                    <b>${v.position}</b><br>
+                    Зарплата: ${v.salary}₽
+                    <button class="btn" onclick="alert('Отклик отправлен!')">Откликнуться</button>
                 </div>
             `).join('');
         }
 
-        // Загрузка откликов
-        async function loadResponses() {
-            const list = document.getElementById('responsesList');
-            list.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📬</div>
-                    <div class="empty-title">Нет откликов</div>
-                    <div class="empty-text">Когда на ваши вакансии откликнутся, они появятся здесь</div>
-                </div>
-            `;
-        }
-
-        // Профиль работодателя
-        async function loadProfile() {
-            const view = document.getElementById('profileView');
-            const profile = await getData('employer_profile_' + currentUserId);
-            
-            if (!profile) {
-                view.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🏢</div>
-                        <div class="empty-title">Создайте профиль компании</div>
-                        <div class="empty-text">Добавьте информацию о вашей компании</div>
-                        <button class="btn btn-lg" onclick="showCreateProfile()">Создать профиль</button>
-                    </div>
-                `;
-                return;
-            }
-            
-            view.innerHTML = `
-                <div class="form-section">
-                    <div class="detail-section">
-                        <div class="detail-section-title">О компании</div>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <span class="detail-item-icon">🏢</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Название</div>
-                                    <div class="detail-item-value">${profile.companyName}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📋</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">ИНН</div>
-                                    <div class="detail-item-value">${profile.inn}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📍</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Адрес</div>
-                                    <div class="detail-item-value">${profile.address}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="showCreateProfile()">Редактировать</button>
-                </div>
-            `;
-        }
-
-        function showCreateProfile() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">Профиль компании</h2>
-                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-                    </div>
-                    <form onsubmit="submitProfile(event)">
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Название компании</label>
-                                <input type="text" class="form-input" id="companyName" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">ИНН</label>
-                                <input type="text" class="form-input" id="companyInn" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Адрес</label>
-                                <input type="text" class="form-input" id="companyAddress" required>
-                            </div>
-                            <button type="submit" class="btn btn-lg">Сохранить</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        async function submitProfile(event) {
-            event.preventDefault();
-            
-            const profile = {
-                userId: currentUserId,
-                companyName: document.getElementById('companyName').value,
-                inn: document.getElementById('companyInn').value,
-                address: document.getElementById('companyAddress').value
-            };
-            
-            await saveData('employer_profile_' + currentUserId, profile);
-            showToast('Профиль сохранен! ✅');
-            document.querySelector('.modal').remove();
-            loadProfile();
-        }
-
-        // Соискатель - вакансии
-        async function loadWorkerVacancies() {
-            const list = document.getElementById('workerVacanciesList');
-            list.innerHTML = '<div class="loading">Загрузка...</div>';
-            
-            const vacancies = await getAllData('vacancy_');
-            
-            if (vacancies.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">💼</div>
-                        <div class="empty-title">Вакансий не найдено</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            list.innerHTML = vacancies.map(v => `
-                <div class="card" onclick="showVacancyDetailWorker('${v.id}')">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">${v.specialty}</div>
-                            <div class="card-company">${v.employerName}</div>
-                        </div>
-                        <button class="favorite-btn" onclick="event.stopPropagation()">🤍</button>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag tag-primary">📍 ${v.region}</span>
-                        <span class="tag">📅 ${v.schedule}</span>
-                    </div>
-                    <div class="card-salary">💰 ${v.salary.toLocaleString()} ₽</div>
-                    <div class="card-info">🏢 ${v.object}</div>
+        function loadAdminData() {
+            const list = document.getElementById('adminVacanciesList');
+            const vacs = db.list('vac_');
+            list.innerHTML = vacs.map(v => `
+                <div class="card">
+                    <b>${v.position}</b> [${v.status}]
+                    ${v.status === 'pending' ? `<button onclick="approveVac('${v.id}')">Одобрить</button>` : ''}
                 </div>
             `).join('');
         }
 
-        async function loadWorkerResponses() {
-            const list = document.getElementById('workerResponsesList');
-            list.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📝</div>
-                    <div class="empty-title">Нет откликов</div>
-                    <div class="empty-text">Когда вы откликнитесь на вакансии, они появятся здесь</div>
-                </div>
-            `;
-        }
-
-        async function loadWorkerProfile() {
-            const view = document.getElementById('workerProfileView');
-            const profile = await getData('profile_' + currentUserId);
-            
-            if (!profile) {
-                view.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">👤</div>
-                        <div class="empty-title">Создайте свой профиль</div>
-                        <div class="empty-text">Заполните профиль, чтобы работодатели могли найти вас</div>
-                        <button class="btn btn-lg" onclick="showCreateWorkerProfile()">Создать профиль</button>
-                    </div>
-                `;
-                return;
-            }
-            
-            view.innerHTML = `
-                <div class="form-section">
-                    <div class="detail-section">
-                        <div class="detail-section-title">Основная информация</div>
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <span class="detail-item-icon">👤</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">ФИО</div>
-                                    <div class="detail-item-value">${profile.name}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📞</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Телефон</div>
-                                    <div class="detail-item-value">${profile.phone}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">🔧</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Специальность</div>
-                                    <div class="detail-item-value">${profile.specialty}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="showCreateWorkerProfile()">Редактировать</button>
-                </div>
-            `;
-        }
-
-        function showCreateWorkerProfile() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">Мой профиль</h2>
-                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-                    </div>
-                    <form onsubmit="submitWorkerProfile(event)">
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label class="form-label form-label-required">ФИО</label>
-                                <input type="text" class="form-input" id="workerName" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Телефон</label>
-                                <input type="tel" class="form-input" id="workerPhone" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Специальность</label>
-                                <select class="form-select" id="workerSpecialty" required>
-                                    <option value="">Выберите специальность</option>
-                                    ${specialties.map(s => '<option value="'+s+'">'+s+'</option>').join('')}
-                                    <option value="custom">Другое</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Опыт (лет)</label>
-                                <input type="number" class="form-input" id="workerExperience" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label form-label-required">Регион</label>
-                                <input type="text" class="form-input" id="workerRegion" required>
-                            </div>
-                            <button type="submit" class="btn btn-lg">Сохранить</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        async function submitWorkerProfile(event) {
-            event.preventDefault();
-            
-            const profile = {
-                userId: currentUserId,
-                name: document.getElementById('workerName').value,
-                phone: document.getElementById('workerPhone').value,
-                specialty: document.getElementById('workerSpecialty').value,
-                experience: document.getElementById('workerExperience').value,
-                region: document.getElementById('workerRegion').value
-            };
-            
-            await saveData('profile_' + currentUserId, profile);
-            showToast('Профиль сохранен! ✅');
-            document.querySelector('.modal').remove();
-            loadWorkerProfile();
-        }
-
-        // Детальный просмотр вакансии
-        async function showVacancyDetail(vacancyId) {
-            const vacancy = await getData('vacancy_' + vacancyId);
-            if (!vacancy) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">${vacancy.specialty}</h2>
-                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-                    </div>
-                    <div class="card-company">${vacancy.employerName}</div>
-                    <div class="detail-section">
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <span class="detail-item-icon">💰</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Зарплата</div>
-                                    <div class="detail-item-value" style="color: var(--success); font-size: 18px;">${vacancy.salary.toLocaleString()} ₽</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📅</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">График</div>
-                                    <div class="detail-item-value">${vacancy.schedule}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📍</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Регион</div>
-                                    <div class="detail-item-value">${vacancy.region}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    ${vacancy.housing ? '<div class="detail-section"><div class="detail-section-title">Проживание</div><p>'+vacancy.housing+'</p></div>' : ''}
-                    ${vacancy.food ? '<div class="detail-section"><div class="detail-section-title">Питание</div><p>'+vacancy.food+'</p></div>' : ''}
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        async function showVacancyDetailWorker(vacancyId) {
-            const vacancy = await getData('vacancy_' + vacancyId);
-            if (!vacancy) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">${vacancy.specialty}</h2>
-                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-                    </div>
-                    <div class="card-company">${vacancy.employerName}</div>
-                    <div class="detail-section">
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <span class="detail-item-icon">💰</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Зарплата</div>
-                                    <div class="detail-item-value" style="color: var(--success); font-size: 18px;">${vacancy.salary.toLocaleString()} ₽</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📅</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">График</div>
-                                    <div class="detail-item-value">${vacancy.schedule}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📍</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Регион</div>
-                                    <div class="detail-item-value">${vacancy.region}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    ${vacancy.housing ? '<div class="detail-section"><div class="detail-section-title">Проживание</div><p>'+vacancy.housing+'</p></div>' : ''}
-                    ${vacancy.food ? '<div class="detail-section"><div class="detail-section-title">Питание</div><p>'+vacancy.food+'</p></div>' : ''}
-                    <button class="btn btn-success btn-lg" onclick="applyVacancy('${vacancyId}')">Откликнуться</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        async function showProfileDetail(userId) {
-            const profile = await getData('profile_' + userId);
-            if (!profile) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">${profile.name}</h2>
-                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-                    </div>
-                    <div class="card-company">${profile.specialty}</div>
-                    <div class="detail-section">
-                        <div class="detail-grid">
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📞</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Телефон</div>
-                                    <div class="detail-item-value">${profile.phone}</div>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-item-icon">📊</span>
-                                <div class="detail-item-text">
-                                    <div class="detail-item-label">Опыт</div>
-                                    <div class="detail-item-value">${profile.experience} лет</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="tel:${profile.phone}" class="btn btn-success btn-lg">📞 Позвонить</a>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function applyVacancy(vacancyId) {
-            showToast('Отклик отправлен! ✅');
-            document.querySelector('.modal').remove();
-        }
-
-        function showFavorites() {
-            showToast('Избранное пока пусто');
-        }
-
-        function showToast(text) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = text;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Хранилище данных
-        async function saveData(key, value) {
-            try {
-                if (window.storage) {
-                    await window.storage.set(key, JSON.stringify(value), true);
-                } else {
-                    localStorage.setItem(key, JSON.stringify(value));
-                }
-            } catch (error) {
-                console.error('Save error:', error);
-            }
-        }
-
-        async function getData(key) {
-            try {
-                if (window.storage) {
-                    const result = await window.storage.get(key, true);
-                    return result ? JSON.parse(result.value) : null;
-                } else {
-                    const data = localStorage.getItem(key);
-                    return data ? JSON.parse(data) : null;
-                }
-            } catch (error) {
-                console.error('Get error:', error);
-                return null;
-            }
-        }
-
-        async function getAllData(prefix) {
-            try {
-                if (window.storage) {
-                    const result = await window.storage.list(prefix, true);
-                    const keys = result ? result.keys : [];
-                    const items = [];
-                    for (const key of keys) {
-                        const item = await getData(key);
-                        if (item) items.push(item);
-                    }
-                    return items;
-                } else {
-                    const items = [];
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key.startsWith(prefix)) {
-                            const item = JSON.parse(localStorage.getItem(key));
-                            items.push(item);
-                        }
-                    }
-                    return items;
-                }
-            } catch (error) {
-                console.error('GetAll error:', error);
-                return [];
-            }
+        function approveVac(id) {
+            const v = db.get(id);
+            v.status = 'approved';
+            db.save(id, v);
+            loadAdminData();
+            alert('Вакансия одобрена!');
         }
     </script>
 </body>
