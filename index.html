@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Вахта Работа</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            padding: 20px 16px;
+            margin: -16px -16px 20px -16px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--tg-theme-hint-color, #707579);
+            font-size: 14px;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .role-btn {
+            padding: 16px;
+            border: 2px solid var(--tg-theme-button-color, #3390ec);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--tg-theme-button-color, #3390ec);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .role-btn.active {
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        .role-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn {
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+            margin-top: 12px;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+
+        .btn-secondary {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .card {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-info {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #707579);
+            margin-bottom: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            color: var(--tg-theme-hint-color, #707579);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--tg-theme-button-color, #3390ec);
+            border-bottom-color: var(--tg-theme-button-color, #3390ec);
+        }
+
+        .filters {
+            background: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--tg-theme-hint-color, #707579);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color, #707579);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--tg-theme-button-color, #3390ec);
+            font-size: 16px;
+            padding: 8px 0;
+            cursor: pointer;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--tg-theme-hint-color, #707579);
+        }
+
+        .detail-section p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tg-theme-button-color, #3390ec);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Экран выбора роли -->
+        <div id="welcomeScreen">
+            <div class="header">
+                <h1>🏗️ Вахта Работа</h1>
+                <p>Платформа подбора вахтовых работников</p>
+            </div>
+            <div class="role-selector">
+                <button class="role-btn" onclick="selectRole('employer')">
+                    👔 Работодатель
+                </button>
+                <button class="role-btn" onclick="selectRole('worker')">
+                    👷 Ищу работу
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="showAdminPanel()">
+                🔐 Админ-панель
+            </button>
+        </div>
+
+        <!-- Экран работодателя -->
+        <div id="employerScreen" class="hidden">
+            <button class="back-btn" onclick="backToWelcome()">← Назад</button>
+            <div class="header">
+                <h1>Кабинет работодателя</h1>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchEmployerTab('vacancies')">Мои вакансии</button>
+                <button class="tab" onclick="switchEmployerTab('candidates')">Кандидаты</button>
+                <button class="tab" onclick="switchEmployerTab('responses')">Отклики</button>
+            </div>
+
+            <div id="employerVacancies">
+                <button class="btn" onclick="showCreateVacancy()">+ Создать вакансию</button>
+                <div id="vacanciesList" class="loading">Загрузка...</div>
+            </div>
+
+            <div id="employerCandidates" class="hidden">
+                <div class="filters">
+                    <div class="form-group">
+                        <select class="form-select" id="filterSpecialty" onchange="filterCandidates()">
+                            <option value="">Все специальности</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" id="filterExperience" onchange="filterCandidates()">
+                            <option value="">Любой опыт</option>
+                            <option value="0-1">До 1 года</option>
+                            <option value="1-3">1-3 года</option>
+                            <option value="3-5">3-5 лет</option>
+                            <option value="5+">Более 5 лет</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="candidatesList" class="loading">Загрузка...</div>
+            </div>
+
+            <div id="employerResponses" class="hidden">
+                <div id="responsesList" class="loading">Загрузка...</div>
+            </div>
+        </div>
+
+        <!-- Экран создания вакансии -->
+        <div id="createVacancyScreen" class="hidden">
+            <button class="back-btn" onclick="backToEmployer()">← Назад</button>
+            <div class="header">
+                <h1>Создание вакансии</h1>
+            </div>
+            
+            <form id="vacancyForm" onsubmit="submitVacancy(event)">
+                <div class="form-group">
+                    <label class="form-label">Должность *</label>
+                    <input type="text" class="form-input" id="vacancyPosition" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Объект *</label>
+                    <input type="text" class="form-input" id="vacancyObject" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Регион *</label>
+                    <input type="text" class="form-input" id="vacancyRegion" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Зарплата (₽) *</label>
+                    <input type="number" class="form-input" id="vacancySalary" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">График работы *</label>
+                    <input type="text" class="form-input" id="vacancySchedule" placeholder="Например: 15/15, 30/30" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Специальность *</label>
+                    <select class="form-select" id="vacancySpecialty" required>
+                        <option value="">Выберите специальность</option>
+                        <option value="Сварщик">Сварщик</option>
+                        <option value="Монтажник">Монтажник</option>
+                        <option value="Электрик">Электрик</option>
+                        <option value="Слесарь">Слесарь</option>
+                        <option value="Токарь">Токарь</option>
+                        <option value="Фрезеровщик">Фрезеровщик</option>
+                        <option value="Маляр">Маляр</option>
+                        <option value="Штукатур">Штукатур</option>
+                        <option value="Каменщик">Каменщик</option>
+                        <option value="Бетонщик">Бетонщик</option>
+                        <option value="Арматурщик">Арматурщик</option>
+                        <option value="Крановщик">Крановщик</option>
+                        <option value="Стропальщик">Стропальщик</option>
+                        <option value="Оператор станков">Оператор станков</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Требования и обязанности</label>
+                    <textarea class="form-textarea" id="vacancyDescription"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Условия проживания</label>
+                    <textarea class="form-textarea" id="vacancyHousing"></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Создать вакансию</button>
+            </form>
+        </div>
+
+        <!-- Экран соискателя -->
+        <div id="workerScreen" class="hidden">
+            <button class="back-btn" onclick="backToWelcome()">← Назад</button>
+            <div class="header">
+                <h1>Поиск работы</h1>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchWorkerTab('vacancies')">Вакансии</button>
+                <button class="tab" onclick="switchWorkerTab('profile')">Мой профиль</button>
+                <button class="tab" onclick="switchWorkerTab('myResponses')">Мои отклики</button>
+            </div>
+
+            <div id="workerVacancies">
+                <div class="filters">
+                    <div class="form-group">
+                        <select class="form-select" id="filterVacancySpecialty" onchange="filterVacancies()">
+                            <option value="">Все специальности</option>
+                            <option value="Сварщик">Сварщик</option>
+                            <option value="Монтажник">Монтажник</option>
+                            <option value="Электрик">Электрик</option>
+                            <option value="Слесарь">Слесарь</option>
+                            <option value="Токарь">Токарь</option>
+                            <option value="Фрезеровщик">Фрезеровщик</option>
+                            <option value="Маляр">Маляр</option>
+                            <option value="Штукатур">Штукатур</option>
+                            <option value="Каменщик">Каменщик</option>
+                            <option value="Бетонщик">Бетонщик</option>
+                            <option value="Арматурщик">Арматурщик</option>
+                            <option value="Крановщик">Крановщик</option>
+                            <option value="Стропальщик">Стропальщик</option>
+                            <option value="Оператор станков">Оператор станков</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="filterVacancyRegion" placeholder="Регион" onchange="filterVacancies()">
+                    </div>
+                </div>
+                <div id="workerVacanciesList" class="loading">Загрузка...</div>
+            </div>
+
+            <div id="workerProfile" class="hidden">
+                <div id="profileView"></div>
+            </div>
+
+            <div id="workerResponses" class="hidden">
+                <div id="myResponsesList" class="loading">Загрузка...</div>
+            </div>
+        </div>
+
+        <!-- Экран создания/редактирования профиля -->
+        <div id="createProfileScreen" class="hidden">
+            <button class="back-btn" onclick="backToWorker()">← Назад</button>
+            <div class="header">
+                <h1>Мой профиль</h1>
+            </div>
+            
+            <form id="profileForm" onsubmit="submitProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">ФИО *</label>
+                    <input type="text" class="form-input" id="profileName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Телефон *</label>
+                    <input type="tel" class="form-input" id="profilePhone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Специальность *</label>
+                    <select class="form-select" id="profileSpecialty" required>
+                        <option value="">Выберите специальность</option>
+                        <option value="Сварщик">Сварщик</option>
+                        <option value="Монтажник">Монтажник</option>
+                        <option value="Электрик">Электрик</option>
+                        <option value="Слесарь">Слесарь</option>
+                        <option value="Токарь">Токарь</option>
+                        <option value="Фрезеровщик">Фрезеровщик</option>
+                        <option value="Маляр">Маляр</option>
+                        <option value="Штукатур">Штукатур</option>
+                        <option value="Каменщик">Каменщик</option>
+                        <option value="Бетонщик">Бетонщик</option>
+                        <option value="Арматурщик">Арматурщик</option>
+                        <option value="Крановщик">Крановщик</option>
+                        <option value="Стропальщик">Стропальщик</option>
+                        <option value="Оператор станков">Оператор станков</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Опыт работы (лет) *</label>
+                    <input type="number" class="form-input" id="profileExperience" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Регион проживания *</label>
+                    <input type="text" class="form-input" id="profileRegion" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">О себе и навыки</label>
+                    <textarea class="form-textarea" id="profileAbout"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Наличие документов</label>
+                    <textarea class="form-textarea" id="profileDocuments" placeholder="Медкнижка, допуски, удостоверения и т.д."></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Сохранить профиль</button>
+            </form>
+        </div>
+
+        <!-- Админ-панель -->
+        <div id="adminScreen" class="hidden">
+            <button class="back-btn" onclick="backToWelcome()">← Назад</button>
+            <div class="header">
+                <h1>Админ-панель</h1>
+                <p>Модерация профилей и вакансий</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchAdminTab('profiles')">Профили</button>
+                <button class="tab" onclick="switchAdminTab('vacancies')">Вакансии</button>
+            </div>
+
+            <div id="adminProfiles">
+                <div id="adminProfilesList" class="loading">Загрузка...</div>
+            </div>
+
+            <div id="adminVacancies" class="hidden">
+                <div id="adminVacanciesList" class="loading">Загрузка...</div>
+            </div>
+        </div>
+
+        <!-- Детальный просмотр вакансии -->
+        <div id="vacancyDetailScreen" class="hidden">
+            <button class="back-btn" onclick="backFromDetail()">← Назад</button>
+            <div id="vacancyDetail"></div>
+        </div>
+
+        <!-- Детальный просмотр профиля -->
+        <div id="profileDetailScreen" class="hidden">
+            <button class="back-btn" onclick="backFromDetail()">← Назад</button>
+            <div id="profileDetail"></div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Глобальные переменные
+        let currentRole = null;
+        let currentScreen = 'welcome';
+        let currentUserId = tg.initDataUnsafe?.user?.id || Date.now();
+        let currentUserName = tg.initDataUnsafe?.user?.first_name || 'Пользователь';
+
+        // Управление экранами
+        function showScreen(screenId) {
+            document.querySelectorAll('.container > div').forEach(div => {
+                div.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            currentScreen = screenId;
+        }
+
+        function selectRole(role) {
+            currentRole = role;
+            if (role === 'employer') {
+                showScreen('employerScreen');
+                loadEmployerData();
+            } else {
+                showScreen('workerScreen');
+                loadWorkerData();
+            }
+        }
+
+        function backToWelcome() {
+            showScreen('welcomeScreen');
+            currentRole = null;
+        }
+
+        function backToEmployer() {
+            showScreen('employerScreen');
+        }
+
+        function backToWorker() {
+            showScreen('workerScreen');
+        }
+
+        function backFromDetail() {
+            if (currentRole === 'employer') {
+                showScreen('employerScreen');
+            } else if (currentRole === 'worker') {
+                showScreen('workerScreen');
+            } else {
+                showScreen('adminScreen');
+            }
+        }
+
+        // Вкладки работодателя
+        function switchEmployerTab(tab) {
+            document.querySelectorAll('#employerScreen .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('employerVacancies').classList.add('hidden');
+            document.getElementById('employerCandidates').classList.add('hidden');
+            document.getElementById('employerResponses').classList.add('hidden');
+            
+            if (tab === 'vacancies') {
+                document.getElementById('employerVacancies').classList.remove('hidden');
+                loadVacancies();
+            } else if (tab === 'candidates') {
+                document.getElementById('employerCandidates').classList.remove('hidden');
+                loadCandidates();
+            } else if (tab === 'responses') {
+                document.getElementById('employerResponses').classList.remove('hidden');
+                loadResponses();
+            }
+        }
+
+        // Вкладки соискателя
+        function switchWorkerTab(tab) {
+            document.querySelectorAll('#workerScreen .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('workerVacancies').classList.add('hidden');
+            document.getElementById('workerProfile').classList.add('hidden');
+            document.getElementById('workerResponses').classList.add('hidden');
+            
+            if (tab === 'vacancies') {
+                document.getElementById('workerVacancies').classList.remove('hidden');
+                loadWorkerVacancies();
+            } else if (tab === 'profile') {
+                document.getElementById('workerProfile').classList.remove('hidden');
+                loadProfile();
+            } else if (tab === 'myResponses') {
+                document.getElementById('workerResponses').classList.remove('hidden');
+                loadMyResponses();
+            }
+        }
+
+        // Вкладки админа
+        function switchAdminTab(tab) {
+            document.querySelectorAll('#adminScreen .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('adminProfiles').classList.add('hidden');
+            document.getElementById('adminVacancies').classList.add('hidden');
+            
+            if (tab === 'profiles') {
+                document.getElementById('adminProfiles').classList.remove('hidden');
+                loadAdminProfiles();
+            } else if (tab === 'vacancies') {
+                document.getElementById('adminVacancies').classList.remove('hidden');
+                loadAdminVacancies();
+            }
+        }
+
+        // Показать форму создания вакансии
+        function showCreateVacancy() {
+            showScreen('createVacancyScreen');
+        }
+
+        // Отправка вакансии
+        async function submitVacancy(event) {
+            event.preventDefault();
+            
+            const vacancy = {
+                id: 'vac_' + Date.now(),
+                employerId: currentUserId,
+                employerName: currentUserName,
+                position: document.getElementById('vacancyPosition').value,
+                object: document.getElementById('vacancyObject').value,
+                region: document.getElementById('vacancyRegion').value,
+                salary: document.getElementById('vacancySalary').value,
+                schedule: document.getElementById('vacancySchedule').value,
+                specialty: document.getElementById('vacancySpecialty').value,
+                description: document.getElementById('vacancyDescription').value,
+                housing: document.getElementById('vacancyHousing').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            await saveToStorage('vacancy_' + vacancy.id, vacancy, true);
+            showNotification('Вакансия отправлена на модерацию');
+            document.getElementById('vacancyForm').reset();
+            backToEmployer();
+            loadVacancies();
+        }
+
+        // Загрузка вакансий работодателя
+        async function loadVacancies() {
+            const list = document.getElementById('vacanciesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('vacancy_', true);
+            const vacancies = [];
+            
+            for (const key of keys) {
+                const vacancy = await getFromStorage(key, true);
+                if (vacancy && vacancy.employerId === currentUserId) {
+                    vacancies.push(vacancy);
+                }
+            }
+            
+            if (vacancies.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>У вас пока нет вакансий</p></div>';
+                return;
+            }
+            
+            list.innerHTML = vacancies.map(v => `
+                <div class="card" onclick="showVacancyDetail('${v.id}', 'employer')">
+                    <div class="card-title">${v.position}</div>
+                    <div class="card-info">📍 ${v.object}, ${v.region}</div>
+                    <div class="card-info">💰 ${parseInt(v.salary).toLocaleString()} ₽</div>
+                    <div class="card-info">📅 ${v.schedule}</div>
+                    <span class="badge badge-${v.status}">${getStatusText(v.status)}</span>
+                </div>
+            `).join('');
+        }
+
+        // Загрузка кандидатов
+        async function loadCandidates() {
+            const list = document.getElementById('candidatesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('profile_', true);
+            const profiles = [];
+            
+            for (const key of keys) {
+                const profile = await getFromStorage(key, true);
+                if (profile && profile.status === 'approved') {
+                    profiles.push(profile);
+                }
+            }
+            
+            // Заполнение фильтра специальностей
+            const specialties = [...new Set(profiles.map(p => p.specialty))];
+            const filterSelect = document.getElementById('filterSpecialty');
+            filterSelect.innerHTML = '<option value="">Все специальности</option>' + 
+                specialties.map(s => `<option value="${s}">${s}</option>`).join('');
+            
+            displayCandidates(profiles);
+        }
+
+        function displayCandidates(profiles) {
+            const list = document.getElementById('candidatesList');
+            
+            if (profiles.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><p>Кандидаты не найдены</p></div>';
+                return;
+            }
+            
+            list.innerHTML = profiles.map(p => `
+                <div class="card" onclick="showProfileDetail('${p.id}', 'employer')">
+                    <div class="card-title">${p.name}</div>
+                    <div class="card-info">🔧 ${p.specialty}</div>
+                    <div class="card-info">📊 Опыт: ${p.experience} ${getYearsText(p.experience)}</div>
+                    <div class="card-info">📍 ${p.region}</div>
+                    <div class="card-info">📞 ${p.phone}</div>
+                </div>
+            `).join('');
+        }
+
+        // Фильтрация кандидатов
+        async function filterCandidates() {
+            const specialty = document.getElementById('filterSpecialty').value;
+            const experience = document.getElementById('filterExperience').value;
+            
+            const keys = await listFromStorage('profile_', true);
+            let profiles = [];
+            
+            for (const key of keys) {
+                const profile = await getFromStorage(key, true);
+                if (profile && profile.status === 'approved') {
+                    profiles.push(profile);
+                }
+            }
+            
+            if (specialty) {
+                profiles = profiles.filter(p => p.specialty === specialty);
+            }
+            
+            if (experience) {
+                const [min, max] = experience.includes('+') ? [5, 100] : experience.split('-').map(Number);
+                profiles = profiles.filter(p => {
+                    const exp = parseInt(p.experience);
+                    return exp >= min && (max ? exp <= max : true);
+                });
+            }
+            
+            displayCandidates(profiles);
+        }
+
+        // Загрузка откликов
+        async function loadResponses() {
+            const list = document.getElementById('responsesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('response_', true);
+            const responses = [];
+            
+            for (const key of keys) {
+                const response = await getFromStorage(key, true);
+                if (response) {
+                    const vacancy = await getFromStorage('vacancy_' + response.vacancyId, true);
+                    if (vacancy && vacancy.employerId === currentUserId) {
+                        const profile = await getFromStorage('profile_' + response.workerId, true);
+                        responses.push({...response, vacancy, profile});
+                    }
+                }
+            }
+            
+            if (responses.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📬</div><p>Откликов пока нет</p></div>';
+                return;
+            }
+            
+            list.innerHTML = responses.map(r => `
+                <div class="card" onclick="showProfileDetail('${r.workerId}', 'employer')">
+                    <div class="card-title">${r.profile.name}</div>
+                    <div class="card-info">На вакансию: ${r.vacancy.position}</div>
+                    <div class="card-info">🔧 ${r.profile.specialty}</div>
+                    <div class="card-info">📊 Опыт: ${r.profile.experience} ${getYearsText(r.profile.experience)}</div>
+                    <div class="card-info">📞 ${r.profile.phone}</div>
+                    <div class="card-info">📅 ${new Date(r.createdAt).toLocaleDateString('ru-RU')}</div>
+                </div>
+            `).join('');
+        }
+
+        // Загрузка данных работодателя
+        async function loadEmployerData() {
+            loadVacancies();
+        }
+
+        // Загрузка вакансий для соискателя
+        async function loadWorkerVacancies() {
+            const list = document.getElementById('workerVacanciesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('vacancy_', true);
+            let vacancies = [];
+            
+            for (const key of keys) {
+                const vacancy = await getFromStorage(key, true);
+                if (vacancy && vacancy.status === 'approved') {
+                    vacancies.push(vacancy);
+                }
+            }
+            
+            displayWorkerVacancies(vacancies);
+        }
+
+        function displayWorkerVacancies(vacancies) {
+            const list = document.getElementById('workerVacanciesList');
+            
+            if (vacancies.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💼</div><p>Вакансий не найдено</p></div>';
+                return;
+            }
+            
+            list.innerHTML = vacancies.map(v => `
+                <div class="card" onclick="showVacancyDetail('${v.id}', 'worker')">
+                    <div class="card-title">${v.position}</div>
+                    <div class="card-info">📍 ${v.object}, ${v.region}</div>
+                    <div class="card-info">💰 ${parseInt(v.salary).toLocaleString()} ₽</div>
+                    <div class="card-info">📅 ${v.schedule}</div>
+                    <div class="card-info">🔧 ${v.specialty}</div>
+                </div>
+            `).join('');
+        }
+
+        // Фильтрация вакансий
+        async function filterVacancies() {
+            const specialty = document.getElementById('filterVacancySpecialty').value;
+            const region = document.getElementById('filterVacancyRegion').value.toLowerCase();
+            
+            const keys = await listFromStorage('vacancy_', true);
+            let vacancies = [];
+            
+            for (const key of keys) {
+                const vacancy = await getFromStorage(key, true);
+                if (vacancy && vacancy.status === 'approved') {
+                    vacancies.push(vacancy);
+                }
+            }
+            
+            if (specialty) {
+                vacancies = vacancies.filter(v => v.specialty === specialty);
+            }
+            
+            if (region) {
+                vacancies = vacancies.filter(v => v.region.toLowerCase().includes(region));
+            }
+            
+            displayWorkerVacancies(vacancies);
+        }
+
+        // Загрузка профиля соискателя
+        async function loadProfile() {
+            const profileView = document.getElementById('profileView');
+            const profile = await getFromStorage('profile_' + currentUserId, true);
+            
+            if (!profile) {
+                profileView.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>У вас ещё нет профиля</p>
+                    </div>
+                    <button class="btn" onclick="showCreateProfile()">Создать профиль</button>
+                `;
+                return;
+            }
+            
+            profileView.innerHTML = `
+                <div class="card">
+                    <div class="card-title">${profile.name}</div>
+                    <div class="card-info">📞 ${profile.phone}</div>
+                    <div class="card-info">🔧 ${profile.specialty}</div>
+                    <div class="card-info">📊 Опыт: ${profile.experience} ${getYearsText(profile.experience)}</div>
+                    <div class="card-info">📍 ${profile.region}</div>
+                    ${profile.about ? `<div class="card-info" style="margin-top: 12px;">${profile.about}</div>` : ''}
+                    ${profile.documents ? `<div class="card-info" style="margin-top: 8px;">📄 ${profile.documents}</div>` : ''}
+                    <span class="badge badge-${profile.status}">${getStatusText(profile.status)}</span>
+                </div>
+                <button class="btn" onclick="showEditProfile()">Редактировать профиль</button>
+            `;
+        }
+
+        function showCreateProfile() {
+            showScreen('createProfileScreen');
+        }
+
+        async function showEditProfile() {
+            showScreen('createProfileScreen');
+            const profile = await getFromStorage('profile_' + currentUserId, true);
+            
+            if (profile) {
+                document.getElementById('profileName').value = profile.name;
+                document.getElementById('profilePhone').value = profile.phone;
+                document.getElementById('profileSpecialty').value = profile.specialty;
+                document.getElementById('profileExperience').value = profile.experience;
+                document.getElementById('profileRegion').value = profile.region;
+                document.getElementById('profileAbout').value = profile.about || '';
+                document.getElementById('profileDocuments').value = profile.documents || '';
+            }
+        }
+
+        // Отправка профиля
+        async function submitProfile(event) {
+            event.preventDefault();
+            
+            const profile = {
+                id: currentUserId,
+                userId: currentUserId,
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                specialty: document.getElementById('profileSpecialty').value,
+                experience: document.getElementById('profileExperience').value,
+                region: document.getElementById('profileRegion').value,
+                about: document.getElementById('profileAbout').value,
+                documents: document.getElementById('profileDocuments').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            await saveToStorage('profile_' + profile.id, profile, true);
+            showNotification('Профиль отправлен на модерацию');
+            document.getElementById('profileForm').reset();
+            backToWorker();
+            loadProfile();
+        }
+
+        // Загрузка моих откликов
+        async function loadMyResponses() {
+            const list = document.getElementById('myResponsesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('response_', true);
+            const responses = [];
+            
+            for (const key of keys) {
+                const response = await getFromStorage(key, true);
+                if (response && response.workerId === currentUserId) {
+                    const vacancy = await getFromStorage('vacancy_' + response.vacancyId, true);
+                    responses.push({...response, vacancy});
+                }
+            }
+            
+            if (responses.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><p>Вы ещё не откликались на вакансии</p></div>';
+                return;
+            }
+            
+            list.innerHTML = responses.map(r => `
+                <div class="card" onclick="showVacancyDetail('${r.vacancyId}', 'worker')">
+                    <div class="card-title">${r.vacancy.position}</div>
+                    <div class="card-info">📍 ${r.vacancy.object}, ${r.vacancy.region}</div>
+                    <div class="card-info">💰 ${parseInt(r.vacancy.salary).toLocaleString()} ₽</div>
+                    <div class="card-info">📅 Откликнулись: ${new Date(r.createdAt).toLocaleDateString('ru-RU')}</div>
+                </div>
+            `).join('');
+        }
+
+        // Загрузка данных соискателя
+        async function loadWorkerData() {
+            loadWorkerVacancies();
+        }
+
+        // Админ-панель
+        function showAdminPanel() {
+            showScreen('adminScreen');
+            loadAdminProfiles();
+        }
+
+        async function loadAdminProfiles() {
+            const list = document.getElementById('adminProfilesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('profile_', true);
+            const profiles = [];
+            
+            for (const key of keys) {
+                const profile = await getFromStorage(key, true);
+                if (profile) {
+                    profiles.push(profile);
+                }
+            }
+            
+            if (profiles.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><p>Профилей нет</p></div>';
+                return;
+            }
+            
+            list.innerHTML = profiles.map(p => `
+                <div class="card" onclick="showProfileDetail('${p.id}', 'admin')">
+                    <div class="card-title">${p.name}</div>
+                    <div class="card-info">🔧 ${p.specialty}</div>
+                    <div class="card-info">📊 Опыт: ${p.experience} ${getYearsText(p.experience)}</div>
+                    <div class="card-info">📍 ${p.region}</div>
+                    <span class="badge badge-${p.status}">${getStatusText(p.status)}</span>
+                </div>
+            `).join('');
+        }
+
+        async function loadAdminVacancies() {
+            const list = document.getElementById('adminVacanciesList');
+            list.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            const keys = await listFromStorage('vacancy_', true);
+            const vacancies = [];
+            
+            for (const key of keys) {
+                const vacancy = await getFromStorage(key, true);
+                if (vacancy) {
+                    vacancies.push(vacancy);
+                }
+            }
+            
+            if (vacancies.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💼</div><p>Вакансий нет</p></div>';
+                return;
+            }
+            
+            list.innerHTML = vacancies.map(v => `
+                <div class="card" onclick="showVacancyDetail('${v.id}', 'admin')">
+                    <div class="card-title">${v.position}</div>
+                    <div class="card-info">📍 ${v.object}, ${v.region}</div>
+                    <div class="card-info">💰 ${parseInt(v.salary).toLocaleString()} ₽</div>
+                    <div class="card-info">Работодатель: ${v.employerName}</div>
+                    <span class="badge badge-${v.status}">${getStatusText(v.status)}</span>
+                </div>
+            `).join('');
+        }
+
+        // Детальный просмотр вакансии
+        async function showVacancyDetail(vacancyId, source) {
+            showScreen('vacancyDetailScreen');
+            const vacancy = await getFromStorage('vacancy_' + vacancyId, true);
+            
+            if (!vacancy) {
+                document.getElementById('vacancyDetail').innerHTML = '<p>Вакансия не найдена</p>';
+                return;
+            }
+            
+            let buttons = '';
+            
+            if (source === 'worker') {
+                const hasResponse = await checkResponse(vacancyId, currentUserId);
+                const profile = await getFromStorage('profile_' + currentUserId, true);
+                
+                if (!profile) {
+                    buttons = '<button class="btn btn-secondary" onclick="showCreateProfile()">Сначала создайте профиль</button>';
+                } else if (profile.status !== 'approved') {
+                    buttons = '<button class="btn btn-secondary" disabled>Ваш профиль на модерации</button>';
+                } else if (hasResponse) {
+                    buttons = '<button class="btn btn-secondary" disabled>Вы уже откликнулись</button>';
+                } else {
+                    buttons = `<button class="btn" onclick="applyToVacancy('${vacancyId}')">Откликнуться</button>`;
+                }
+            } else if (source === 'admin') {
+                if (vacancy.status === 'pending') {
+                    buttons = `
+                        <div class="action-buttons">
+                            <button class="btn" onclick="moderateVacancy('${vacancyId}', 'approved')">✓ Одобрить</button>
+                            <button class="btn btn-danger" onclick="moderateVacancy('${vacancyId}', 'rejected')">✗ Отклонить</button>
+                        </div>
+                    `;
+                }
+            }
+            
+            document.getElementById('vacancyDetail').innerHTML = `
+                <div class="header">
+                    <h1>${vacancy.position}</h1>
+                    <p>${vacancy.specialty}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Объект</h3>
+                    <p>${vacancy.object}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Регион</h3>
+                    <p>${vacancy.region}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Зарплата</h3>
+                    <p>${parseInt(vacancy.salary).toLocaleString()} ₽</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>График работы</h3>
+                    <p>${vacancy.schedule}</p>
+                </div>
+                
+                ${vacancy.description ? `
+                    <div class="detail-section">
+                        <h3>Требования и обязанности</h3>
+                        <p>${vacancy.description}</p>
+                    </div>
+                ` : ''}
+                
+                ${vacancy.housing ? `
+                    <div class="detail-section">
+                        <h3>Условия проживания</h3>
+                        <p>${vacancy.housing}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h3>Статус</h3>
+                    <p><span class="badge badge-${vacancy.status}">${getStatusText(vacancy.status)}</span></p>
+                </div>
+                
+                ${buttons}
+            `;
+        }
+
+        // Детальный просмотр профиля
+        async function showProfileDetail(profileId, source) {
+            showScreen('profileDetailScreen');
+            const profile = await getFromStorage('profile_' + profileId, true);
+            
+            if (!profile) {
+                document.getElementById('profileDetail').innerHTML = '<p>Профиль не найден</p>';
+                return;
+            }
+            
+            let buttons = '';
+            
+            if (source === 'admin' && profile.status === 'pending') {
+                buttons = `
+                    <div class="action-buttons">
+                        <button class="btn" onclick="moderateProfile('${profileId}', 'approved')">✓ Одобрить</button>
+                        <button class="btn btn-danger" onclick="moderateProfile('${profileId}', 'rejected')">✗ Отклонить</button>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('profileDetail').innerHTML = `
+                <div class="header">
+                    <h1>${profile.name}</h1>
+                    <p>${profile.specialty}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Контакты</h3>
+                    <p>📞 ${profile.phone}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Опыт работы</h3>
+                    <p>${profile.experience} ${getYearsText(profile.experience)}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Регион</h3>
+                    <p>${profile.region}</p>
+                </div>
+                
+                ${profile.about ? `
+                    <div class="detail-section">
+                        <h3>О себе и навыки</h3>
+                        <p>${profile.about}</p>
+                    </div>
+                ` : ''}
+                
+                ${profile.documents ? `
+                    <div class="detail-section">
+                        <h3>Документы</h3>
+                        <p>${profile.documents}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h3>Статус</h3>
+                    <p><span class="badge badge-${profile.status}">${getStatusText(profile.status)}</span></p>
+                </div>
+                
+                ${buttons}
+            `;
+        }
+
+        // Отклик на вакансию
+        async function applyToVacancy(vacancyId) {
+            const response = {
+                id: 'resp_' + Date.now(),
+                vacancyId: vacancyId,
+                workerId: currentUserId,
+                createdAt: new Date().toISOString()
+            };
+            
+            await saveToStorage('response_' + response.id, response, true);
+            showNotification('Отклик отправлен работодателю');
+            backFromDetail();
+        }
+
+        // Проверка наличия отклика
+        async function checkResponse(vacancyId, workerId) {
+            const keys = await listFromStorage('response_', true);
+            
+            for (const key of keys) {
+                const response = await getFromStorage(key, true);
+                if (response && response.vacancyId === vacancyId && response.workerId === workerId) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Модерация вакансии
+        async function moderateVacancy(vacancyId, status) {
+            const vacancy = await getFromStorage('vacancy_' + vacancyId, true);
+            vacancy.status = status;
+            await saveToStorage('vacancy_' + vacancyId, vacancy, true);
+            
+            showNotification(status === 'approved' ? 'Вакансия одобрена' : 'Вакансия отклонена');
+            backFromDetail();
+            loadAdminVacancies();
+        }
+
+        // Модерация профиля
+        async function moderateProfile(profileId, status) {
+            const profile = await getFromStorage('profile_' + profileId, true);
+            profile.status = status;
+            await saveToStorage('profile_' + profileId, profile, true);
+            
+            showNotification(status === 'approved' ? 'Профиль одобрен' : 'Профиль отклонен');
+            backFromDetail();
+            loadAdminProfiles();
+        }
+
+        // Вспомогательные функции
+        function getStatusText(status) {
+            const statuses = {
+                pending: 'На модерации',
+                approved: 'Одобрено',
+                rejected: 'Отклонено'
+            };
+            return statuses[status] || status;
+        }
+
+        function getYearsText(years) {
+            const num = parseInt(years);
+            if (num === 1) return 'год';
+            if (num >= 2 && num <= 4) return 'года';
+            return 'лет';
+        }
+
+        function showNotification(text) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = text;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Работа с хранилищем
+        async function saveToStorage(key, value, shared = false) {
+            try {
+                await window.storage.set(key, JSON.stringify(value), shared);
+            } catch (error) {
+                console.error('Error saving to storage:', error);
+            }
+        }
+
+        async function getFromStorage(key, shared = false) {
+            try {
+                const result = await window.storage.get(key, shared);
+                return result ? JSON.parse(result.value) : null;
+            } catch (error) {
+                console.error('Error getting from storage:', error);
+                return null;
+            }
+        }
+
+        async function listFromStorage(prefix, shared = false) {
+            try {
+                const result = await window.storage.list(prefix, shared);
+                return result ? result.keys : [];
+            } catch (error) {
+                console.error('Error listing from storage:', error);
+                return [];
+            }
+        }
+    </script>
+</body>
+</html>
