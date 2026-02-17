@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ВахтаПоиск</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--c1:#0f172a;--c2:#1e293b;--accent:#f97316;--accent2:#fb923c;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--gold:#f59e0b;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--border:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.05);--r:16px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;}
+.hidden{display:none!important;}
+.topbar{background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 100%);padding:16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-back{background:rgba(255,255,255,0.1);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.topbar-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;color:white;}
+.topbar-subtitle{font-size:11px;color:rgba(255,255,255,0.6);margin-top:1px;}
+.topbar-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:white;padding:8px 12px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;position:relative;display:flex;align-items:center;gap:5px;}
+.topbar-btn .cnt{background:var(--red);color:white;font-size:10px;padding:2px 5px;border-radius:8px;font-weight:700;min-width:16px;text-align:center;}
+.hero{background:linear-gradient(135deg,var(--c1) 0%,#1a2744 100%);padding:40px 20px 50px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 60% 40%,rgba(249,115,22,0.12) 0%,transparent 60%);pointer-events:none;}
+.hero-logo{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;color:white;margin-bottom:8px;letter-spacing:-1px;}
+.hero-logo span{color:var(--accent);}
+.hero-sub{color:rgba(255,255,255,0.65);font-size:14px;margin-bottom:36px;}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px 30px;}
+.role-card{background:white;border-radius:var(--r);padding:24px 16px;text-align:center;cursor:pointer;transition:transform 0.2s;box-shadow:var(--shadow);}
+.role-card:active{transform:scale(0.97);}
+.role-card-ico{font-size:44px;margin-bottom:12px;}
+.role-card-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px;}
+.role-card-desc{font-size:12px;color:var(--text2);line-height:1.4;}
+.tabs-wrap{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;position:sticky;top:58px;z-index:100;}
+.tabs-wrap::-webkit-scrollbar{display:none;}
+.tab-btn{flex:1;min-width:90px;padding:14px 8px;background:none;border:none;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-family:'Manrope',sans-serif;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.search-bar{padding:14px 16px;background:white;border-bottom:1px solid var(--border);}
+.search-input-wrap{position:relative;margin-bottom:12px;}
+.search-input-wrap input{width:100%;padding:11px 16px 11px 42px;border:2px solid var(--border);border-radius:12px;font-size:14px;font-family:'Manrope',sans-serif;transition:border-color 0.2s;}
+.search-input-wrap input:focus{outline:none;border-color:var(--accent);}
+.search-input-wrap .s-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text3);}
+.filters-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;}
+.filters-row::-webkit-scrollbar{display:none;}
+.fchip{padding:7px 14px;border-radius:20px;background:var(--bg);border:2px solid transparent;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--text2);font-family:'Manrope',sans-serif;}
+.fchip.on{background:var(--accent);color:white;}
+.list-wrap{padding:12px 16px 80px;}
+.vcard{background:white;border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform 0.15s;}
+.vcard:active{transform:scale(0.99);}
+.vcard-top{padding:16px 16px 12px;}
+.vcard-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;}
+.vcard-title{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.vcard-fav{background:none;border:none;font-size:22px;cursor:pointer;padding:2px;transition:transform 0.2s;flex-shrink:0;}
+.vcard-fav:active{transform:scale(1.3);}
+.vcard-company{font-size:13px;color:var(--text2);margin-bottom:10px;}
+.verified{color:var(--blue);}
+.vcard-salary{font-size:20px;font-weight:700;color:var(--green);margin-bottom:10px;}
+.vcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.vtag{background:var(--bg);padding:5px 10px;border-radius:8px;font-size:12px;color:var(--text2);font-weight:500;}
+.vtag-blue{background:#dbeafe;color:#1d4ed8;}
+.vtag-green{background:#dcfce7;color:#15803d;}
+.vtag-orange{background:#fff7ed;color:#c2410c;}
+.vcard-desc{font-size:13px;color:var(--text2);line-height:1.5;padding:10px 16px;border-top:1px solid var(--bg);}
+.vcard-desc-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.vcard-footer{padding:10px 16px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;}
+.vcard-date{font-size:11px;color:var(--text3);}
+.vcard-responses{font-size:11px;color:var(--text2);font-weight:600;}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.status-active{background:#dcfce7;color:#15803d;}
+.status-paused{background:#fef3c7;color:#92400e;}
+.status-closed{background:#fee2e2;color:#991b1b;}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:'Manrope',sans-serif;transition:all 0.2s;width:100%;}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;}
+.btn-green{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;}
+.btn-blue{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text);}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;}
+.btn-sm{padding:10px 16px;font-size:13px;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.fab{position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;font-size:28px;box-shadow:0 4px 16px rgba(249,115,22,0.4);cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);display:flex;z-index:150;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px;background:none;border:none;color:var(--text3);font-size:10px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;position:relative;}
+.bnav-item.active{color:var(--accent);}
+.bnav-ico{font-size:22px;}
+.bnav-cnt{position:absolute;top:6px;right:calc(50% - 18px);background:var(--red);color:white;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700;}
+.form-wrap{padding:16px;}
+.fg{margin-bottom:18px;}
+.fg label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--text);}
+.fg label .req{color:var(--red);margin-left:3px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:'Manrope',sans-serif;color:var(--text);transition:border-color 0.2s;background:white;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--accent);}
+.fg textarea{min-height:90px;resize:vertical;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg);border-radius:10px;margin-bottom:18px;}
+.toggle-label{font-size:14px;font-weight:600;}
+.toggle{width:48px;height:26px;background:var(--border);border-radius:13px;border:none;cursor:pointer;position:relative;transition:background 0.2s;}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;background:white;border-radius:50%;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle.on{background:var(--green);}
+.toggle.on::after{transform:translateX(22px);}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:flex-end;}
+.modal-box{background:white;border-radius:24px 24px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px;}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
+.detail-section{margin-bottom:24px;}
+.detail-section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+.detail-row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px;}
+.detail-ico{font-size:22px;width:32px;text-align:center;}
+.detail-info{flex:1;}
+.detail-label{font-size:11px;color:var(--text3);margin-bottom:2px;}
+.detail-value{font-size:14px;font-weight:600;color:var(--text);}
+.empty{text-align:center;padding:50px 20px;}
+.empty-ico{font-size:56px;margin-bottom:14px;opacity:0.4;}
+.empty-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;}
+.empty-text{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5;}
+.star{font-size:24px;cursor:pointer;}
+.stars-row{display:flex;gap:4px;margin-bottom:12px;}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--c1);color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.2);white-space:nowrap;font-family:'Manrope',sans-serif;animation:toastIn 0.3s ease;}
+@keyframes toastIn{from{transform:translate(-50%,-20px);opacity:0;}to{transform:translate(-50%,0);opacity:1;}}
+.notif-banner{position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,var(--c1),#1a2744);color:white;padding:16px;z-index:2000;transform:translateY(-100%);transition:transform 0.3s ease;border-bottom:2px solid var(--accent);}
+.notif-banner.show{transform:translateY(0);}
+.notif-title{font-weight:700;font-size:14px;margin-bottom:4px;}
+.notif-text{font-size:12px;opacity:0.8;}
+.profile-hero{background:linear-gradient(135deg,var(--c1),var(--c2));padding:28px 20px;text-align:center;color:white;}
+.profile-avatar{width:72px;height:72px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;}
+.profile-name{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;}
+.profile-role{font-size:13px;opacity:0.7;}
+.loading{text-align:center;padding:40px;color:var(--text3);}
+.spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="welcomeScreen">
+  <div class="hero">
+    <div class="hero-logo">Вахта<span>Поиск</span></div>
+    <div class="hero-sub">Платформа вахтовой занятости</div>
+  </div>
+  <div class="role-grid">
+    <div class="role-card" onclick="goRole('employer')">
+      <div class="role-card-ico">👔</div>
+      <div class="role-card-title">Работодатель</div>
+      <div class="role-card-desc">Найти специалистов для вахтового объекта</div>
+    </div>
+    <div class="role-card" onclick="goRole('worker')">
+      <div class="role-card-ico">👷</div>
+      <div class="role-card-title">Соискатель</div>
+      <div class="role-card-desc">Найти высокооплачиваемую вахтовую работу</div>
+    </div>
+  </div>
+</div>
+<div id="employerScreen" class="hidden">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back" onclick="goWelcome()">←</button>
+      <div><div class="topbar-title">ВахтаПоиск</div><div class="topbar-subtitle" id="empTabLabel">Мои вакансии</div></div>
+    </div>
+    <div><button class="topbar-btn" onclick="openFavs()">❤️ <span class="cnt" id="empFavCnt" style="display:none">0</span></button></div>
+  </div>
+  <div class="tabs-wrap">
+    <button class="tab-btn active" onclick="empTab('vacancies',this)">Вакансии</button>
+    <button class="tab-btn" onclick="empTab('candidates',this)">Кандидаты</button>
+    <button class="tab-btn" onclick="empTab('incoming',this)">Входящие</button>
+    <button class="tab-btn" onclick="empTab('profile',this)">Профиль</button>
+  </div>
+  <div id="empVacanciesTab"><div class="list-wrap" id="empVacList"></div></div>
+  <div id="empCandidatesTab" class="hidden">
+    <div class="search-bar">
+      <div class="search-input-wrap"><span class="s-ico">🔍</span><input type="text" placeholder="Поиск кандидатов..." id="candSearch" oninput="filterCandidates()"></div>
+      <div class="filters-row" id="candFilters"></div>
+    </div>
+    <div class="list-wrap" id="empCandList"></div>
+  </div>
+  <div id="empIncomingTab" class="hidden"><div class="list-wrap" id="empIncomingList"></div></div>
+  <div id="empProfileTab" class="hidden"><div id="empProfileView"></div></div>
+  <button class="fab" onclick="showCreateVacancy()">+</button>
+  <div class="bottom-nav">
+    <button class="bnav-item active" id="empBnav0" onclick="empTab('vacancies',this);setActiveBnav('empBnav0')"><span class="bnav-ico">💼</span><span>Вакансии</span></button>
+    <button class="bnav-item" id="empBnav1" onclick="openFavs()"><span class="bnav-ico">❤️</span><span>Избранное</span><span class="bnav-cnt" id="empFavBadge" style="display:none">0</span></button>
+    <button class="bnav-item" id="empBnav2" onclick="empTab('profile',this);setActiveBnav('empBnav2')"><span class="bnav-ico">👤</span><span>Профиль</span></button>
+  </div>
+</div>
+<div id="workerScreen" class="hidden">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-back" onclick="goWelcome()">←</button>
+      <div><div class="topbar-title">ВахтаПоиск</div><div class="topbar-subtitle" id="wrkTabLabel">Вакансии</div></div>
+    </div>
+    <div><button class="topbar-btn" onclick="openFavs()">❤️ <span class="cnt" id="wrkFavCnt" style="display:none">0</span></button></div>
+  </div>
+  <div class="tabs-wrap">
+    <button class="tab-btn active" onclick="wrkTab('vacancies',this)">Вакансии</button>
+    <button class="tab-btn" onclick="wrkTab('profile',this)">Профиль</button>
+  </div>
+  <div id="wrkVacanciesTab">
+    <div class="search-bar">
+      <div class="search-input-wrap"><span class="s-ico">🔍</span><input type="text" placeholder="Поиск вакансий..." id="vacSearch" oninput="filterVacancies()"></div>
+      <div class="filters-row" id="vacFilters"></div>
+    </div>
+    <div class="list-wrap" id="wrkVacList"></div>
+  </div>
+  <div id="wrkProfileTab" class="hidden"><div id="wrkProfileView"></div></div>
+  <div class="bottom-nav">
+    <button class="bnav-item active" id="wrkBnav0" onclick="wrkTab('vacancies',this);setActiveBnav('wrkBnav0')"><span class="bnav-ico">💼</span><span>Вакансии</span></button>
+    <button class="bnav-item" id="wrkBnav1" onclick="openFavs()"><span class="bnav-ico">❤️</span><span>Избранное</span><span class="bnav-cnt" id="wrkFavBadge" style="display:none">0</span></button>
+    <button class="bnav-item" id="wrkBnav2" onclick="wrkTab('profile',this);setActiveBnav('wrkBnav2')"><span class="bnav-ico">👤</span><span>Профиль</span></button>
+  </div>
+</div>
+<div class="notif-banner" id="notifBanner"><div class="notif-title" id="notifTitle"></div><div class="notif-text" id="notifText"></div></div>
+</div>
+<script>
+const tg=window.Telegram.WebApp;
+tg.ready();tg.expand();
+const BOT_TOKEN='8406340321:AAE6pjKfFflkF4V2peKKWZ6-vPljslWZjlA';
+const UID=String(tg.initDataUnsafe?.user?.id||'demo_'+Math.random().toString(36).slice(2,8));
+const UNAME=tg.initDataUnsafe?.user?.first_name||'Пользователь';
+const TG_USERNAME=tg.initDataUnsafe?.user?.username||null;
+let ROLE=null;
+let favs={vacancies:[],candidates:[]};
+const SPECS=['Сварщик','Монтажник','Электрик','Слесарь','Токарь','Фрезеровщик','Маляр','Штукатур','Каменщик','Бетонщик','Арматурщик','Крановщик','Стропальщик','Оператор станков'];
+const SCHEDS=['15/15','30/30','45/15','45/45','60/30','2/2','3/3','Другой график'];
+
+async function SD(k,v,s=true){try{if(window.storage)await window.storage.set(k,JSON.stringify(v),s);else localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+async function GD(k,s=true){try{if(window.storage){const r=await window.storage.get(k,s);return r?JSON.parse(r.value):null;}else{const d=localStorage.getItem(k);return d?JSON.parse(d):null;}}catch(e){return null;}}
+async function LD(prefix,s=true){try{if(window.storage){const r=await window.storage.list(prefix,s);const keys=r?r.keys:[];const items=[];for(const k of keys){const i=await GD(k,s);if(i)items.push(i);}return items;}else{const items=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(prefix)){try{items.push(JSON.parse(localStorage.getItem(k)));}catch(e){}}}return items;}}catch(e){return[];}}
+
+function toast(msg){let t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+function showNotif(title,text){const b=document.getElementById('notifBanner');document.getElementById('notifTitle').textContent=title;document.getElementById('notifText').textContent=text;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),4000);}
+function timeAgo(iso){const d=new Date(iso),now=new Date();const diff=Math.floor((now-d)/60000);if(diff<1)return'только что';if(diff<60)return diff+'м назад';if(diff<1440)return Math.floor(diff/60)+'ч назад';return Math.floor(diff/1440)+'д назад';}
+function yrs(n){n=parseInt(n);if(n===1)return'год';if(n>=2&&n<=4)return'года';return'лет';}
+function salStr(a,b){if(a&&b)return`${parseInt(a).toLocaleString()} — ${parseInt(b).toLocaleString()} ₽`;if(a)return`от ${parseInt(a).toLocaleString()} ₽`;return'—';}
+function starsHtml(r,c){if(!r)return'';const f=Math.round(r);let s='';for(let i=1;i<=5;i++)s+=i<=f?'⭐':'☆';return`<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">${s} <span style="font-weight:700;color:var(--gold)">${r.toFixed(1)}</span><span style="font-size:12px;color:var(--text3)">(${c||0})</span></div>`;}
+function isVerified(p){return p&&p.companyName&&p.inn&&p.address&&p.about;}
+function setActiveBnav(id){document.querySelectorAll('.bottom-nav .bnav-item').forEach(b=>b.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');}
+
+async function loadFavs(){const f=await GD('favs_'+UID,false);if(f)favs=f;updateFavUI();}
+async function saveFavs(){await SD('favs_'+UID,favs,false);updateFavUI();}
+function updateFavUI(){const cnt=favs.vacancies.length+favs.candidates.length;['empFavCnt','wrkFavCnt'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=cnt;el.style.display=cnt>0?'inline':'none';}});['empFavBadge','wrkFavBadge'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=cnt;el.style.display=cnt>0?'inline':'none';}});}
+function isFav(type,id){return(type==='v'?favs.vacancies:favs.candidates).includes(id);}
+async function toggleFav(type,id,e){if(e)e.stopPropagation();const list=type==='v'?favs.vacancies:favs.candidates;const idx=list.indexOf(id);if(idx>-1){list.splice(idx,1);toast('Удалено из избранного');}else{list.push(id);toast('Добавлено в избранное ❤️');}await saveFavs();if(ROLE==='employer')loadEmpVacancies();else loadWrkVacancies();}
+
+function hideAll(){['welcomeScreen','employerScreen','workerScreen'].forEach(id=>document.getElementById(id).classList.add('hidden'));}
+function goWelcome(){hideAll();document.getElementById('welcomeScreen').classList.remove('hidden');ROLE=null;}
+async function goRole(role){ROLE=role;hideAll();await loadFavs();if(role==='employer'){document.getElementById('employerScreen').classList.remove('hidden');loadEmpVacancies();}else{document.getElementById('workerScreen').classList.remove('hidden');loadWrkVacancies();}}
+
+function empTab(tab,btn){
+  document.querySelectorAll('#employerScreen .tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['empVacanciesTab','empCandidatesTab','empIncomingTab','empProfileTab'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  const labels={vacancies:'Мои вакансии',candidates:'Кандидаты',incoming:'Входящие отклики',profile:'Профиль компании'};
+  document.getElementById('empTabLabel').textContent=labels[tab]||tab;
+  if(tab==='vacancies'){document.getElementById('empVacanciesTab').classList.remove('hidden');loadEmpVacancies();}
+  else if(tab==='candidates'){document.getElementById('empCandidatesTab').classList.remove('hidden');loadCandidates();}
+  else if(tab==='incoming'){document.getElementById('empIncomingTab').classList.remove('hidden');loadIncoming();}
+  else if(tab==='profile'){document.getElementById('empProfileTab').classList.remove('hidden');loadEmpProfile();}
+}
+function wrkTab(tab,btn){
+  document.querySelectorAll('#workerScreen .tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['wrkVacanciesTab','wrkProfileTab'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  const labels={vacancies:'Вакансии',profile:'Мой профиль'};
+  document.getElementById('wrkTabLabel').textContent=labels[tab]||tab;
+  if(tab==='vacancies'){document.getElementById('wrkVacanciesTab').classList.remove('hidden');loadWrkVacancies();}
+  else if(tab==='profile'){document.getElementById('wrkProfileTab').classList.remove('hidden');loadWrkProfile();}
+}
+
+async function loadEmpVacancies(){
+  const el=document.getElementById('empVacList');el.innerHTML='<div class="loading"><div class="spin"></div>Загрузка...</div>';
+  const all=await LD('vacancy_');const mine=all.filter(v=>v.eid===UID);
+  if(!mine.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-title">Нет вакансий</div><div class="empty-text">Нажмите + чтобы создать первую вакансию</div></div>`;return;}
+  const allResp=await LD('response_');
+  el.innerHTML=mine.map(v=>{
+    const rc=allResp.filter(r=>r.vid===v.id).length;
+    const fb=isFav('v',v.id)?'❤️':'🤍';
+    const sc={'active':'status-active','paused':'status-paused','closed':'status-closed'}[v.status||'active'];
+    const st={'active':'Активна','paused':'Приостановлена','closed':'Закрыта'}[v.status||'active'];
+    return`<div class="vcard" onclick="openVacancy('${v.id}','employer')"><div class="vcard-top"><div class="vcard-head"><div class="vcard-title">${v.specialty}</div><button class="vcard-fav" onclick="toggleFav('v','${v.id}',event)">${fb}</button></div><div class="vcard-company">${v.companyName||UNAME}</div><div class="vcard-salary">${salStr(v.salFrom,v.salTo)}</div><div class="vcard-tags"><span class="vtag vtag-blue">📍 ${v.region}</span><span class="vtag">📅 ${v.schedule}</span>${v.workSchedule?`<span class="vtag vtag-orange">⏰ ${v.workSchedule}</span>`:''}<span class="status-badge ${sc}">${st}</span></div></div>${v.shortDesc?`<div class="vcard-desc"><div class="vcard-desc-text">${v.shortDesc}</div></div>`:''}<div class="vcard-footer"><span class="vcard-date">${timeAgo(v.createdAt)}</span><span class="vcard-responses">👥 ${rc} откликов</span></div></div>`;
+  }).join('');
+}
+
+async function showCreateVacancy(){
+  const profile=await GD('empProfile_'+UID);
+  if(!profile||!profile.companyName){toast('Сначала заполните профиль компании!');empTab('profile',document.querySelectorAll('#employerScreen .tab-btn')[3]);return;}
+  openModal(`<div class="modal-handle"></div><div class="modal-title">Новая вакансия</div><div class="modal-sub">от ${profile.companyName}</div><form onsubmit="submitVacancy(event)"><div class="form-wrap">
+    <div class="fg"><label>Специальность<span class="req">*</span></label><select id="vSpec" required onchange="toggleCustomSpec()"><option value="">Выберите...</option>${SPECS.map(s=>`<option value="${s}">${s}</option>`).join('')}<option value="custom">Другое</option></select></div>
+    <div class="fg hidden" id="vSpecCustomWrap"><label>Укажите специальность<span class="req">*</span></label><input type="text" id="vSpecCustom"></div>
+    <div class="fg"><label>Краткое описание</label><input type="text" id="vShortDesc" placeholder="Видно в списке вакансий"></div>
+    <div class="fg-row"><div class="fg"><label>ЗП от (₽)<span class="req">*</span></label><input type="number" id="vSalFrom" required></div><div class="fg"><label>ЗП до (₽)</label><input type="number" id="vSalTo"></div></div>
+    <div class="fg"><label>Объект<span class="req">*</span></label><input type="text" id="vObject" required></div>
+    <div class="fg"><label>Регион<span class="req">*</span></label><input type="text" id="vRegion" required></div>
+    <div class="fg"><label>График вахты<span class="req">*</span></label><select id="vSchedule" required onchange="toggleCustomSchedule()"><option value="">Выберите...</option>${SCHEDS.map(s=>`<option value="${s}">${s}</option>`).join('')}</select></div>
+    <div class="fg hidden" id="vScheduleCustomWrap"><label>Укажите график</label><input type="text" id="vScheduleCustom" placeholder="Например: 20/10"></div>
+    <div class="fg"><label>График смен</label><input type="text" id="vWorkSchedule" placeholder="12/12, 8/8, дневные..."></div>
+    <div class="fg"><label>Требования</label><textarea id="vDesc"></textarea></div>
+    <div class="fg"><label>Проживание</label><textarea id="vHousing"></textarea></div>
+    <div class="fg"><label>Питание</label><textarea id="vFood"></textarea></div>
+    <div class="fg"><label>Спецодежда</label><textarea id="vClothing"></textarea></div>
+    <div class="fg"><label>Проезд до объекта</label><textarea id="vTransport"></textarea></div>
+    <div class="toggle-row"><span class="toggle-label">Показывать телефон компании</span><button type="button" class="toggle" id="vShowPhone" onclick="this.classList.toggle('on')"></button></div>
+    <button type="submit" class="btn btn-primary">Опубликовать вакансию</button>
+  </div></form>`);
+}
+function toggleCustomSpec(){const v=document.getElementById('vSpec').value;document.getElementById('vSpecCustomWrap').classList.toggle('hidden',v!=='custom');}
+function toggleCustomSchedule(){const v=document.getElementById('vSchedule').value;document.getElementById('vScheduleCustomWrap').classList.toggle('hidden',v!=='Другой график');}
+async function submitVacancy(e){
+  e.preventDefault();
+  const profile=await GD('empProfile_'+UID);
+  let spec=document.getElementById('vSpec').value;if(spec==='custom')spec=document.getElementById('vSpecCustom').value;
+  let sched=document.getElementById('vSchedule').value;if(sched==='Другой график')sched=document.getElementById('vScheduleCustom').value;
+  const v={id:'v_'+Date.now(),eid:UID,companyName:profile.companyName,verified:isVerified(profile),specialty:spec,shortDesc:document.getElementById('vShortDesc').value,salFrom:document.getElementById('vSalFrom').value,salTo:document.getElementById('vSalTo').value,object:document.getElementById('vObject').value,region:document.getElementById('vRegion').value,schedule:sched,workSchedule:document.getElementById('vWorkSchedule').value,desc:document.getElementById('vDesc').value,housing:document.getElementById('vHousing').value,food:document.getElementById('vFood').value,clothing:document.getElementById('vClothing').value,transport:document.getElementById('vTransport').value,showPhone:document.getElementById('vShowPhone').classList.contains('on'),status:'active',createdAt:new Date().toISOString()};
+  await SD('vacancy_'+v.id,v);closeModal();toast('Вакансия опубликована! ✅');loadEmpVacancies();
+}
+
+let allCands=[];
+async function loadCandidates(){
+  const el=document.getElementById('empCandList');el.innerHTML='<div class="loading"><div class="spin"></div>Загрузка...</div>';
+  allCands=await LD('wrkProfile_');buildCandFilters();renderCands(allCands);
+}
+function buildCandFilters(){const specs=[...new Set(allCands.map(c=>c.specialty).filter(Boolean))];const el=document.getElementById('candFilters');el.innerHTML=`<div class="fchip on" onclick="filterCandidates(this,'')">Все</div>`+specs.map(s=>`<div class="fchip" onclick="filterCandidates(this,'${s}')">${s}</div>`).join('');}
+function filterCandidates(chip,spec){if(chip){document.querySelectorAll('#candFilters .fchip').forEach(c=>c.classList.remove('on'));chip.classList.add('on');}const search=document.getElementById('candSearch').value.toLowerCase();const activeSpec=chip?spec:(document.querySelector('#candFilters .fchip.on')?.textContent==='Все'?'':document.querySelector('#candFilters .fchip.on')?.textContent||'');let res=allCands;if(activeSpec)res=res.filter(c=>c.specialty===activeSpec);if(search)res=res.filter(c=>`${c.name} ${c.specialty} ${c.about||''} ${c.region||''}`.toLowerCase().includes(search));renderCands(res);}
+function renderCands(list){const el=document.getElementById('empCandList');if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">👥</div><div class="empty-title">Кандидатов нет</div></div>`;return;}el.innerHTML=list.map(c=>`<div class="vcard" onclick="openCandidate('${c.uid}')"><div class="vcard-top"><div class="vcard-head"><div class="vcard-title">${c.name}</div><button class="vcard-fav" onclick="toggleFav('c','${c.uid}',event)">${isFav('c',c.uid)?'❤️':'🤍'}</button></div><div class="vcard-company">${c.specialty}</div><div class="vcard-tags"><span class="vtag vtag-green">📊 ${c.experience} ${yrs(c.experience)}</span><span class="vtag vtag-blue">📍 ${c.region||'—'}</span></div>${c.about?`<div style="font-size:13px;color:var(--text2);margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${c.about}</div>`:''}</div><div class="vcard-footer"><span class="vcard-date">📞 ${c.phone}</span></div></div>`).join('');}
+
+async function loadIncoming(){
+  const el=document.getElementById('empIncomingList');el.innerHTML='<div class="loading"><div class="spin"></div>Загрузка...</div>';
+  const allResp=await LD('response_');const allVacs=await LD('vacancy_');const myVacIds=allVacs.filter(v=>v.eid===UID).map(v=>v.id);const mine=allResp.filter(r=>myVacIds.includes(r.vid));
+  if(!mine.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📬</div><div class="empty-title">Откликов нет</div><div class="empty-text">Когда соискатели откликнутся — они появятся здесь</div></div>`;return;}
+  const profiles=await LD('wrkProfile_');const vacs=await LD('vacancy_');
+  el.innerHTML=mine.map(r=>{const prof=profiles.find(p=>p.uid===r.wid);const vac=vacs.find(v=>v.id===r.vid);if(!prof||!vac)return'';return`<div class="vcard" onclick="openCandidate('${prof.uid}')"><div class="vcard-top"><div class="vcard-head"><div class="vcard-title">${prof.name}</div></div><div class="vcard-company">Отклик на: ${vac.specialty}</div><div class="vcard-tags"><span class="vtag vtag-green">📊 ${prof.experience} ${yrs(prof.experience)}</span><span class="vtag vtag-blue">📍 ${prof.region||'—'}</span></div></div><div class="vcard-footer"><span class="vcard-date">📞 ${prof.phone}</span><span class="vcard-date">${timeAgo(r.createdAt)}</span></div></div>`;}).join('');
+}
+
+async function loadEmpProfile(){
+  const el=document.getElementById('empProfileView');const profile=await GD('empProfile_'+UID);
+  if(!profile){el.innerHTML=`<div class="empty"><div class="empty-ico">🏢</div><div class="empty-title">Профиль компании</div><div class="empty-text">Заполните профиль чтобы публиковать вакансии. Полный профиль получает значок ✅</div><button class="btn btn-primary" style="margin:0 20px;width:calc(100% - 40px)" onclick="showEmpProfileForm()">Заполнить профиль</button></div>`;return;}
+  const verified=isVerified(profile);
+  el.innerHTML=`<div class="profile-hero"><div class="profile-avatar">🏢</div><div class="profile-name">${profile.companyName} ${verified?'✅':''}</div><div class="profile-role">${profile.sphere||'Строительство / Производство'}</div></div><div class="form-wrap"><div class="detail-section"><div class="detail-section-title">Реквизиты</div><div class="detail-row"><span class="detail-ico">📋</span><div class="detail-info"><div class="detail-label">ИНН</div><div class="detail-value">${profile.inn||'—'}</div></div></div><div class="detail-row"><span class="detail-ico">📍</span><div class="detail-info"><div class="detail-label">Юр. адрес</div><div class="detail-value">${profile.address||'—'}</div></div></div>${profile.phone?`<div class="detail-row"><span class="detail-ico">📞</span><div class="detail-info"><div class="detail-label">Телефон</div><div class="detail-value">${profile.phone}</div></div></div>`:''}</div>${profile.about?`<div class="detail-section"><div class="detail-section-title">О компании</div><p style="font-size:14px;line-height:1.6;color:var(--text2)">${profile.about}</p></div>`:''}<button class="btn btn-outline" onclick="showEmpProfileForm()">✏️ Редактировать</button></div>`;
+}
+function showEmpProfileForm(){openModal(`<div class="modal-handle"></div><div class="modal-title">Профиль компании</div><div class="modal-sub">Заполните все поля для получения значка ✅</div><form onsubmit="submitEmpProfile(event)"><div class="form-wrap"><div class="fg"><label>Название<span class="req">*</span></label><input type="text" id="epName" required></div><div class="fg"><label>ИНН<span class="req">*</span></label><input type="text" id="epInn" required></div><div class="fg"><label>Юр. адрес<span class="req">*</span></label><input type="text" id="epAddr" required></div><div class="fg"><label>Сфера деятельности</label><input type="text" id="epSphere"></div><div class="fg"><label>Телефон</label><input type="tel" id="epPhone"></div><div class="fg"><label>Email</label><input type="email" id="epEmail"></div><div class="fg"><label>О компании<span class="req">*</span></label><textarea id="epAbout" placeholder="Расскажите о компании, проектах, условиях..." required></textarea></div><button type="submit" class="btn btn-primary">Сохранить</button></div></form>`);}
+async function submitEmpProfile(e){e.preventDefault();const p={uid:UID,companyName:document.getElementById('epName').value,inn:document.getElementById('epInn').value,address:document.getElementById('epAddr').value,sphere:document.getElementById('epSphere').value,phone:document.getElementById('epPhone').value,email:document.getElementById('epEmail').value,about:document.getElementById('epAbout').value};await SD('empProfile_'+UID,p);closeModal();toast('Профиль сохранён! ✅');loadEmpProfile();}
+
+let allVacs=[];
+async function loadWrkVacancies(){
+  const el=document.getElementById('wrkVacList');el.innerHTML='<div class="loading"><div class="spin"></div>Загрузка...</div>';
+  allVacs=await LD('vacancy_');allVacs=allVacs.filter(v=>v.status!=='closed');buildVacFilters();renderVacs(allVacs);
+}
+function buildVacFilters(){const specs=[...new Set(allVacs.map(v=>v.specialty).filter(Boolean))];const el=document.getElementById('vacFilters');el.innerHTML=`<div class="fchip on" onclick="filterVacancies(this,'')">Все</div>`+specs.map(s=>`<div class="fchip" onclick="filterVacancies(this,'${s}')">${s}</div>`).join('');}
+function filterVacancies(chip,spec){if(chip){document.querySelectorAll('#vacFilters .fchip').forEach(c=>c.classList.remove('on'));chip.classList.add('on');}const search=document.getElementById('vacSearch').value.toLowerCase();const activeSpec=chip?spec:(document.querySelector('#vacFilters .fchip.on')?.textContent==='Все'?'':document.querySelector('#vacFilters .fchip.on')?.textContent||'');let res=allVacs;if(activeSpec)res=res.filter(v=>v.specialty===activeSpec);if(search)res=res.filter(v=>`${v.specialty} ${v.region} ${v.object} ${v.shortDesc||''} ${v.desc||''}`.toLowerCase().includes(search));renderVacs(res);}
+function renderVacs(list){const el=document.getElementById('wrkVacList');if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-ico">💼</div><div class="empty-title">Вакансий нет</div></div>`;return;}el.innerHTML=list.map(v=>`<div class="vcard" onclick="openVacancy('${v.id}','worker')"><div class="vcard-top"><div class="vcard-head"><div class="vcard-title">${v.specialty}</div><button class="vcard-fav" onclick="toggleFav('v','${v.id}',event)">${isFav('v',v.id)?'❤️':'🤍'}</button></div><div class="vcard-company">${v.companyName} ${v.verified?'<span class="verified">✅</span>':''}</div><div class="vcard-salary">${salStr(v.salFrom,v.salTo)}</div><div class="vcard-tags"><span class="vtag vtag-blue">📍 ${v.region}</span><span class="vtag">📅 ${v.schedule}</span>${v.workSchedule?`<span class="vtag vtag-orange">⏰ ${v.workSchedule}</span>`:''}</div></div>${v.shortDesc?`<div class="vcard-desc"><div class="vcard-desc-text">${v.shortDesc}</div></div>`:''}<div class="vcard-footer"><span class="vcard-date">${timeAgo(v.createdAt)}</span></div></div>`).join('');}
+
+async function loadWrkProfile(){
+  const el=document.getElementById('wrkProfileView');const p=await GD('wrkProfile_'+UID);
+  if(!p){el.innerHTML=`<div class="empty"><div class="empty-ico">👤</div><div class="empty-title">Создайте профиль</div><div class="empty-text">Заполните профиль чтобы работодатели могли найти вас</div><button class="btn btn-primary" style="margin:0 20px;width:calc(100% - 40px)" onclick="showWrkProfileForm()">Создать профиль</button></div>`;return;}
+  el.innerHTML=`<div class="profile-hero"><div class="profile-avatar">👷</div><div class="profile-name">${p.name}</div><div class="profile-role">${p.specialty}</div></div><div class="form-wrap"><div class="detail-section"><div class="detail-section-title">Контакты и данные</div><div class="detail-row"><span class="detail-ico">📞</span><div class="detail-info"><div class="detail-label">Телефон</div><div class="detail-value">${p.phone}</div></div></div><div class="detail-row"><span class="detail-ico">📊</span><div class="detail-info"><div class="detail-label">Опыт работы</div><div class="detail-value">${p.experience} ${yrs(p.experience)}</div></div></div><div class="detail-row"><span class="detail-ico">📍</span><div class="detail-info"><div class="detail-label">Регион</div><div class="detail-value">${p.region||'—'}</div></div></div>${p.tg?`<div class="detail-row"><span class="detail-ico">✈️</span><div class="detail-info"><div class="detail-label">Telegram</div><div class="detail-value">@${p.tg}</div></div></div>`:''}</div>${p.about?`<div class="detail-section"><div class="detail-section-title">О себе и навыки</div><p style="font-size:14px;line-height:1.6;color:var(--text2)">${p.about}</p></div>`:''} ${p.docs?`<div class="detail-section"><div class="detail-section-title">Документы и допуски</div><p style="font-size:14px;line-height:1.6;color:var(--text2)">${p.docs}</p></div>`:''}<button class="btn btn-outline" onclick="showWrkProfileForm()">✏️ Редактировать профиль</button></div>`;
+}
+function showWrkProfileForm(){openModal(`<div class="modal-handle"></div><div class="modal-title">Мой профиль</div><form onsubmit="submitWrkProfile(event)"><div class="form-wrap"><div class="fg"><label>ФИО<span class="req">*</span></label><input type="text" id="wpName" required></div><div class="fg"><label>Телефон<span class="req">*</span></label><input type="tel" id="wpPhone" required></div><div class="fg"><label>Специальность<span class="req">*</span></label><select id="wpSpec" required onchange="toggleWrkCustomSpec()"><option value="">Выберите...</option>${SPECS.map(s=>`<option value="${s}">${s}</option>`).join('')}<option value="custom">Другое</option></select></div><div class="fg hidden" id="wpSpecCustomWrap"><label>Укажите специальность<span class="req">*</span></label><input type="text" id="wpSpecCustom"></div><div class="fg-row"><div class="fg"><label>Опыт (лет)<span class="req">*</span></label><input type="number" id="wpExp" min="0" required></div><div class="fg"><label>Регион<span class="req">*</span></label><input type="text" id="wpRegion" required></div></div><div class="fg"><label>Telegram username</label><input type="text" id="wpTg" placeholder="username (без @)"></div><div class="fg"><label>О себе и навыки<span class="req">*</span></label><textarea id="wpAbout" placeholder="Расскажите об опыте, навыках, достижениях..." required></textarea></div><div class="fg"><label>Документы и допуски</label><textarea id="wpDocs" placeholder="Медкнижка, удостоверения, сертификаты..."></textarea></div><button type="submit" class="btn btn-primary">Сохранить профиль</button></div></form>`);}
+function toggleWrkCustomSpec(){const v=document.getElementById('wpSpec').value;document.getElementById('wpSpecCustomWrap').classList.toggle('hidden',v!=='custom');}
+async function submitWrkProfile(e){e.preventDefault();let spec=document.getElementById('wpSpec').value;if(spec==='custom')spec=document.getElementById('wpSpecCustom').value;const p={uid:UID,name:document.getElementById('wpName').value,phone:document.getElementById('wpPhone').value,specialty:spec,experience:parseInt(document.getElementById('wpExp').value),region:document.getElementById('wpRegion').value,tg:document.getElementById('wpTg').value||TG_USERNAME||'',about:document.getElementById('wpAbout').value,docs:document.getElementById('wpDocs').value};await SD('wrkProfile_'+UID,p);closeModal();toast('Профиль сохранён! ✅');loadWrkProfile();}
+
+async function openVacancy(vid,viewAs){
+  const v=await GD('vacancy_'+vid);if(!v)return;
+  const profile=await GD('empProfile_'+v.eid);
+  const rating=await GD('rating_'+v.eid)||{avg:0,cnt:0};
+  const allResp=await LD('response_');
+  const rc=allResp.filter(r=>r.vid===vid).length;
+  const myResp=allResp.find(r=>r.vid===vid&&r.wid===UID);
+  let actions='';
+  if(viewAs==='worker'){
+    if(myResp){actions=`<button class="btn btn-outline" disabled>✅ Вы уже откликнулись</button>`;}
+    else{actions=`<button class="btn btn-primary" onclick="sendResponse('${vid}')">📩 Откликнуться</button>`;}
+    if(profile?.phone&&v.showPhone){actions+=`<div class="btn-row"><a href="tel:${profile.phone}" class="btn btn-green" style="text-decoration:none">📞 Позвонить</a>${profile?.tg?`<a href="https://t.me/${profile.tg}" class="btn btn-blue" style="text-decoration:none" target="_blank">✈️ Написать</a>`:''}</div>`;}
+  }else if(viewAs==='employer'){actions=`<div class="btn-row"><button class="btn btn-outline btn-sm" onclick="changeVacStatus('${vid}','paused')">⏸ Приостановить</button><button class="btn btn-danger btn-sm" onclick="changeVacStatus('${vid}','closed')">✖ Закрыть</button></div>`;}
+  openModal(`<div class="modal-handle"></div><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px"><div class="modal-title" style="font-size:16px;flex:1">${v.specialty}</div><button class="vcard-fav" onclick="toggleFav('v','${vid}',event)">${isFav('v',vid)?'❤️':'🤍'}</button></div><div style="font-size:13px;color:var(--text2);margin-bottom:4px">${v.companyName} ${v.verified?'✅':''}</div>${starsHtml(rating.avg,rating.cnt)}<div style="font-size:22px;font-weight:700;color:var(--green);margin:12px 0">${salStr(v.salFrom,v.salTo)}</div><div class="detail-section"><div class="detail-grid"><div class="detail-row"><span class="detail-ico">📍</span><div class="detail-info"><div class="detail-label">Регион</div><div class="detail-value">${v.region}</div></div></div><div class="detail-row"><span class="detail-ico">🏢</span><div class="detail-info"><div class="detail-label">Объект</div><div class="detail-value">${v.object}</div></div></div><div class="detail-row"><span class="detail-ico">📅</span><div class="detail-info"><div class="detail-label">График вахты</div><div class="detail-value">${v.schedule}</div></div></div>${v.workSchedule?`<div class="detail-row"><span class="detail-ico">⏰</span><div class="detail-info"><div class="detail-label">График смен</div><div class="detail-value">${v.workSchedule}</div></div></div>`:''}<div class="detail-row"><span class="detail-ico">👥</span><div class="detail-info"><div class="detail-label">Откликов</div><div class="detail-value">${rc}</div></div></div></div></div>${v.desc?`<div class="detail-section"><div class="detail-section-title">Требования</div><p style="font-size:14px;line-height:1.6;color:var(--text2)">${v.desc}</p></div>`:''} ${v.housing||v.food||v.clothing||v.transport?`<div class="detail-section"><div class="detail-section-title">Условия</div>${v.housing?`<div class="detail-row"><span class="detail-ico">🏠</span><div class="detail-info"><div class="detail-label">Проживание</div><div class="detail-value">${v.housing}</div></div></div>`:''}${v.food?`<div class="detail-row"><span class="detail-ico">🍽️</span><div class="detail-info"><div class="detail-label">Питание</div><div class="detail-value">${v.food}</div></div></div>`:''}${v.clothing?`<div class="detail-row"><span class="detail-ico">👔</span><div class="detail-info"><div class="detail-label">Спецодежда</div><div class="detail-value">${v.clothing}</div></div></div>`:''}${v.transport?`<div class="detail-row"><span class="detail-ico">🚗</span><div class="detail-info"><div class="detail-label">Проезд</div><div class="detail-value">${v.transport}</div></div></div>`:''}</div>`:''} ${profile?`<div class="detail-section"><div class="detail-section-title">О компании</div>${profile.about?`<p style="font-size:14px;line-height:1.6;color:var(--text2);margin-bottom:12px">${profile.about}</p>`:''} ${profile.phone&&v.showPhone?`<div class="detail-row"><span class="detail-ico">📞</span><div class="detail-info"><div class="detail-label">Телефон</div><div class="detail-value">${profile.phone}</div></div></div>`:''}</div>`:''} ${viewAs==='worker'?`<div class="detail-section"><div class="detail-section-title">Оценить работодателя</div><div class="stars-row" id="ratingStars">${[1,2,3,4,5].map(i=>`<span class="star" onclick="rateEmployer('${v.eid}',${i})">☆</span>`).join('')}</div></div>`:''} <div style="padding-bottom:8px">${actions}</div>`);
+}
+
+async function openCandidate(uid){
+  const p=await GD('wrkProfile_'+uid);if(!p)return;
+  const tgLink=p.tg?`<a href="https://t.me/${p.tg}" class="btn btn-blue" style="text-decoration:none;margin-top:0" target="_blank">✈️ Написать в Telegram</a>`:'';
+  openModal(`<div class="modal-handle"></div><div class="modal-title">${p.name}</div><div style="font-size:13px;color:var(--text2);margin-bottom:16px">${p.specialty}</div><div class="detail-section"><div class="detail-section-title">Контакты</div><div class="detail-row"><span class="detail-ico">📞</span><div class="detail-info"><div class="detail-label">Телефон</div><div class="detail-value">${p.phone}</div></div></div><div class="detail-row"><span class="detail-ico">📊</span><div class="detail-info"><div class="detail-label">Опыт работы</div><div class="detail-value">${p.experience} ${yrs(p.experience)}</div></div></div><div class="detail-row"><span class="detail-ico">📍</span><div class="detail-info"><div class="detail-label">Регион</div><div class="detail-value">${p.region||'—'}</div></div></div>${p.tg?`<div class="detail-row"><span class="detail-ico">✈️</span><div class="detail-info"><div class="detail-label">Telegram</div><div class="detail-value">@${p.tg}</div></div></div>`:''}</div>${p.about?`<div class="detail-section"><div class="detail-section-title">О себе и навыки</div><p style="font-size:14px;line-height:1.6;color:var(--text2)">${p.about}</p></div>`:''} ${p.docs?`<div class="detail-section"><div class="detail-section-title">Документы</div><p style="font-size:14px;line-height:1.6;color:var(--text2)">${p.docs}</p></div>`:''} <div class="btn-row"><a href="tel:${p.phone}" class="btn btn-green" style="text-decoration:none">📞 Позвонить</a>${tgLink}</div>${ROLE==='employer'?`<button class="btn btn-primary" style="margin-top:10px" onclick="sendOffer('${uid}')">📩 Отправить предложение</button>`:''}`);
+}
+
+async function sendResponse(vid){
+  const wp=await GD('wrkProfile_'+UID);if(!wp){toast('Сначала заполните профиль!');closeModal();wrkTab('profile',null);return;}
+  const r={id:'r_'+Date.now(),vid,wid:UID,createdAt:new Date().toISOString()};
+  await SD('response_'+r.id,r);
+  const vac=await GD('vacancy_'+vid);
+  if(vac){await sendBotMsg(vac.eid,`🔔 Новый отклик на вакансию!\n\n👷 ${wp.name}\n🔧 ${wp.specialty}\n📍 ${wp.region||'—'}\n📞 ${wp.phone}\n\nВакансия: ${vac.specialty}`);}
+  showNotif('Отклик отправлен!','Работодатель получил уведомление');
+  toast('Отклик отправлен! ✅');closeModal();
+}
+async function sendOffer(wid){
+  const wp=await GD('wrkProfile_'+wid);const ep=await GD('empProfile_'+UID);if(!wp||!ep)return;
+  await sendBotMsg(wid,`💼 Вам поступило предложение о работе!\n\n🏢 ${ep.companyName}\n📞 ${ep.phone||'—'}\n\nОткройте приложение для просмотра деталей`);
+  toast('Предложение отправлено! ✅');closeModal();
+}
+async function sendBotMsg(userId,text){try{await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:userId,text})});}catch(e){}}
+
+async function changeVacStatus(vid,status){const v=await GD('vacancy_'+vid);if(!v)return;v.status=status;await SD('vacancy_'+vid,v);closeModal();toast(status==='paused'?'Вакансия приостановлена':'Вакансия закрыта');loadEmpVacancies();}
+
+async function rateEmployer(eid,score){document.querySelectorAll('#ratingStars .star').forEach((s,i)=>{s.textContent=i<score?'⭐':'☆';});let r=await GD('rating_'+eid)||{avg:0,cnt:0,sum:0};r.sum=(r.sum||0)+score;r.cnt++;r.avg=r.sum/r.cnt;await SD('rating_'+eid,r);toast(`Оценка ${score}⭐ сохранена!`);}
+
+async function openFavs(){
+  let html='<div class="modal-handle"></div><div class="modal-title">Избранное</div>';let hasContent=false;
+  if(favs.vacancies.length){html+='<div class="detail-section-title" style="margin:16px 0 8px">Вакансии</div>';for(const vid of favs.vacancies){const v=await GD('vacancy_'+vid);if(v){hasContent=true;html+=`<div class="vcard" onclick="closeModal();openVacancy('${v.id}','${ROLE}')"><div class="vcard-top"><div class="vcard-title">${v.specialty}</div><div class="vcard-company">${v.companyName}</div><div class="vcard-salary">${salStr(v.salFrom,v.salTo)}</div></div></div>`;}}}
+  if(favs.candidates.length&&ROLE==='employer'){html+='<div class="detail-section-title" style="margin:16px 0 8px">Кандидаты</div>';for(const cid of favs.candidates){const c=await GD('wrkProfile_'+cid);if(c){hasContent=true;html+=`<div class="vcard" onclick="closeModal();openCandidate('${c.uid}')"><div class="vcard-top"><div class="vcard-title">${c.name}</div><div class="vcard-company">${c.specialty}</div></div></div>`;}}}
+  if(!hasContent)html+=`<div class="empty"><div class="empty-ico">❤️</div><div class="empty-title">Избранное пусто</div><div class="empty-text">Нажимайте 🤍 на карточках чтобы добавить в избранное</div></div>`;
+  html+='<div style="height:20px"></div>';openModal(html);
+}
+
+function openModal(html){let m=document.getElementById('globalModal');if(!m){m=document.createElement('div');m.id='globalModal';m.className='modal';m.onclick=function(e){if(e.target===m)closeModal();};document.body.appendChild(m);}m.innerHTML=`<div class="modal-box">${html}</div>`;m.classList.remove('hidden');}
+function closeModal(){const m=document.getElementById('globalModal');if(m)m.classList.add('hidden');}
+</script>
+</body>
+</html>
