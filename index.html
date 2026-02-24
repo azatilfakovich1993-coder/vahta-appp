@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Good_Вахта</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b}
+.container{max-width:600px;margin:0 auto;padding:20px}
+.header{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:20px;text-align:center;border-radius:12px;margin-bottom:20px}
+.title{font-size:24px;font-weight:900}
+.title span{color:#f97316}
+.btn{padding:12px 24px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin:8px 0}
+.btn-primary{background:#f97316;color:#fff}
+.btn-outline{background:#fff;border:2px solid #e2e8f0;color:#1e293b}
+.card{background:#fff;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.card-title{font-size:16px;font-weight:700;margin-bottom:8px}
+.card-info{font-size:14px;color:#64748b;margin:4px 0}
+.salary{color:#16a34a;font-size:18px;font-weight:700;margin:8px 0}
+.empty{text-align:center;padding:40px;color:#94a3b8}
+.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tab{flex:1;padding:10px;border:none;background:#e2e8f0;border-radius:8px;cursor:pointer;font-weight:600}
+.tab.active{background:#f97316;color:#fff}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999}
+.modal.show{display:flex;align-items:center;justify-content:center}
+.modal-content{background:#fff;border-radius:16px;padding:24px;max-width:90%;max-height:80vh;overflow-y:auto}
+.input{width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;margin:8px 0;font-size:14px}
+textarea.input{min-height:80px}
+.label{font-size:13px;font-weight:600;margin-top:12px;display:block}
+.loading{text-align:center;padding:20px;color:#64748b}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Welcome Screen -->
+  <div id="welcome">
+    <div class="header">
+      <div class="title">Good_<span>Вахта</span></div>
+      <div style="font-size:14px;margin-top:8px">Работа мечты — на вахте!</div>
+    </div>
+    <button class="btn btn-primary" onclick="goRole('employer')">👔 Работодатель</button>
+    <button class="btn btn-primary" onclick="goRole('worker')">👷 Соискатель</button>
+  </div>
+
+  <!-- Employer Screen -->
+  <div id="employer" style="display:none">
+    <div class="header">
+      <div class="title">Good_<span>Вахта</span></div>
+      <button class="btn btn-outline" onclick="goWelcome()" style="width:auto;padding:8px 16px">← Назад</button>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="empTab('vac')">Вакансии</button>
+      <button class="tab" onclick="empTab('prof')">Профиль</button>
+    </div>
+
+    <div id="emp-vac">
+      <button class="btn btn-primary" onclick="createVac()">+ Создать вакансию</button>
+      <div id="vac-list" class="loading">Загрузка...</div>
+    </div>
+
+    <div id="emp-prof" style="display:none">
+      <div id="prof-view"></div>
+    </div>
+  </div>
+
+  <!-- Worker Screen -->
+  <div id="worker" style="display:none">
+    <div class="header">
+      <div class="title">Good_<span>Вахта</span></div>
+      <button class="btn btn-outline" onclick="goWelcome()" style="width:auto;padding:8px 16px">← Назад</button>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="wrkTab('vac')">Вакансии</button>
+      <button class="tab" onclick="wrkTab('prof')">Профиль</button>
+    </div>
+
+    <div id="wrk-vac">
+      <div id="wrk-vac-list" class="loading">Загрузка...</div>
+    </div>
+
+    <div id="wrk-prof" style="display:none">
+      <button class="btn btn-primary" onclick="createResume()">+ Создать резюме</button>
+      <div id="resume-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content" id="modal-body"></div>
+</div>
+
+<script>
+// Config
+const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand()}
+const SB_URL='https://zutiselchauekvvoirgw.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1dGlzZWxjaGF1ZWt2dm9pcmd3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTMyMTAzMiwiZXhwIjoyMDg2ODk3MDMyfQ.XghMDb_u3s1Yz9sg2XL22gW-UEjoyPmVRukq_vlxUwc';
+const ADMIN='805705211';
+const UID=String(tg?.initDataUnsafe?.user?.id||'demo');
+let ROLE='';
+
+// Supabase helpers
+async function sbGet(table,id){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}&select=*`,{
+      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
+    });
+    const d=await r.json();
+    return d[0]?.data||null;
+  }catch(e){console.error(e);return null}
+}
+
+async function sbSet(table,id,data){
+  try{
+    await fetch(`${SB_URL}/rest/v1/${table}`,{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id,data})
+    });
+    return true;
+  }catch(e){console.error(e);return false}
+}
+
+async function sbList(table,prefix){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/${table}?id=like.${prefix}%&select=*&order=id.desc`,{
+      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
+    });
+    const d=await r.json();
+    console.log(`${table} ${prefix}:`,d.length,'записей');
+    return d.map(x=>x.data).filter(Boolean);
+  }catch(e){console.error(e);return[]}
+}
+
+// Navigation
+function goWelcome(){
+  document.getElementById('welcome').style.display='block';
+  document.getElementById('employer').style.display='none';
+  document.getElementById('worker').style.display='none';
+  ROLE='';
+}
+
+function goRole(role){
+  ROLE=role;
+  document.getElementById('welcome').style.display='none';
+  if(role==='employer'){
+    document.getElementById('employer').style.display='block';
+    loadVacancies();
+  }else{
+    document.getElementById('worker').style.display='block';
+    loadWorkerVacancies();
+  }
+}
+
+function empTab(tab){
+  document.querySelectorAll('#employer .tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('emp-vac').style.display=tab==='vac'?'block':'none';
+  document.getElementById('emp-prof').style.display=tab==='prof'?'block':'none';
+  if(tab==='prof')loadEmpProfile();
+}
+
+function wrkTab(tab){
+  document.querySelectorAll('#worker .tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('wrk-vac').style.display=tab==='vac'?'block':'none';
+  document.getElementById('wrk-prof').style.display=tab==='prof'?'block':'none';
+  if(tab==='prof')loadResumes();
+}
+
+// Load vacancies
+async function loadVacancies(){
+  const el=document.getElementById('vac-list');
+  el.innerHTML='<div class="loading">Загрузка...</div>';
+  const all=await sbList('vacancies','vac_');
+  const mine=all.filter(v=>v.eid===UID);
+  if(!mine.length){
+    el.innerHTML='<div class="empty">Нет вакансий</div>';
+    return;
+  }
+  el.innerHTML=mine.map(v=>`
+    <div class="card">
+      <div class="card-title">${v.specialty||'Вакансия'}</div>
+      <div class="salary">от ${parseInt(v.salFrom||0).toLocaleString()} ₽</div>
+      <div class="card-info">📍 ${v.region||'—'}</div>
+      <div class="card-info">📅 ${v.schedule||'—'}</div>
+    </div>
+  `).join('');
+}
+
+async function loadWorkerVacancies(){
+  const el=document.getElementById('wrk-vac-list');
+  el.innerHTML='<div class="loading">Загрузка...</div>';
+  const all=await sbList('vacancies','vac_');
+  if(!all.length){
+    el.innerHTML='<div class="empty">Нет вакансий</div>';
+    return;
+  }
+  el.innerHTML=all.map(v=>`
+    <div class="card">
+      <div class="card-title">${v.specialty||'Вакансия'}</div>
+      <div class="card-info">${v.companyName||'Компания'}</div>
+      <div class="salary">от ${parseInt(v.salFrom||0).toLocaleString()} ₽</div>
+      <div class="card-info">📍 ${v.region||'—'}</div>
+      <div class="card-info">📅 ${v.schedule||'—'}</div>
+    </div>
+  `).join('');
+}
+
+// Create vacancy
+function createVac(){
+  openModal(`
+    <h2>Новая вакансия</h2>
+    <label class="label">Специальность</label>
+    <input class="input" id="vSpec" placeholder="Сварщик">
+    <label class="label">ЗП от (₽)</label>
+    <input class="input" type="number" id="vSalFrom" placeholder="80000">
+    <label class="label">Регион</label>
+    <input class="input" id="vReg" placeholder="Москва">
+    <label class="label">График</label>
+    <input class="input" id="vSched" placeholder="15/15">
+    <button class="btn btn-primary" onclick="saveVac()">Сохранить</button>
+  `);
+}
+
+async function saveVac(){
+  const v={
+    id:'vac_'+Date.now(),
+    eid:UID,
+    specialty:document.getElementById('vSpec').value,
+    salFrom:document.getElementById('vSalFrom').value,
+    region:document.getElementById('vReg').value,
+    schedule:document.getElementById('vSched').value,
+    companyName:'Компания',
+    createdAt:new Date().toISOString()
+  };
+  await sbSet('vacancies',v.id,v);
+  closeModal();
+  loadVacancies();
+  alert('Вакансия создана!');
+}
+
+// Employer profile
+async function loadEmpProfile(){
+  const p=await sbGet('profiles','emp_'+UID);
+  const el=document.getElementById('prof-view');
+  if(!p){
+    el.innerHTML='<button class="btn btn-primary" onclick="editEmpProfile()">Создать профиль</button>';
+    return;
+  }
+  el.innerHTML=`
+    <div class="card">
+      <div class="card-title">${p.companyName||'Компания'}</div>
+      <div class="card-info">ИНН: ${p.inn||'—'}</div>
+      <div class="card-info">Адрес: ${p.address||'—'}</div>
+      <button class="btn btn-outline" onclick="editEmpProfile()">Редактировать</button>
+    </div>
+  `;
+}
+
+function editEmpProfile(){
+  openModal(`
+    <h2>Профиль компании</h2>
+    <label class="label">Название</label>
+    <input class="input" id="epName">
+    <label class="label">ИНН</label>
+    <input class="input" id="epInn">
+    <label class="label">Адрес</label>
+    <input class="input" id="epAddr">
+    <button class="btn btn-primary" onclick="saveEmpProfile()">Сохранить</button>
+  `);
+}
+
+async function saveEmpProfile(){
+  const p={
+    uid:UID,
+    companyName:document.getElementById('epName').value,
+    inn:document.getElementById('epInn').value,
+    address:document.getElementById('epAddr').value,
+    moderationStatus:'approved'
+  };
+  await sbSet('profiles','emp_'+UID,p);
+  closeModal();
+  loadEmpProfile();
+  alert('Сохранено!');
+}
+
+// Worker resumes
+async function loadResumes(){
+  const el=document.getElementById('resume-list');
+  const resumes=[];
+  for(let i=1;i<=3;i++){
+    const r=await sbGet('profiles',`wrk${i}_`+UID);
+    if(r)resumes.push({num:i,...r});
+  }
+  if(!resumes.length){
+    el.innerHTML='<div class="empty">Нет резюме</div>';
+    return;
+  }
+  el.innerHTML=resumes.map(r=>`
+    <div class="card">
+      <div class="card-title">Резюме ${r.num}</div>
+      <div class="card-info">${r.name||'—'}</div>
+      <div class="card-info">${r.specialty||'—'}</div>
+      <div class="card-info">Опыт: ${r.experience||0} лет</div>
+      <div class="card-info">📞 ${r.phone||'—'}</div>
+    </div>
+  `).join('');
+}
+
+function createResume(){
+  openModal(`
+    <h2>Новое резюме</h2>
+    <label class="label">ФИО</label>
+    <input class="input" id="rName">
+    <label class="label">Телефон</label>
+    <input class="input" id="rPhone">
+    <label class="label">Специальность</label>
+    <input class="input" id="rSpec">
+    <label class="label">Опыт (лет)</label>
+    <input class="input" type="number" id="rExp">
+    <button class="btn btn-primary" onclick="saveResume()">Сохранить</button>
+  `);
+}
+
+async function saveResume(){
+  const num=1; // Всегда создаём резюме 1
+  const r={
+    uid:UID,
+    resumeNum:num,
+    name:document.getElementById('rName').value,
+    phone:document.getElementById('rPhone').value,
+    specialty:document.getElementById('rSpec').value,
+    experience:parseInt(document.getElementById('rExp').value||0)
+  };
+  await sbSet('profiles',`wrk${num}_`+UID,r);
+  closeModal();
+  loadResumes();
+  alert('Резюме создано!');
+}
+
+// Modal
+function openModal(html){
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+}
+</script>
+</body>
+</html>
