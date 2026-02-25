@@ -1,359 +1,217 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Good_Вахта</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b}
-.container{max-width:600px;margin:0 auto;padding:20px}
-.header{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:20px;text-align:center;border-radius:12px;margin-bottom:20px}
-.title{font-size:24px;font-weight:900}
-.title span{color:#f97316}
-.btn{padding:12px 24px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin:8px 0}
-.btn-primary{background:#f97316;color:#fff}
-.btn-outline{background:#fff;border:2px solid #e2e8f0;color:#1e293b}
-.card{background:#fff;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
-.card-title{font-size:16px;font-weight:700;margin-bottom:8px}
-.card-info{font-size:14px;color:#64748b;margin:4px 0}
-.salary{color:#16a34a;font-size:18px;font-weight:700;margin:8px 0}
-.empty{text-align:center;padding:40px;color:#94a3b8}
-.tabs{display:flex;gap:8px;margin-bottom:20px}
-.tab{flex:1;padding:10px;border:none;background:#e2e8f0;border-radius:8px;cursor:pointer;font-weight:600}
-.tab.active{background:#f97316;color:#fff}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999}
-.modal.show{display:flex;align-items:center;justify-content:center}
-.modal-content{background:#fff;border-radius:16px;padding:24px;max-width:90%;max-height:80vh;overflow-y:auto}
-.input{width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;margin:8px 0;font-size:14px}
-textarea.input{min-height:80px}
-.label{font-size:13px;font-weight:600;margin-top:12px;display:block}
-.loading{text-align:center;padding:20px;color:#64748b}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Good_Вахта</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --grad-start: #1a1a2e; --grad-mid: #16213e; --grad-end: #0f3460;
+      --accent: #e94560; --accent2: #f5a623;
+      --card-bg: rgba(255,255,255,0.07); --card-border: rgba(255,255,255,0.12);
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.55); --radius: 18px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--grad-start) 0%, var(--grad-mid) 50%, var(--grad-end) 100%);
+      min-height: 100vh; color: var(--text); overflow-x: hidden;
+    }
+    .screen { display: none; flex-direction: column; align-items: center; min-height: 100vh; padding: 24px 20px 40px; animation: fadeIn .35s ease; }
+    .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .back-btn {
+      align-self: flex-start; display: flex; align-items: center; gap: 6px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); font-size: 14px; padding: 8px 16px;
+      border-radius: 30px; cursor: pointer; transition: all .2s; margin-bottom: 28px; backdrop-filter: blur(10px);
+    }
+    .back-btn:hover { color: var(--text); background: rgba(255,255,255,.13); }
+    .back-btn svg { width: 16px; height: 16px; }
+    .hero { display: flex; flex-direction: column; align-items: center; margin-bottom: 44px; }
+    .logo-ring {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(233,69,96,.4);
+    }
+    .app-title {
+      font-size: 28px; font-weight: 800; letter-spacing: .5px;
+      background: linear-gradient(90deg, #fff 0%, #f5a623 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .app-subtitle { margin-top: 8px; font-size: 14px; color: var(--text-muted); text-align: center; max-width: 260px; }
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 380px; }
+    .role-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 28px 16px; cursor: pointer; text-align: center;
+      transition: transform .2s, box-shadow .2s, background .2s; backdrop-filter: blur(12px);
+    }
+    .role-card:hover, .role-card:active { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.35); background: rgba(255,255,255,.12); }
+    .role-card .label { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .role-card .desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .role-card.employer .icon-wrap {
+      background: linear-gradient(135deg, rgba(233,69,96,.25), rgba(233,69,96,.05));
+      border-radius: 50%; width: 66px; height: 66px; display: flex; align-items: center;
+      justify-content: center; margin: 0 auto 14px; font-size: 32px;
+    }
+    .role-card.worker .icon-wrap {
+      background: linear-gradient(135deg, rgba(245,166,35,.25), rgba(245,166,35,.05));
+      border-radius: 50%; width: 66px; height: 66px; display: flex; align-items: center;
+      justify-content: center; margin: 0 auto 14px; font-size: 32px;
+    }
+    .stats-row { display: flex; gap: 24px; margin-top: 36px; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .section-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; text-align: center; }
+    .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: center; }
+    .menu-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
+    .menu-item {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 18px 20px; display: flex; align-items: center;
+      gap: 16px; cursor: pointer; transition: transform .18s, background .18s; backdrop-filter: blur(10px);
+    }
+    .menu-item:hover, .menu-item:active { transform: translateX(4px); background: rgba(255,255,255,.11); }
+    .menu-item .mi-icon { width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .mi-icon.red    { background: rgba(233,69,96,.2); }
+    .mi-icon.orange { background: rgba(245,166,35,.2); }
+    .mi-icon.blue   { background: rgba(80,160,255,.2); }
+    .mi-icon.green  { background: rgba(80,220,140,.2); }
+    .mi-icon.purple { background: rgba(180,100,255,.2); }
+    .mi-text .mi-title { font-size: 15px; font-weight: 600; }
+    .mi-text .mi-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .mi-arrow { margin-left: auto; color: var(--text-muted); font-size: 18px; }
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+    .badge-new { background: var(--accent); color: #fff; }
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(30,30,50,.95); border: 1px solid var(--card-border);
+      color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px;
+      backdrop-filter: blur(16px); transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      z-index: 9999; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- Welcome Screen -->
-  <div id="welcome">
-    <div class="header">
-      <div class="title">Good_<span>Вахта</span></div>
-      <div style="font-size:14px;margin-top:8px">Работа мечты — на вахте!</div>
-    </div>
-    <button class="btn btn-primary" onclick="goRole('employer')">👔 Работодатель</button>
-    <button class="btn btn-primary" onclick="goRole('worker')">👷 Соискатель</button>
+<div id="screen-home" class="screen active">
+  <div class="hero">
+    <div class="logo-ring">⛏️</div>
+    <div class="app-title">Good_Вахта</div>
+    <div class="app-subtitle">Работа вахтовым методом — быстро и удобно</div>
   </div>
-
-  <!-- Employer Screen -->
-  <div id="employer" style="display:none">
-    <div class="header">
-      <div class="title">Good_<span>Вахта</span></div>
-      <button class="btn btn-outline" onclick="goWelcome()" style="width:auto;padding:8px 16px">← Назад</button>
+  <div class="role-grid">
+    <div class="role-card employer" onclick="goTo('screen-employer')">
+      <div class="icon-wrap">🏗️</div>
+      <div class="label">Работодатель</div>
+      <div class="desc">Размещайте вакансии и находите персонал</div>
     </div>
-    
-    <div class="tabs">
-      <button class="tab active" onclick="empTab('vac')">Вакансии</button>
-      <button class="tab" onclick="empTab('prof')">Профиль</button>
-    </div>
-
-    <div id="emp-vac">
-      <button class="btn btn-primary" onclick="createVac()">+ Создать вакансию</button>
-      <div id="vac-list" class="loading">Загрузка...</div>
-    </div>
-
-    <div id="emp-prof" style="display:none">
-      <div id="prof-view"></div>
+    <div class="role-card worker" onclick="goTo('screen-worker')">
+      <div class="icon-wrap">👷</div>
+      <div class="label">Соискатель</div>
+      <div class="desc">Ищите вахту и откликайтесь на вакансии</div>
     </div>
   </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">2 400+</div><div class="stat-label">Вакансий</div></div>
+    <div class="stat-item"><div class="stat-num">18 000+</div><div class="stat-label">Соискателей</div></div>
+    <div class="stat-item"><div class="stat-num">340+</div><div class="stat-label">Компаний</div></div>
+  </div>
+</div>
 
-  <!-- Worker Screen -->
-  <div id="worker" style="display:none">
-    <div class="header">
-      <div class="title">Good_<span>Вахта</span></div>
-      <button class="btn btn-outline" onclick="goWelcome()" style="width:auto;padding:8px 16px">← Назад</button>
+<div id="screen-employer" class="screen">
+  <button class="back-btn" onclick="goTo('screen-home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <div class="section-title">Кабинет работодателя 🏗️</div>
+  <div class="section-sub">Управляйте вакансиями и откликами</div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="showToast('Скоро: Создание вакансии')">
+      <div class="mi-icon red">📋</div>
+      <div class="mi-text"><div class="mi-title">Создать вакансию <span class="badge badge-new">NEW</span></div><div class="mi-desc">Разместите новое объявление о работе</div></div>
+      <div class="mi-arrow">›</div>
     </div>
-    
-    <div class="tabs">
-      <button class="tab active" onclick="wrkTab('vac')">Вакансии</button>
-      <button class="tab" onclick="wrkTab('prof')">Профиль</button>
+    <div class="menu-item" onclick="showToast('Скоро: Мои вакансии')">
+      <div class="mi-icon orange">📁</div>
+      <div class="mi-text"><div class="mi-title">Мои вакансии</div><div class="mi-desc">Активные и архивные объявления</div></div>
+      <div class="mi-arrow">›</div>
     </div>
-
-    <div id="wrk-vac">
-      <div id="wrk-vac-list" class="loading">Загрузка...</div>
+    <div class="menu-item" onclick="showToast('Скоро: Отклики')">
+      <div class="mi-icon blue">💬</div>
+      <div class="mi-text"><div class="mi-title">Отклики</div><div class="mi-desc">Просматривайте кандидатов</div></div>
+      <div class="mi-arrow">›</div>
     </div>
-
-    <div id="wrk-prof" style="display:none">
-      <button class="btn btn-primary" onclick="createResume()">+ Создать резюме</button>
-      <div id="resume-list"></div>
+    <div class="menu-item" onclick="showToast('Скоро: База резюме')">
+      <div class="mi-icon green">🔍</div>
+      <div class="mi-text"><div class="mi-title">База резюме</div><div class="mi-desc">Найдите подходящего работника</div></div>
+      <div class="mi-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showToast('Скоро: Профиль компании')">
+      <div class="mi-icon purple">🏢</div>
+      <div class="mi-text"><div class="mi-title">Профиль компании</div><div class="mi-desc">Настройте страницу вашей организации</div></div>
+      <div class="mi-arrow">›</div>
     </div>
   </div>
 </div>
 
-<!-- Modal -->
-<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal-content" id="modal-body"></div>
+<div id="screen-worker" class="screen">
+  <button class="back-btn" onclick="goTo('screen-home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <div class="section-title">Кабинет соискателя 👷</div>
+  <div class="section-sub">Найдите лучшую вахту для себя</div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="showToast('Скоро: Поиск вакансий')">
+      <div class="mi-icon orange">🔎</div>
+      <div class="mi-text"><div class="mi-title">Найти вакансию <span class="badge badge-new">NEW</span></div><div class="mi-desc">Поиск по профессии, региону, зарплате</div></div>
+      <div class="mi-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showToast('Скоро: Моё резюме')">
+      <div class="mi-icon blue">📄</div>
+      <div class="mi-text"><div class="mi-title">Моё резюме</div><div class="mi-desc">Создайте или обновите анкету</div></div>
+      <div class="mi-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showToast('Скоро: Мои отклики')">
+      <div class="mi-icon green">✅</div>
+      <div class="mi-text"><div class="mi-title">Мои отклики</div><div class="mi-desc">Отслеживайте статус заявок</div></div>
+      <div class="mi-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showToast('Скоро: Избранное')">
+      <div class="mi-icon red">❤️</div>
+      <div class="mi-text"><div class="mi-title">Избранное</div><div class="mi-desc">Сохранённые вакансии</div></div>
+      <div class="mi-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showToast('Скоро: Профиль')">
+      <div class="mi-icon purple">👤</div>
+      <div class="mi-text"><div class="mi-title">Мой профиль</div><div class="mi-desc">Личные данные и настройки</div></div>
+      <div class="mi-arrow">›</div>
+    </div>
+  </div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-// Config
-const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand()}
-const SB_URL='https://zutiselchauekvvoirgw.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1dGlzZWxjaGF1ZWt2dm9pcmd3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTMyMTAzMiwiZXhwIjoyMDg2ODk3MDMyfQ.XghMDb_u3s1Yz9sg2XL22gW-UEjoyPmVRukq_vlxUwc';
-const ADMIN='805705211';
-const UID=String(tg?.initDataUnsafe?.user?.id||'demo');
-let ROLE='';
-
-// Supabase helpers
-async function sbGet(table,id){
-  try{
-    const r=await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}&select=*`,{
-      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
-    });
-    const d=await r.json();
-    return d[0]?.data||null;
-  }catch(e){console.error(e);return null}
-}
-
-async function sbSet(table,id,data){
-  try{
-    await fetch(`${SB_URL}/rest/v1/${table}`,{
-      method:'POST',
-      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id,data})
-    });
-    return true;
-  }catch(e){console.error(e);return false}
-}
-
-async function sbList(table,prefix){
-  try{
-    const r=await fetch(`${SB_URL}/rest/v1/${table}?id=like.${prefix}%&select=*&order=id.desc`,{
-      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
-    });
-    const d=await r.json();
-    console.log(`${table} ${prefix}:`,d.length,'записей');
-    return d.map(x=>x.data).filter(Boolean);
-  }catch(e){console.error(e);return[]}
-}
-
-// Navigation
-function goWelcome(){
-  document.getElementById('welcome').style.display='block';
-  document.getElementById('employer').style.display='none';
-  document.getElementById('worker').style.display='none';
-  ROLE='';
-}
-
-function goRole(role){
-  ROLE=role;
-  document.getElementById('welcome').style.display='none';
-  if(role==='employer'){
-    document.getElementById('employer').style.display='block';
-    loadVacancies();
-  }else{
-    document.getElementById('worker').style.display='block';
-    loadWorkerVacancies();
+  if (window.Telegram?.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-}
-
-function empTab(tab){
-  document.querySelectorAll('#employer .tab').forEach(t=>t.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('emp-vac').style.display=tab==='vac'?'block':'none';
-  document.getElementById('emp-prof').style.display=tab==='prof'?'block':'none';
-  if(tab==='prof')loadEmpProfile();
-}
-
-function wrkTab(tab){
-  document.querySelectorAll('#worker .tab').forEach(t=>t.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('wrk-vac').style.display=tab==='vac'?'block':'none';
-  document.getElementById('wrk-prof').style.display=tab==='prof'?'block':'none';
-  if(tab==='prof')loadResumes();
-}
-
-// Load vacancies
-async function loadVacancies(){
-  const el=document.getElementById('vac-list');
-  el.innerHTML='<div class="loading">Загрузка...</div>';
-  const all=await sbList('vacancies','vac_');
-  // ВРЕМЕННО: показываем ВСЕ вакансии (без фильтра)
-  if(!all.length){
-    el.innerHTML='<div class="empty">Нет вакансий</div>';
-    return;
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
-  el.innerHTML=all.map(v=>`
-    <div class="card">
-      <div class="card-title">${v.specialty||'Вакансия'}</div>
-      <div class="salary">от ${parseInt(v.salFrom||0).toLocaleString()} ₽</div>
-      <div class="card-info">📍 ${v.region||'—'}</div>
-      <div class="card-info">📅 ${v.schedule||'—'}</div>
-      <div style="font-size:11px;color:#94a3b8;margin-top:8px">ID владельца: ${v.eid||'—'}</div>
-    </div>
-  `).join('');
-}
-
-async function loadWorkerVacancies(){
-  const el=document.getElementById('wrk-vac-list');
-  el.innerHTML='<div class="loading">Загрузка...</div>';
-  const all=await sbList('vacancies','vac_');
-  if(!all.length){
-    el.innerHTML='<div class="empty">Нет вакансий</div>';
-    return;
-  }
-  el.innerHTML=all.map(v=>`
-    <div class="card">
-      <div class="card-title">${v.specialty||'Вакансия'}</div>
-      <div class="card-info">${v.companyName||'Компания'}</div>
-      <div class="salary">от ${parseInt(v.salFrom||0).toLocaleString()} ₽</div>
-      <div class="card-info">📍 ${v.region||'—'}</div>
-      <div class="card-info">📅 ${v.schedule||'—'}</div>
-    </div>
-  `).join('');
-}
-
-// Create vacancy
-function createVac(){
-  openModal(`
-    <h2>Новая вакансия</h2>
-    <label class="label">Специальность</label>
-    <input class="input" id="vSpec" placeholder="Сварщик">
-    <label class="label">ЗП от (₽)</label>
-    <input class="input" type="number" id="vSalFrom" placeholder="80000">
-    <label class="label">Регион</label>
-    <input class="input" id="vReg" placeholder="Москва">
-    <label class="label">График</label>
-    <input class="input" id="vSched" placeholder="15/15">
-    <button class="btn btn-primary" onclick="saveVac()">Сохранить</button>
-  `);
-}
-
-async function saveVac(){
-  const v={
-    id:'vac_'+Date.now(),
-    eid:UID,
-    specialty:document.getElementById('vSpec').value,
-    salFrom:document.getElementById('vSalFrom').value,
-    region:document.getElementById('vReg').value,
-    schedule:document.getElementById('vSched').value,
-    companyName:'Компания',
-    createdAt:new Date().toISOString()
-  };
-  await sbSet('vacancies',v.id,v);
-  closeModal();
-  loadVacancies();
-  alert('Вакансия создана!');
-}
-
-// Employer profile
-async function loadEmpProfile(){
-  const p=await sbGet('profiles','emp_'+UID);
-  const el=document.getElementById('prof-view');
-  if(!p){
-    el.innerHTML='<button class="btn btn-primary" onclick="editEmpProfile()">Создать профиль</button>';
-    return;
-  }
-  el.innerHTML=`
-    <div class="card">
-      <div class="card-title">${p.companyName||'Компания'}</div>
-      <div class="card-info">ИНН: ${p.inn||'—'}</div>
-      <div class="card-info">Адрес: ${p.address||'—'}</div>
-      <button class="btn btn-outline" onclick="editEmpProfile()">Редактировать</button>
-    </div>
-  `;
-}
-
-function editEmpProfile(){
-  openModal(`
-    <h2>Профиль компании</h2>
-    <label class="label">Название</label>
-    <input class="input" id="epName">
-    <label class="label">ИНН</label>
-    <input class="input" id="epInn">
-    <label class="label">Адрес</label>
-    <input class="input" id="epAddr">
-    <button class="btn btn-primary" onclick="saveEmpProfile()">Сохранить</button>
-  `);
-}
-
-async function saveEmpProfile(){
-  const p={
-    uid:UID,
-    companyName:document.getElementById('epName').value,
-    inn:document.getElementById('epInn').value,
-    address:document.getElementById('epAddr').value,
-    moderationStatus:'approved'
-  };
-  await sbSet('profiles','emp_'+UID,p);
-  closeModal();
-  loadEmpProfile();
-  alert('Сохранено!');
-}
-
-// Worker resumes
-async function loadResumes(){
-  const el=document.getElementById('resume-list');
-  const resumes=[];
-  for(let i=1;i<=3;i++){
-    const r=await sbGet('profiles',`wrk${i}_`+UID);
-    if(r)resumes.push({num:i,...r});
-  }
-  if(!resumes.length){
-    el.innerHTML='<div class="empty">Нет резюме</div>';
-    return;
-  }
-  el.innerHTML=resumes.map(r=>`
-    <div class="card">
-      <div class="card-title">Резюме ${r.num}</div>
-      <div class="card-info">${r.name||'—'}</div>
-      <div class="card-info">${r.specialty||'—'}</div>
-      <div class="card-info">Опыт: ${r.experience||0} лет</div>
-      <div class="card-info">📞 ${r.phone||'—'}</div>
-    </div>
-  `).join('');
-}
-
-function createResume(){
-  openModal(`
-    <h2>Новое резюме</h2>
-    <label class="label">ФИО</label>
-    <input class="input" id="rName">
-    <label class="label">Телефон</label>
-    <input class="input" id="rPhone">
-    <label class="label">Специальность</label>
-    <input class="input" id="rSpec">
-    <label class="label">Опыт (лет)</label>
-    <input class="input" type="number" id="rExp">
-    <button class="btn btn-primary" onclick="saveResume()">Сохранить</button>
-  `);
-}
-
-async function saveResume(){
-  const num=1; // Всегда создаём резюме 1
-  const r={
-    uid:UID,
-    resumeNum:num,
-    name:document.getElementById('rName').value,
-    phone:document.getElementById('rPhone').value,
-    specialty:document.getElementById('rSpec').value,
-    experience:parseInt(document.getElementById('rExp').value||0)
-  };
-  await sbSet('profiles',`wrk${num}_`+UID,r);
-  closeModal();
-  loadResumes();
-  alert('Резюме создано!');
-}
-
-// Modal
-function openModal(html){
-  document.getElementById('modal-body').innerHTML=html;
-  document.getElementById('modal').classList.add('show');
-}
-
-function closeModal(){
-  document.getElementById('modal').classList.remove('show');
-}
 </script>
 </body>
 </html>
