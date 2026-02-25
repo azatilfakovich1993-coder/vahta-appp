@@ -23,7 +23,21 @@
       --card-border:rgba(255, 255, 255, 0.12);
       --text:       #ffffff;
       --text-muted: rgba(255,255,255,0.55);
+      --input-bg:   rgba(255,255,255,0.07);
+      --input-border: rgba(255,255,255,0.15);
       --radius:     18px;
+    }
+
+    :root.light {
+      --grad-start: #e8eaf6;
+      --grad-mid:   #dce7f5;
+      --grad-end:   #c5d8f0;
+      --card-bg:    rgba(255,255,255,0.75);
+      --card-border:rgba(0,0,0,0.10);
+      --text:       #1a1a2e;
+      --text-muted: rgba(30,30,60,0.50);
+      --input-bg:   rgba(255,255,255,0.85);
+      --input-border: rgba(0,0,0,0.15);
     }
 
     body {
@@ -34,6 +48,17 @@
       overflow-x: hidden;
     }
 
+    /* ─── theme toggle ─── */
+    .theme-toggle {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 50%; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; transition: background .2s, transform .2s;
+      backdrop-filter: blur(10px);
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,.15); transform: scale(1.1); }
+
+    /* ─── screens ─── */
     .screen {
       display: none;
       flex-direction: column;
@@ -49,6 +74,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* ─── back button ─── */
     .back-btn {
       align-self: flex-start;
       display: flex;
@@ -68,6 +94,7 @@
     .back-btn:hover  { color: var(--text); background: rgba(255,255,255,.13); }
     .back-btn svg    { width: 16px; height: 16px; }
 
+    /* ─── logo / hero ─── */
     .hero {
       display: flex;
       flex-direction: column;
@@ -75,110 +102,216 @@
       margin-bottom: 44px;
     }
     .logo-ring {
-      width: 90px; height: 90px; border-radius: 50%;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 40px; margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 20px;
       box-shadow: 0 8px 32px rgba(233,69,96,.4);
     }
     .app-title {
-      font-size: 28px; font-weight: 800; letter-spacing: .5px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: .5px;
       background: linear-gradient(90deg, #fff 0%, #f5a623 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .app-subtitle {
-      margin-top: 8px; font-size: 14px; color: var(--text-muted);
-      text-align: center; max-width: 260px;
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 260px;
     }
 
+    /* ─── main buttons ─── */
     .role-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 16px; width: 100%; max-width: 380px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 380px;
     }
     .role-card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 28px 16px; cursor: pointer;
-      text-align: center; transition: transform .2s, box-shadow .2s, background .2s;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform .2s, box-shadow .2s, background .2s;
       backdrop-filter: blur(12px);
     }
-    .role-card:hover, .role-card:active {
+    .role-card:hover,
+    .role-card:active {
       transform: translateY(-4px);
       box-shadow: 0 16px 40px rgba(0,0,0,.35);
       background: rgba(255,255,255,.12);
     }
-    .role-card .icon { font-size: 44px; margin-bottom: 14px; }
-    .role-card .label { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-    .role-card .desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .role-card .icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+    }
+    .role-card .label {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .role-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
     .role-card.employer .icon-wrap {
       background: linear-gradient(135deg, rgba(233,69,96,.25), rgba(233,69,96,.05));
-      border-radius: 50%; width: 66px; height: 66px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 14px; font-size: 32px;
+      border-radius: 50%;
+      width: 66px;
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 32px;
     }
     .role-card.worker .icon-wrap {
       background: linear-gradient(135deg, rgba(245,166,35,.25), rgba(245,166,35,.05));
-      border-radius: 50%; width: 66px; height: 66px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 14px; font-size: 32px;
+      border-radius: 50%;
+      width: 66px;
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 32px;
     }
 
-    .stats-row { display: flex; gap: 24px; margin-top: 36px; }
-    .stat-item { text-align: center; }
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 36px;
+    }
+    .stat-item {
+      text-align: center;
+    }
     .stat-num {
-      font-size: 20px; font-weight: 800;
+      font-size: 20px;
+      font-weight: 800;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-    .section-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; text-align: center; }
-    .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: center; }
+    /* ─── section screen shared ─── */
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .section-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      text-align: center;
+    }
 
-    .menu-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
+    /* ─── menu cards ─── */
+    .menu-list {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
     .menu-item {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 18px 20px;
-      display: flex; align-items: center; gap: 16px;
-      cursor: pointer; transition: transform .18s, background .18s;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: transform .18s, background .18s;
       backdrop-filter: blur(10px);
     }
-    .menu-item:hover, .menu-item:active { transform: translateX(4px); background: rgba(255,255,255,.11); }
+    .menu-item:hover,
+    .menu-item:active {
+      transform: translateX(4px);
+      background: rgba(255,255,255,.11);
+    }
     .menu-item .mi-icon {
-      width: 46px; height: 46px; border-radius: 13px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; flex-shrink: 0;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
     }
     .mi-icon.red    { background: rgba(233,69,96,.2);  }
     .mi-icon.orange { background: rgba(245,166,35,.2); }
     .mi-icon.blue   { background: rgba(80,160,255,.2); }
     .mi-icon.green  { background: rgba(80,220,140,.2); }
     .mi-icon.purple { background: rgba(180,100,255,.2);}
+
     .mi-text .mi-title { font-size: 15px; font-weight: 600; }
     .mi-text .mi-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .mi-arrow { margin-left: auto; color: var(--text-muted); font-size: 18px; }
 
-    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+    /* ─── badge ─── */
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
     .badge-new      { background: var(--accent); color: #fff; }
     .badge-verified { background: #1db954; color: #fff; }
 
+    /* ─── trust strip ─── */
     .trust-strip {
-      display: flex; align-items: center; gap: 8px; margin-top: 16px;
-      background: rgba(29,185,84,.13); border: 1px solid rgba(29,185,84,.35);
-      border-radius: 30px; padding: 8px 18px;
-      font-size: 13px; font-weight: 600; color: #4ddb8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      background: rgba(29,185,84,.13);
+      border: 1px solid rgba(29,185,84,.35);
+      border-radius: 30px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4ddb8a;
     }
     .trust-strip .ts-icon { font-size: 16px; }
 
+    /* ─── verified banner (employer screen) ─── */
     .verified-banner {
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(29,185,84,.1); border: 1px solid rgba(29,185,84,.3);
-      border-radius: var(--radius); padding: 14px 18px;
-      margin-bottom: 16px; width: 100%; max-width: 400px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(29,185,84,.1);
+      border: 1px solid rgba(29,185,84,.3);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 400px;
     }
     .verified-banner .vb-icon { font-size: 26px; }
     .verified-banner .vb-text .vb-title { font-size: 14px; font-weight: 700; color: #4ddb8a; }
     .verified-banner .vb-text .vb-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
+    /* ─── search bar ─── */
     .search-wrap { width: 100%; max-width: 400px; position: relative; margin-bottom: 14px; }
     .search-input {
       width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
@@ -188,6 +321,7 @@
     .search-input::placeholder { color: var(--text-muted); }
     .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
 
+    /* ─── filter chips ─── */
     .chips-scroll {
       width: 100%; max-width: 400px; overflow-x: auto; display: flex;
       gap: 8px; margin-bottom: 20px; padding-bottom: 4px; scrollbar-width: none;
@@ -201,6 +335,7 @@
     }
     .chip.active, .chip:hover { background: rgba(233,69,96,.2); border-color: rgba(233,69,96,.5); color: #fff; }
 
+    /* ─── job cards ─── */
     .jobs-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
     .job-card {
       background: var(--card-bg); border: 1px solid var(--card-border);
@@ -236,6 +371,7 @@
     }
     .jc-btn:hover { opacity: .85; }
 
+    /* ─── job detail ─── */
     .detail-card {
       width: 100%; max-width: 400px; background: var(--card-bg);
       border: 1px solid var(--card-border); border-radius: var(--radius);
@@ -268,18 +404,33 @@
     }
     .apply-btn:hover { opacity: .88; }
 
-    .form-wrap { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 16px; }
+    /* ─── create job form ─── */
+    .form-wrap {
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 13px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .form-label {
+      font-size: 13px; font-weight: 600; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
     .form-label .fl-req { color: var(--accent); }
     .form-input, .form-textarea, .form-select {
-      width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 14px; padding: 13px 16px; color: var(--text);
-      font-size: 14px; font-family: inherit; outline: none;
-      backdrop-filter: blur(10px); transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 14px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      backdrop-filter: blur(10px);
+      transition: border-color .2s, box-shadow .2s;
       -webkit-appearance: none;
     }
-    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+    .form-input::placeholder,
+    .form-textarea::placeholder { color: var(--text-muted); }
     .form-input:focus, .form-textarea:focus, .form-select:focus {
       border-color: rgba(233,69,96,.6);
       box-shadow: 0 0 0 3px rgba(233,69,96,.12);
@@ -287,22 +438,30 @@
     .form-input.error, .form-textarea.error { border-color: var(--accent); }
     .form-textarea { resize: none; min-height: 96px; line-height: 1.5; }
     .form-select { cursor: pointer; }
-    .form-select option { background: #1a1a2e; color: #fff; }
+    .form-select option { background: var(--grad-start); color: var(--text); }
 
+    /* inline chips for schedule */
     .sched-chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .sched-chip {
       padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
       background: var(--card-bg); border: 1px solid var(--card-border);
-      color: var(--text-muted); cursor: pointer; transition: all .18s; backdrop-filter: blur(8px);
+      color: var(--text-muted); cursor: pointer; transition: all .18s;
+      backdrop-filter: blur(8px);
     }
-    .sched-chip.active { background: rgba(245,166,35,.2); border-color: rgba(245,166,35,.5); color: #f5a623; }
+    .sched-chip.active {
+      background: rgba(245,166,35,.2); border-color: rgba(245,166,35,.5); color: #f5a623;
+    }
 
+    /* dynamic list items (req / cond) */
     .dyn-list { display: flex; flex-direction: column; gap: 8px; }
-    .dyn-item { display: flex; gap: 8px; align-items: center; }
+    .dyn-item {
+      display: flex; gap: 8px; align-items: center;
+    }
     .dyn-input {
       flex: 1; background: var(--card-bg); border: 1px solid var(--card-border);
       border-radius: 12px; padding: 10px 14px; color: var(--text);
-      font-size: 13px; font-family: inherit; outline: none; transition: border-color .2s;
+      font-size: 13px; font-family: inherit; outline: none;
+      transition: border-color .2s;
     }
     .dyn-input::placeholder { color: var(--text-muted); }
     .dyn-input:focus { border-color: rgba(233,69,96,.5); }
@@ -318,10 +477,12 @@
       display: flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,.06); border: 1px dashed rgba(255,255,255,.2);
       border-radius: 12px; padding: 9px 14px; font-size: 13px;
-      color: var(--text-muted); cursor: pointer; transition: all .18s; width: 100%;
+      color: var(--text-muted); cursor: pointer; transition: all .18s;
+      width: 100%;
     }
     .dyn-add-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
 
+    /* salary row */
     .salary-row { display: flex; gap: 10px; }
     .salary-row .form-input { flex: 1; }
     .salary-suffix {
@@ -331,8 +492,14 @@
       white-space: nowrap; backdrop-filter: blur(10px);
     }
 
-    .form-progress { display: flex; align-items: center; gap: 0; width: 100%; max-width: 400px; margin-bottom: 24px; }
-    .fp-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    /* step progress */
+    .form-progress {
+      display: flex; align-items: center; gap: 0;
+      width: 100%; max-width: 400px; margin-bottom: 24px;
+    }
+    .fp-step {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
     .fp-dot {
       width: 28px; height: 28px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -343,9 +510,13 @@
     .fp-dot.done   { background: #1db954; border-color: #1db954; color: #fff; }
     .fp-dot.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; color: #fff; }
     .fp-label { font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.2; }
-    .fp-line { height: 2px; flex: 1; background: var(--card-border); margin-top: -18px; transition: background .3s; }
+    .fp-line {
+      height: 2px; flex: 1; background: var(--card-border);
+      margin-top: -18px; transition: background .3s;
+    }
     .fp-line.done { background: #1db954; }
 
+    /* form nav buttons */
     .form-nav { display: flex; gap: 12px; width: 100%; max-width: 400px; margin-top: 8px; }
     .btn-prev {
       flex: 1; padding: 14px; border-radius: var(--radius); border: 1px solid var(--card-border);
@@ -367,6 +538,7 @@
     }
     .btn-submit:hover { opacity: .88; }
 
+    /* success state */
     .success-screen {
       display: none; flex-direction: column; align-items: center;
       justify-content: center; text-align: center; padding: 40px 24px;
@@ -388,12 +560,20 @@
       padding: 18px; backdrop-filter: blur(10px); text-align: left; margin-bottom: 24px;
     }
     .pc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .pc-logo { width: 48px; height: 48px; border-radius: 13px; background: rgba(233,69,96,.25); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .pc-logo {
+      width: 48px; height: 48px; border-radius: 13px;
+      background: rgba(233,69,96,.25); display: flex;
+      align-items: center; justify-content: center; font-size: 24px;
+    }
     .pc-company { font-size: 12px; color: var(--text-muted); }
     .pc-title  { font-size: 17px; font-weight: 700; }
     .pc-salary { font-size: 16px; font-weight: 800; color: var(--accent2); margin: 8px 0; }
     .pc-meta   { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pc-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,.08); border: 1px solid var(--card-border); color: var(--text-muted); }
+    .pc-tag {
+      font-size: 11px; padding: 3px 10px; border-radius: 20px;
+      background: rgba(255,255,255,.08); border: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
     .btn-back-employer {
       width: 100%; max-width: 400px; padding: 14px; border-radius: var(--radius);
       border: 1px solid var(--card-border); background: var(--card-bg);
@@ -402,31 +582,146 @@
     }
     .btn-back-employer:hover { background: rgba(255,255,255,.1); }
 
-    .char-count { align-self: flex-end; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .char-count {
+      align-self: flex-end; font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    }
     .char-count.warn { color: var(--accent2); }
     .char-count.over { color: var(--accent); }
 
+    /* ─── coming soon toast ─── */
     .toast {
-      position: fixed; bottom: 28px; left: 50%;
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: rgba(30,30,50,.95); border: 1px solid var(--card-border);
-      color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px;
-      backdrop-filter: blur(16px); transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-      z-index: 9999; white-space: nowrap;
+      background: rgba(30,30,50,.95);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      backdrop-filter: blur(16px);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      z-index: 9999;
+      white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── resume list screen ─── */
+    .resume-list {
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .resume-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 18px 18px 14px;
+      backdrop-filter: blur(10px); transition: background .18s;
+    }
+    .rc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .rc-avatar {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(245,166,35,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .rc-name  { font-size: 15px; font-weight: 700; }
+    .rc-spec  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .rc-meta  { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .rc-tag {
+      font-size: 11px; padding: 3px 10px; border-radius: 20px;
+      background: rgba(255,255,255,.07); border: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
+    .rc-actions { display: flex; gap: 8px; }
+    .rc-btn-edit {
+      flex: 1; padding: 9px; border-radius: 12px; border: 1px solid var(--card-border);
+      background: var(--card-bg); color: var(--text); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .18s; text-align: center;
+    }
+    .rc-btn-edit:hover { background: rgba(255,255,255,.12); }
+    .rc-btn-del {
+      width: 38px; height: 38px; border-radius: 12px; border: none;
+      background: rgba(233,69,96,.12); color: var(--accent);
+      font-size: 18px; cursor: pointer; transition: background .18s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .rc-btn-del:hover { background: rgba(233,69,96,.28); }
+    .resume-empty {
+      text-align: center; padding: 40px 20px; color: var(--text-muted);
+    }
+    .resume-empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .resume-empty-text { font-size: 14px; line-height: 1.5; }
+    .resume-count-hint {
+      font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 4px;
+    }
+    .btn-create-resume {
+      width: 100%; max-width: 400px; padding: 15px; border: none;
+      background: linear-gradient(90deg, var(--accent), #c73652); color: #fff;
+      border-radius: var(--radius); font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s; margin-top: 8px;
+    }
+    .btn-create-resume:hover { opacity: .88; }
+    .btn-create-resume:disabled {
+      opacity: .4; cursor: not-allowed;
+    }
+
+    /* ─── resume form ─── */
+    .gender-chips { display: flex; gap: 10px; }
+    .gender-chip {
+      flex: 1; padding: 10px; border-radius: 14px; text-align: center;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); transition: all .18s;
+    }
+    .gender-chip.active {
+      background: rgba(245,166,35,.2); border-color: rgba(245,166,35,.55); color: #f5a623;
+    }
+    .exp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .exp-chip {
+      padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); cursor: pointer; transition: all .18s;
+    }
+    .exp-chip.active {
+      background: rgba(233,69,96,.2); border-color: rgba(233,69,96,.5); color: #fff;
+    }
+    .citizen-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .citizen-chip {
+      padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); cursor: pointer; transition: all .18s;
+    }
+    .citizen-chip.active {
+      background: rgba(80,160,255,.2); border-color: rgba(80,160,255,.5); color: #60aaff;
+    }
+    .tg-input-wrap { position: relative; }
+    .tg-input-wrap .form-input { padding-left: 36px; }
+    .tg-prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 14px; color: var(--text-muted); pointer-events: none;
+    }
+    .field-optional { color: var(--text-muted); font-weight: 400; font-size: 12px; }
   </style>
 </head>
 <body>
 
-<!-- SCREEN: HOME -->
+<!-- ══════════════════════════════════════
+     SCREEN: HOME
+══════════════════════════════════════ -->
 <div id="screen-home" class="screen active">
+  <div style="align-self:flex-end;margin-bottom:-14px">
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Сменить тему">
+      <span id="theme-icon">🌙</span>
+    </button>
+  </div>
   <div class="hero">
     <div class="logo-ring">⛏️</div>
     <div class="app-title">Good_Вахта</div>
     <div class="app-subtitle">Вахтовая работа только с проверенными работодателями</div>
     <div class="trust-strip"><span class="ts-icon">🛡️</span> Только проверенные работодатели</div>
   </div>
+
   <div class="role-grid">
     <div class="role-card employer" onclick="goTo('screen-employer')">
       <div class="icon-wrap">🏗️</div>
@@ -439,21 +734,38 @@
       <div class="desc">Работайте только с проверенными компаниями</div>
     </div>
   </div>
+
   <div class="stats-row">
-    <div class="stat-item"><div class="stat-num">2 400+</div><div class="stat-label">Вакансий</div></div>
-    <div class="stat-item"><div class="stat-num">18 000+</div><div class="stat-label">Соискателей</div></div>
-    <div class="stat-item"><div class="stat-num">340+</div><div class="stat-label">Проверенных компаний</div></div>
+    <div class="stat-item">
+      <div class="stat-num">2 400+</div>
+      <div class="stat-label">Вакансий</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">18 000+</div>
+      <div class="stat-label">Соискателей</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">340+</div>
+      <div class="stat-label">Проверенных компаний</div>
+    </div>
   </div>
 </div>
 
-<!-- SCREEN: РАБОТОДАТЕЛЬ -->
+
+<!-- ══════════════════════════════════════
+     SCREEN: РАБОТОДАТЕЛЬ
+══════════════════════════════════════ -->
 <div id="screen-employer" class="screen">
   <button class="back-btn" onclick="goTo('screen-home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
     Назад
   </button>
+
   <div class="section-title">Кабинет работодателя 🏗️</div>
   <div class="section-sub">Только верифицированные компании</div>
+
   <div class="verified-banner">
     <div class="vb-icon">✅</div>
     <div class="vb-text">
@@ -461,6 +773,7 @@
       <div class="vb-desc">Ваш аккаунт проверен — соискатели вам доверяют</div>
     </div>
   </div>
+
   <div class="menu-list">
     <div class="menu-item" onclick="openCreateJob()">
       <div class="mi-icon red">📋</div>
@@ -470,26 +783,43 @@
       </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Мои вакансии')">
       <div class="mi-icon orange">📁</div>
-      <div class="mi-text"><div class="mi-title">Мои вакансии</div><div class="mi-desc">Активные и архивные объявления</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Мои вакансии</div>
+        <div class="mi-desc">Активные и архивные объявления</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Отклики')">
       <div class="mi-icon blue">💬</div>
-      <div class="mi-text"><div class="mi-title">Отклики</div><div class="mi-desc">Просматривайте кандидатов</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Отклики</div>
+        <div class="mi-desc">Просматривайте кандидатов</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: База резюме')">
       <div class="mi-icon green">🔍</div>
-      <div class="mi-text"><div class="mi-title">База резюме</div><div class="mi-desc">Найдите подходящего работника</div></div>
+      <div class="mi-text">
+        <div class="mi-title">База резюме</div>
+        <div class="mi-desc">Найдите подходящего работника</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Профиль компании')">
       <div class="mi-icon purple">🏢</div>
-      <div class="mi-text"><div class="mi-title">Профиль компании</div><div class="mi-desc">Настройте страницу вашей организации</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Профиль компании</div>
+        <div class="mi-desc">Настройте страницу вашей организации</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Верификация компании')">
       <div class="mi-icon green">🛡️</div>
       <div class="mi-text">
@@ -501,14 +831,21 @@
   </div>
 </div>
 
-<!-- SCREEN: СОИСКАТЕЛЬ -->
+
+<!-- ══════════════════════════════════════
+     SCREEN: СОИСКАТЕЛЬ
+══════════════════════════════════════ -->
 <div id="screen-worker" class="screen">
   <button class="back-btn" onclick="goTo('screen-home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
     Назад
   </button>
+
   <div class="section-title">Кабинет соискателя 👷</div>
   <div class="section-sub">Все работодатели проверены — работайте безопасно</div>
+
   <div class="verified-banner">
     <div class="vb-icon">🛡️</div>
     <div class="vb-text">
@@ -516,6 +853,7 @@
       <div class="vb-desc">Все компании на платформе прошли верификацию — никакого обмана</div>
     </div>
   </div>
+
   <div class="menu-list">
     <div class="menu-item" onclick="goTo('screen-jobs')">
       <div class="mi-icon orange">🔎</div>
@@ -525,41 +863,63 @@
       </div>
       <div class="mi-arrow">›</div>
     </div>
-    <div class="menu-item" onclick="showToast('Скоро: Моё резюме')">
+
+    <div class="menu-item" onclick="goTo('screen-my-resumes')">
       <div class="mi-icon blue">📄</div>
-      <div class="mi-text"><div class="mi-title">Моё резюме</div><div class="mi-desc">Создайте или обновите анкету</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Моё резюме</div>
+        <div class="mi-desc">Создайте или обновите анкету</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Мои отклики')">
       <div class="mi-icon green">✅</div>
-      <div class="mi-text"><div class="mi-title">Мои отклики</div><div class="mi-desc">Отслеживайте статус заявок</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Мои отклики</div>
+        <div class="mi-desc">Отслеживайте статус заявок</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Избранное')">
       <div class="mi-icon red">❤️</div>
-      <div class="mi-text"><div class="mi-title">Избранное</div><div class="mi-desc">Сохранённые вакансии</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Избранное</div>
+        <div class="mi-desc">Сохранённые вакансии</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
+
     <div class="menu-item" onclick="showToast('Скоро: Профиль')">
       <div class="mi-icon purple">👤</div>
-      <div class="mi-text"><div class="mi-title">Мой профиль</div><div class="mi-desc">Личные данные и настройки</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Мой профиль</div>
+        <div class="mi-desc">Личные данные и настройки</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
   </div>
 </div>
 
-<!-- SCREEN: ПОИСК ВАКАНСИЙ -->
+
+<!-- ══════════════════════════════════════
+     SCREEN: ПОИСК ВАКАНСИЙ
+══════════════════════════════════════ -->
 <div id="screen-jobs" class="screen">
   <button class="back-btn" onclick="goTo('screen-worker')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     Назад
   </button>
+
   <div class="section-title">Поиск вакансий 🔎</div>
   <div class="section-sub">Только проверенные работодатели</div>
+
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
     <input class="search-input" type="text" placeholder="Профессия, город..." id="search-input" oninput="filterJobs()" />
   </div>
+
   <div class="chips-scroll">
     <div class="chip active" onclick="setFilter(this,'all')">Все</div>
     <div class="chip" onclick="setFilter(this,'oil')">Нефть и газ</div>
@@ -567,15 +927,20 @@
     <div class="chip" onclick="setFilter(this,'mine')">Горнодобыча</div>
     <div class="chip" onclick="setFilter(this,'food')">Питание / Быт</div>
   </div>
+
   <div class="jobs-list" id="jobs-container"></div>
 </div>
 
-<!-- SCREEN: ДЕТАЛИ ВАКАНСИИ -->
+
+<!-- ══════════════════════════════════════
+     SCREEN: ДЕТАЛИ ВАКАНСИИ
+══════════════════════════════════════ -->
 <div id="screen-job-detail" class="screen">
   <button class="back-btn" onclick="goTo('screen-jobs')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     Назад
   </button>
+
   <div class="detail-card">
     <div class="detail-logo" id="d-logo"></div>
     <div class="detail-company" id="d-company"></div>
@@ -583,58 +948,84 @@
     <div class="detail-salary" id="d-salary"></div>
     <div class="detail-tags" id="d-tags"></div>
   </div>
+
   <div class="detail-card detail-section">
     <div class="detail-section-title">О вакансии</div>
     <p id="d-desc"></p>
   </div>
+
   <div class="detail-card detail-section">
     <div class="detail-section-title">Требования</div>
     <ul id="d-req"></ul>
   </div>
+
   <div class="detail-card detail-section">
     <div class="detail-section-title">Условия</div>
     <ul id="d-cond"></ul>
   </div>
+
   <button class="apply-btn" onclick="showToast('Отклик отправлен! Работодатель свяжется с вами.')">
     ✅ Откликнуться на вакансию
   </button>
 </div>
 
-<!-- SCREEN: СОЗДАТЬ ВАКАНСИЮ -->
+
+<!-- ══════════════════════════════════════
+     SCREEN: СОЗДАТЬ ВАКАНСИЮ
+══════════════════════════════════════ -->
 <div id="screen-create-job" class="screen">
   <button class="back-btn" onclick="goTo('screen-employer')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     Назад
   </button>
+
+  <!-- FORM WRAPPER -->
   <div id="cj-form-wrap" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:0">
     <div class="section-title">Новая вакансия 📋</div>
     <div class="section-sub">Заполните форму — займёт не более 3 минут</div>
+
+    <!-- Progress -->
     <div class="form-progress">
-      <div class="fp-step"><div class="fp-dot active" id="fp1">1</div><div class="fp-label">Основное</div></div>
+      <div class="fp-step">
+        <div class="fp-dot active" id="fp1">1</div>
+        <div class="fp-label">Основное</div>
+      </div>
       <div class="fp-line" id="fl1"></div>
-      <div class="fp-step"><div class="fp-dot" id="fp2">2</div><div class="fp-label">Требования</div></div>
+      <div class="fp-step">
+        <div class="fp-dot" id="fp2">2</div>
+        <div class="fp-label">Требования</div>
+      </div>
       <div class="fp-line" id="fl2"></div>
-      <div class="fp-step"><div class="fp-dot" id="fp3">3</div><div class="fp-label">Условия</div></div>
+      <div class="fp-step">
+        <div class="fp-dot" id="fp3">3</div>
+        <div class="fp-label">Условия</div>
+      </div>
     </div>
 
-    <!-- STEP 1 -->
+    <!-- STEP 1: основное -->
     <div class="form-wrap" id="cj-step1">
       <div class="form-group">
         <label class="form-label">Название вакансии <span class="fl-req">*</span></label>
         <input class="form-input" id="cj-title" type="text" placeholder="Сварщик 5–6 разряда, Машинист экскаватора…" maxlength="80" oninput="updateChar('cj-title','cc-title',80)" />
         <span class="char-count" id="cc-title">0 / 80</span>
       </div>
+
       <div class="form-group">
         <label class="form-label">Категория <span class="fl-req">*</span></label>
-        <select class="form-select" id="cj-category">
+        <select class="form-select" id="cj-category" onchange="onCategoryChange(this)">
           <option value="" disabled selected>Выберите категорию</option>
           <option value="oil">Нефть и газ</option>
           <option value="build">Строительство</option>
           <option value="mine">Горнодобыча</option>
+          <option value="prod">Производство</option>
           <option value="food">Питание / Быт</option>
           <option value="other">Другое</option>
         </select>
+        <input class="form-input" id="cj-category-other" type="text"
+          placeholder="Укажите категорию" maxlength="40"
+          style="margin-top:8px;display:none" />
       </div>
+
       <div class="form-group">
         <label class="form-label">Зарплата <span class="fl-req">*</span></label>
         <div class="salary-row">
@@ -643,10 +1034,12 @@
           <div class="salary-suffix">₽/мес</div>
         </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Город / регион <span class="fl-req">*</span></label>
         <input class="form-input" id="cj-location" type="text" placeholder="Ноябрьск, ЯНАО" maxlength="60" />
       </div>
+
       <div class="form-group">
         <label class="form-label">График вахты <span class="fl-req">*</span></label>
         <div class="sched-chips" id="sched-chips">
@@ -658,22 +1051,35 @@
         </div>
         <input class="form-input" id="cj-schedule-custom" type="text" placeholder="Свой вариант, напр. 45/30" maxlength="12" style="margin-top:8px" />
       </div>
+
+      <div class="form-group">
+        <label class="form-label">График работы <span style="color:var(--text-muted);font-weight:400">(необязательно)</span></label>
+        <div class="sched-chips" id="work-sched-chips">
+          <div class="sched-chip" onclick="selectWorkSched(this,'5/2')">5/2</div>
+          <div class="sched-chip" onclick="selectWorkSched(this,'6/1')">6/1</div>
+          <div class="sched-chip" onclick="selectWorkSched(this,'7/0')">7/0</div>
+        </div>
+        <input class="form-input" id="cj-work-schedule-custom" type="text" placeholder="Свой вариант, напр. 4/3" maxlength="12" style="margin-top:8px" />
+      </div>
       <div class="form-group">
         <label class="form-label">Описание вакансии <span class="fl-req">*</span></label>
         <textarea class="form-textarea" id="cj-desc" placeholder="Расскажите об объекте, задачах и условиях…" maxlength="600" oninput="updateChar('cj-desc','cc-desc',600)"></textarea>
         <span class="char-count" id="cc-desc">0 / 600</span>
       </div>
+
       <div class="form-nav">
         <button class="btn-next" style="flex:1" onclick="goStep(2)">Далее →</button>
       </div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- STEP 2: требования -->
     <div class="form-wrap" id="cj-step2" style="display:none">
       <div class="form-group">
         <label class="form-label">Требования к кандидату <span class="fl-req">*</span></label>
         <div class="dyn-list" id="req-list"></div>
-        <button class="dyn-add-btn" onclick="addDynItem('req-list','req','Например: Опыт от 3 лет')">+ Добавить требование</button>
+        <button class="dyn-add-btn" onclick="addDynItem('req-list','req','Например: Опыт от 3 лет')">
+          + Добавить требование
+        </button>
       </div>
       <div class="form-nav">
         <button class="btn-prev" onclick="goStep(1)">← Назад</button>
@@ -681,12 +1087,14 @@
       </div>
     </div>
 
-    <!-- STEP 3 -->
+    <!-- STEP 3: условия -->
     <div class="form-wrap" id="cj-step3" style="display:none">
       <div class="form-group">
         <label class="form-label">Условия работы <span class="fl-req">*</span></label>
         <div class="dyn-list" id="cond-list"></div>
-        <button class="dyn-add-btn" onclick="addDynItem('cond-list','cond','Например: Бесплатное проживание')">+ Добавить условие</button>
+        <button class="dyn-add-btn" onclick="addDynItem('cond-list','cond','Например: Бесплатное проживание')">
+          + Добавить условие
+        </button>
       </div>
       <div class="form-nav">
         <button class="btn-prev" onclick="goStep(2)">← Назад</button>
@@ -705,60 +1113,268 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════
+     SCREEN: МОИ РЕЗЮМЕ
+══════════════════════════════════════ -->
+<div id="screen-my-resumes" class="screen">
+  <button class="back-btn" onclick="goTo('screen-worker')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+
+  <div class="section-title">Мои резюме 📄</div>
+  <div class="section-sub">До 3 анкет — для разных специальностей</div>
+
+  <div class="resume-list" id="resume-list">
+    <!-- заполняется через JS -->
+  </div>
+
+  <div style="width:100%;max-width:400px;margin-top:6px">
+    <button class="btn-create-resume" id="btn-add-resume" onclick="openCreateResume(null)">
+      + Создать резюме
+    </button>
+    <div class="resume-count-hint" id="resume-count-hint"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN: СОЗДАТЬ / РЕДАКТИРОВАТЬ РЕЗЮМЕ
+══════════════════════════════════════ -->
+<div id="screen-create-resume" class="screen">
+  <button class="back-btn" onclick="goTo('screen-my-resumes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Мои резюме
+  </button>
+
+  <!-- FORM WRAPPER -->
+  <div id="cr-form-wrap" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:0">
+    <div class="section-title" id="cr-screen-title">Новое резюме 📄</div>
+    <div class="section-sub">Заполните анкету — работодатели сами найдут вас</div>
+
+    <div class="form-wrap">
+
+      <!-- ФИО -->
+      <div class="form-group">
+        <label class="form-label">ФИО <span class="fl-req">*</span></label>
+        <input class="form-input" id="cr-name" type="text" placeholder="Иванов Иван Иванович" maxlength="80" />
+      </div>
+
+      <!-- Телефон -->
+      <div class="form-group">
+        <label class="form-label">Телефон <span class="fl-req">*</span></label>
+        <input class="form-input" id="cr-phone" type="tel" placeholder="+7 900 000-00-00" maxlength="20" />
+      </div>
+
+      <!-- Telegram -->
+      <div class="form-group">
+        <label class="form-label">Telegram <span class="field-optional">(заполняется автоматически)</span></label>
+        <div class="tg-input-wrap">
+          <span class="tg-prefix">@</span>
+          <input class="form-input" id="cr-telegram" type="text" placeholder="username" maxlength="40" />
+        </div>
+      </div>
+
+      <!-- Пол -->
+      <div class="form-group">
+        <label class="form-label">Пол <span class="fl-req">*</span></label>
+        <div class="gender-chips">
+          <div class="gender-chip" id="gender-m" onclick="selectGender('М')">👨 Мужской</div>
+          <div class="gender-chip" id="gender-f" onclick="selectGender('Ж')">👩 Женский</div>
+        </div>
+      </div>
+
+      <!-- Специальность -->
+      <div class="form-group">
+        <label class="form-label">Специальность <span class="fl-req">*</span></label>
+        <input class="form-input" id="cr-specialty" type="text" placeholder="Сварщик, Машинист, Повар…" maxlength="60" />
+      </div>
+
+      <!-- Категория работы -->
+      <div class="form-group">
+        <label class="form-label">Категория работы <span class="fl-req">*</span></label>
+        <select class="form-select" id="cr-category">
+          <option value="" disabled selected>Выберите категорию</option>
+          <option value="oil">Нефть и газ</option>
+          <option value="build">Строительство</option>
+          <option value="mine">Горнодобыча</option>
+          <option value="prod">Производство</option>
+          <option value="food">Питание / Быт</option>
+          <option value="other">Другое</option>
+        </select>
+      </div>
+
+      <!-- Опыт -->
+      <div class="form-group">
+        <label class="form-label">Опыт работы <span class="fl-req">*</span></label>
+        <div class="exp-chips" id="exp-chips">
+          <div class="exp-chip" onclick="selectExp(this,'Нет опыта')">Нет опыта</div>
+          <div class="exp-chip" onclick="selectExp(this,'1–3 года')">1–3 года</div>
+          <div class="exp-chip" onclick="selectExp(this,'3–5 лет')">3–5 лет</div>
+          <div class="exp-chip" onclick="selectExp(this,'5+ лет')">5+ лет</div>
+        </div>
+      </div>
+
+      <!-- Желаемая ЗП -->
+      <div class="form-group">
+        <label class="form-label">Желаемая зарплата <span class="fl-req">*</span></label>
+        <div class="salary-row">
+          <input class="form-input" id="cr-salary" type="number" placeholder="90 000" min="0" />
+          <div class="salary-suffix">₽/мес</div>
+        </div>
+      </div>
+
+      <!-- Регион -->
+      <div class="form-group">
+        <label class="form-label">Регион / город <span class="fl-req">*</span></label>
+        <input class="form-input" id="cr-region" type="text" placeholder="Москва, Тюмень, Ноябрьск…" maxlength="60" />
+      </div>
+
+      <!-- Гражданство -->
+      <div class="form-group">
+        <label class="form-label">Гражданство <span class="field-optional">(необязательно)</span></label>
+        <div class="citizen-chips">
+          <div class="citizen-chip" onclick="selectCitizen(this,'Россия')">🇷🇺 Россия</div>
+          <div class="citizen-chip" onclick="selectCitizen(this,'СНГ')">🌐 СНГ</div>
+          <div class="citizen-chip" onclick="selectCitizen(this,'Другое')">🌍 Другое</div>
+        </div>
+      </div>
+
+      <!-- О себе -->
+      <div class="form-group">
+        <label class="form-label">О себе <span class="fl-req">*</span></label>
+        <textarea class="form-textarea" id="cr-about" placeholder="Кратко о себе, опыте и пожеланиях…" maxlength="400" oninput="updateChar('cr-about','cc-about',400)"></textarea>
+        <span class="char-count" id="cc-about">0 / 400</span>
+      </div>
+
+      <!-- Удостоверения -->
+      <div class="form-group">
+        <label class="form-label">Удостоверения <span class="field-optional">(если есть)</span></label>
+        <div class="dyn-list" id="cert-list"></div>
+        <button class="dyn-add-btn" onclick="addDynItem('cert-list','cert','Напр.: Удост. сварщика, Права кат. C')">
+          + Добавить удостоверение
+        </button>
+      </div>
+
+      <!-- Ключевые навыки -->
+      <div class="form-group">
+        <label class="form-label">Ключевые навыки <span class="field-optional">(необязательно)</span></label>
+        <div class="dyn-list" id="skill-list"></div>
+        <button class="dyn-add-btn" onclick="addDynItem('skill-list','skill','Напр.: Работа в полевых условиях')">
+          + Добавить навык
+        </button>
+      </div>
+
+      <!-- Submit -->
+      <div class="form-nav">
+        <button class="btn-submit" style="flex:1" onclick="submitResume()">✅ Сохранить резюме</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="cr-success">
+    <div class="success-ring">✅</div>
+    <div class="success-title" id="cr-success-title">Резюме создано!</div>
+    <div class="success-sub">Ваша анкета сохранена. Работодатели смогут найти вас на платформе.</div>
+    <div class="preview-card" id="cr-preview"></div>
+    <button class="btn-back-employer" onclick="goTo('screen-my-resumes')">← Мои резюме</button>
+  </div>
+</div>
+
+
+<!-- toast -->
 <div id="toast" class="toast"></div>
 
+
 <script>
+  // ── Telegram Web App init ──
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
   }
 
+  // ── category «Другое» ──
+  function onCategoryChange(sel) {
+    const other = document.getElementById('cj-category-other');
+    other.style.display = sel.value === 'other' ? 'block' : 'none';
+    if (sel.value !== 'other') other.value = '';
+  }
+
+  // ── theme ──
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    document.getElementById('theme-icon').textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('gv-theme', isLight ? 'light' : 'dark');
+  }
+  (function() {
+    if (localStorage.getItem('gv-theme') === 'light') {
+      document.documentElement.classList.add('light');
+      const btn = document.getElementById('theme-icon');
+      if (btn) btn.textContent = '☀️';
+    }
+  })();
+
+  // ── screen navigation ──
   function goTo(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (id === 'screen-my-resumes') renderResumes();
   }
 
+  // ── job data ──
   const jobs = [
     {
       id: 1, emoji: '🔥', color: 'rgba(233,69,96,.25)', category: 'oil',
-      company: 'Газпром Добыча Ноябрьск', title: 'Сварщик НГДО (5–6 разряд)',
-      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес', schedule: '60/30', date: '23 фев 2026',
+      company: 'Газпром Добыча Ноябрьск',
+      title: 'Сварщик НГДО (5–6 разряд)',
+      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес',
+      schedule: '60/30', date: '23 фев 2026',
       desc: 'Требуется сварщик для выполнения сварочных работ на нефтегазовых объектах Крайнего Севера. Полное обеспечение на вахте за счёт компании.',
-      req: ['Опыт работы от 3 лет','Удостоверение сварщика 5–6 разряд','Готовность к вахтовому методу','Действующая медкнижка'],
-      cond: ['Проживание в благоустроенном общежитии','Трёхразовое питание','Спецодежда и СИЗ','Официальное оформление по ТК РФ','Доставка до места вахты и обратно']
+      req: ['Опыт работы от 3 лет', 'Удостоверение сварщика 5–6 разряд', 'Готовность к вахтовому методу', 'Действующая медкнижка'],
+      cond: ['Проживание в благоустроенном общежитии', 'Трёхразовое питание', 'Спецодежда и СИЗ', 'Официальное оформление по ТК РФ', 'Доставка до места вахты и обратно']
     },
     {
       id: 2, emoji: '⚡', color: 'rgba(80,160,255,.25)', category: 'oil',
-      company: 'Роснефть — Самотлорнефтегаз', title: 'Электромонтажник (4–5 разряд)',
-      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес', schedule: '45/15', date: '22 фев 2026',
+      company: 'Роснефть — Самотлорнефтегаз',
+      title: 'Электромонтажник (4–5 разряд)',
+      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес',
+      schedule: '45/15', date: '22 фев 2026',
       desc: 'Монтаж, наладка и ремонт электрооборудования на объектах нефтедобычи. Работа в составе бригады под руководством прораба.',
-      req: ['Опыт от 2 лет','Группа допуска по электробезопасности не ниже III','Удостоверение электромонтажника','Справка об отсутствии судимостей'],
-      cond: ['Вахтовый посёлок со всеми удобствами','Питание 4 раза в день','Страховка от НС','Квартальные премии','Аванс 50%']
+      req: ['Опыт от 2 лет', 'Группа допуска по электробезопасности не ниже III', 'Удостоверение электромонтажника', 'Справка об отсутствии судимостей'],
+      cond: ['Вахтовый посёлок со всеми удобствами', 'Питание 4 раза в день', 'Страховка от НС', 'Квартальные премии', 'Аванс 50%']
     },
     {
       id: 3, emoji: '🚜', color: 'rgba(245,166,35,.25)', category: 'build',
-      company: 'СК Мост', title: 'Машинист экскаватора',
-      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес', schedule: '60/30', date: '21 фев 2026',
+      company: 'СК Мост',
+      title: 'Машинист экскаватора',
+      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес',
+      schedule: '60/30', date: '21 фев 2026',
       desc: 'Работа на строительстве федеральной автодороги в Якутии. Управление экскаватором Komatsu PC300. Объект сдаётся в 2027 году.',
-      req: ['Удостоверение машиниста экскаватора','Опыт работы от 5 лет','Готовность к работе в условиях Крайнего Севера','Отсутствие вредных привычек (алкоголь)'],
-      cond: ['Зарплата 2 раза в месяц','Тёплое жильё на объекте','Питание','Надбавка за Крайний Север','Перелёт до объекта за счёт компании']
+      req: ['Удостоверение машиниста экскаватора', 'Опыт работы от 5 лет', 'Готовность к работе в условиях Крайнего Севера', 'Отсутствие вредных привычек (алкоголь)'],
+      cond: ['Зарплата 2 раза в месяц', 'Тёплое жильё на объекте', 'Питание', 'Надбавка за Крайний Север', 'Перелёт до объекта за счёт компании']
     },
     {
       id: 4, emoji: '⛏️', color: 'rgba(180,100,255,.25)', category: 'mine',
-      company: 'Норильский никель', title: 'Бурильщик скважин',
-      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес', schedule: '30/30', date: '20 фев 2026',
+      company: 'Норильский никель',
+      title: 'Бурильщик скважин',
+      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес',
+      schedule: '30/30', date: '20 фев 2026',
       desc: 'Бурение скважин на горнодобывающем предприятии. Работа в подземных условиях. Полный социальный пакет и льготы.',
-      req: ['Удостоверение бурильщика','Опыт подземных работ от 3 лет','Медицинская комиссия (подземные работы)','Без судимостей'],
-      cond: ['Корпоративное жильё','Льготный выход на пенсию','Дополнительный отпуск 8 недель','ДМС','Компенсация проезда']
+      req: ['Удостоверение бурильщика', 'Опыт подземных работ от 3 лет', 'Медицинская комиссия (подземные работы)', 'Без судимостей'],
+      cond: ['Корпоративное жильё', 'Льготный выход на пенсию', 'Дополнительный отпуск 8 недель', 'ДМС', 'Компенсация проезда']
     },
     {
       id: 5, emoji: '🍳', color: 'rgba(80,220,140,.25)', category: 'food',
-      company: 'ПАО Лукойл — Западная Сибирь', title: 'Повар вахтового посёлка',
-      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес', schedule: '60/30', date: '19 фев 2026',
+      company: 'ПАО Лукойл — Западная Сибирь',
+      title: 'Повар вахтового посёлка',
+      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес',
+      schedule: '60/30', date: '19 фев 2026',
       desc: 'Приготовление горячего питания для работников вахтового посёлка (100–150 человек). Работа в оснащённой столовой нового образца.',
-      req: ['Опыт работы поваром от 2 лет','Санитарная книжка','Умение работать с большими объёмами','Ответственность и аккуратность'],
-      cond: ['Проживание бесплатно','Питание бесплатно','Спецодежда выдаётся','Официальное трудоустройство','Возможность карьерного роста до шеф-повара']
+      req: ['Опыт работы поваром от 2 лет', 'Санитарная книжка', 'Умение работать с большими объёмами', 'Ответственность и аккуратность'],
+      cond: ['Проживание бесплатно', 'Питание бесплатно', 'Спецодежда выдаётся', 'Официальное трудоустройство', 'Возможность карьерного роста до шеф-повара']
     }
   ];
 
@@ -771,7 +1387,9 @@
       <div class="job-card" onclick="openJob(${j.id})">
         <div class="jc-header">
           <div class="company-logo" style="background:${j.color}">${j.emoji}</div>
-          <div><div class="jc-company-name">${j.company} <span class="verified-chip">✓ Verified</span></div></div>
+          <div>
+            <div class="jc-company-name">${j.company} <span class="verified-chip">✓ Verified</span></div>
+          </div>
         </div>
         <div class="jc-title">${j.title}</div>
         <div class="jc-salary">${j.salary}</div>
@@ -814,56 +1432,81 @@
       <span class="detail-tag">⏱ Вахта ${j.schedule}</span>
       <span class="detail-tag">📅 ${j.date}</span>`;
     document.getElementById('d-desc').textContent = j.desc;
-    document.getElementById('d-req').innerHTML  = j.req.map(r => `<li>${r}</li>`).join('');
+    document.getElementById('d-req').innerHTML  = j.req.map(r  => `<li>${r}</li>`).join('');
     document.getElementById('d-cond').innerHTML = j.cond.map(c => `<li>${c}</li>`).join('');
     goTo('screen-job-detail');
   }
 
+  // init jobs on load
   renderJobs(jobs);
+
+  // ══════════════════════════════════
+  //  CREATE JOB FORM LOGIC
+  // ══════════════════════════════════
 
   let cjStep = 1;
   let cjSchedule = '';
   const dynCounters = { req: 0, cond: 0 };
 
-  function openCreateJob() { resetJobForm(); goTo('screen-create-job'); }
+  function openCreateJob() {
+    resetJobForm();
+    goTo('screen-create-job');
+  }
 
   function resetJobForm() {
-    cjStep = 1; cjSchedule = '';
-    dynCounters.req = 0; dynCounters.cond = 0;
-    ['cj-title','cj-location','cj-salary-from','cj-salary-to','cj-schedule-custom','cj-desc'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
+    cjStep = 1;
+    cjSchedule = '';
+    cjWorkSchedule = '';
+    dynCounters.req = 0;
+    dynCounters.cond = 0;
+
+    ['cj-title','cj-location','cj-salary-from','cj-salary-to','cj-schedule-custom','cj-work-schedule-custom','cj-category-other','cj-desc'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
     });
     document.getElementById('cj-category').value = '';
-    document.querySelectorAll('.sched-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('cj-category-other').style.display = 'none';
+    document.querySelectorAll('#sched-chips .sched-chip, #work-sched-chips .sched-chip').forEach(c => c.classList.remove('active'));
     document.getElementById('req-list').innerHTML = '';
     document.getElementById('cond-list').innerHTML = '';
     updateChar('cj-title','cc-title',80);
     updateChar('cj-desc','cc-desc',600);
+
     document.getElementById('cj-form-wrap').style.display = 'flex';
     document.getElementById('cj-success').classList.remove('active');
+
     addDynItem('req-list','req','Например: Опыт от 3 лет');
     addDynItem('cond-list','cond','Например: Бесплатное проживание');
-    renderStep(1); updateProgress(1);
+
+    renderStep(1);
+    updateProgress(1);
   }
 
   function renderStep(n) {
-    [1,2,3].forEach(i => { document.getElementById('cj-step'+i).style.display = i === n ? 'flex' : 'none'; });
-    cjStep = n; updateProgress(n);
+    [1,2,3].forEach(i => {
+      document.getElementById('cj-step'+i).style.display = i === n ? 'flex' : 'none';
+    });
+    cjStep = n;
+    updateProgress(n);
   }
 
   function updateProgress(n) {
     [1,2,3].forEach(i => {
       const dot = document.getElementById('fp'+i);
       dot.classList.remove('active','done');
-      if (i < n) dot.classList.add('done');
+      if (i < n)       dot.classList.add('done');
       else if (i === n) dot.classList.add('active');
     });
-    [1,2].forEach(i => { document.getElementById('fl'+i).classList.toggle('done', i < n); });
+    [1,2].forEach(i => {
+      const line = document.getElementById('fl'+i);
+      line.classList.toggle('done', i < n);
+    });
   }
 
   function goStep(n) {
     if (n > cjStep && !validateStep(cjStep)) return;
-    renderStep(n); window.scrollTo({ top: 0, behavior: 'smooth' });
+    renderStep(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function validateStep(step) {
@@ -874,12 +1517,16 @@
       const location = document.getElementById('cj-location').value.trim();
       const desc     = document.getElementById('cj-desc').value.trim();
       const schedule = cjSchedule || document.getElementById('cj-schedule-custom').value.trim();
-      if (!title)    { shakeFocus('cj-title');       showToast('Введите название вакансии'); return false; }
-      if (!cat)      { shakeFocus('cj-category');    showToast('Выберите категорию'); return false; }
+
+      if (!title)    { shakeFocus('cj-title');    showToast('Введите название вакансии'); return false; }
+      if (!cat)      { shakeFocus('cj-category'); showToast('Выберите категорию'); return false; }
+      if (cat === 'other' && !document.getElementById('cj-category-other').value.trim()) {
+        shakeFocus('cj-category-other'); showToast('Укажите категорию'); return false;
+      }
       if (!salFrom)  { shakeFocus('cj-salary-from'); showToast('Укажите зарплату (от)'); return false; }
-      if (!location) { shakeFocus('cj-location');    showToast('Укажите город'); return false; }
+      if (!location) { shakeFocus('cj-location'); showToast('Укажите город'); return false; }
       if (!schedule) { showToast('Выберите или укажите график вахты'); return false; }
-      if (!desc)     { shakeFocus('cj-desc');        showToast('Добавьте описание вакансии'); return false; }
+      if (!desc)     { shakeFocus('cj-desc');     showToast('Добавьте описание вакансии'); return false; }
     }
     if (step === 2) {
       const items = getListValues('req-list');
@@ -894,14 +1541,24 @@
 
   function shakeFocus(id) {
     const el = document.getElementById(id);
-    el.classList.add('error'); el.focus();
+    el.classList.add('error');
+    el.focus();
     setTimeout(() => el.classList.remove('error'), 1200);
   }
 
   function selectSched(el, val) {
-    document.querySelectorAll('.sched-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active'); cjSchedule = val;
+    document.querySelectorAll('#sched-chips .sched-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    cjSchedule = val;
     document.getElementById('cj-schedule-custom').value = '';
+  }
+
+  let cjWorkSchedule = '';
+  function selectWorkSched(el, val) {
+    document.querySelectorAll('#work-sched-chips .sched-chip').forEach(c => c.classList.remove('active'));
+    if (cjWorkSchedule === val) { cjWorkSchedule = ''; }
+    else { el.classList.add('active'); cjWorkSchedule = val; }
+    document.getElementById('cj-work-schedule-custom').value = '';
   }
 
   function addDynItem(listId, prefix, ph) {
@@ -909,13 +1566,19 @@
     const idx = dynCounters[prefix]++;
     const id = `${prefix}-${idx}`;
     const row = document.createElement('div');
-    row.className = 'dyn-item'; row.id = `${id}-row`;
-    row.innerHTML = `<input class="dyn-input" id="${id}" type="text" placeholder="${ph}" maxlength="120" /><button class="dyn-remove" onclick="removeDynItem('${id}-row')" title="Удалить">×</button>`;
+    row.className = 'dyn-item';
+    row.id = `${id}-row`;
+    row.innerHTML = `
+      <input class="dyn-input" id="${id}" type="text" placeholder="${ph}" maxlength="120" />
+      <button class="dyn-remove" onclick="removeDynItem('${id}-row')" title="Удалить">×</button>`;
     list.appendChild(row);
     document.getElementById(id).focus();
   }
 
-  function removeDynItem(rowId) { const el = document.getElementById(rowId); if (el) el.remove(); }
+  function removeDynItem(rowId) {
+    const el = document.getElementById(rowId);
+    if (el) el.remove();
+  }
 
   function getListValues(listId) {
     return Array.from(document.querySelectorAll(`#${listId} .dyn-input`))
@@ -933,27 +1596,42 @@
 
   function submitJob() {
     if (!validateStep(3)) return;
+
     const title    = document.getElementById('cj-title').value.trim();
     const cat      = document.getElementById('cj-category').value;
     const salFrom  = document.getElementById('cj-salary-from').value.trim();
     const salTo    = document.getElementById('cj-salary-to').value.trim();
     const location = document.getElementById('cj-location').value.trim();
-    const schedule = cjSchedule || document.getElementById('cj-schedule-custom').value.trim();
-    const desc     = document.getElementById('cj-desc').value.trim();
+    const schedule     = cjSchedule || document.getElementById('cj-schedule-custom').value.trim();
+    const workSchedule = cjWorkSchedule || document.getElementById('cj-work-schedule-custom').value.trim();
+    const desc         = document.getElementById('cj-desc').value.trim();
     const reqs     = getListValues('req-list');
     const conds    = getListValues('cond-list');
+
     const salaryStr = salFrom && salTo
       ? `${Number(salFrom).toLocaleString('ru')} – ${Number(salTo).toLocaleString('ru')} ₽/мес`
-      : salFrom ? `от ${Number(salFrom).toLocaleString('ru')} ₽/мес`
-               : `до ${Number(salTo).toLocaleString('ru')} ₽/мес`;
-    const catLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', food:'Питание / Быт', other:'Другое' };
+      : salFrom
+        ? `от ${Number(salFrom).toLocaleString('ru')} ₽/мес`
+        : `до ${Number(salTo).toLocaleString('ru')} ₽/мес`;
+
+    const catLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
+    const catLabel  = cat === 'other'
+      ? (document.getElementById('cj-category-other').value.trim() || 'Другое')
+      : (catLabels[cat] || cat);
     const today = new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});
+
     const newJob = {
-      id: jobs.length + 1, emoji: '📋', color: 'rgba(233,69,96,.25)',
-      category: cat, company: 'Ваша компания',
-      title, location, salary: salaryStr, schedule, date: today, desc, req: reqs, cond: conds
+      id: jobs.length + 1,
+      emoji: '📋', color: 'rgba(233,69,96,.25)',
+      category: cat,
+      categoryLabel: catLabel,
+      company: 'Ваша компания',
+      title, location, salary: salaryStr, schedule, workSchedule, date: today,
+      desc, req: reqs, cond: conds
     };
-    jobs.unshift(newJob); renderJobs(jobs);
+    jobs.unshift(newJob);
+    renderJobs(jobs);
+
     document.getElementById('cj-preview').innerHTML = `
       <div class="pc-header">
         <div class="pc-logo">📋</div>
@@ -966,18 +1644,219 @@
       <div class="pc-meta">
         <span class="pc-tag">📍 ${location}</span>
         <span class="pc-tag">⏱ Вахта ${schedule}</span>
-        <span class="pc-tag">🗂 ${catLabels[cat] || cat}</span>
+        ${workSchedule ? `<span class="pc-tag">📆 График ${workSchedule}</span>` : ''}
+        <span class="pc-tag">🗂 ${catLabel}</span>
         <span class="pc-tag">📅 ${today}</span>
       </div>`;
+
     document.getElementById('cj-form-wrap').style.display = 'none';
     document.getElementById('cj-success').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // ══════════════════════════════════════
+  //  RESUME LOGIC
+  // ══════════════════════════════════════
+
+  const MAX_RESUMES = 3;
+  let resumes = [];
+  let crEditIndex = null;
+  let crGender    = '';
+  let crExp       = '';
+  let crCitizen   = '';
+
+  const catLabelsR = {
+    oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча',
+    prod:'Производство', food:'Питание / Быт', other:'Другое'
+  };
+
+  function openMyResumes() {
+    renderResumes();
+    goTo('screen-my-resumes');
+  }
+
+  function renderResumes() {
+    const list = document.getElementById('resume-list');
+    const btn  = document.getElementById('btn-add-resume');
+    const hint = document.getElementById('resume-count-hint');
+
+    if (!resumes.length) {
+      list.innerHTML = `
+        <div class="resume-empty">
+          <div class="resume-empty-icon">📄</div>
+          <div class="resume-empty-text">У вас ещё нет резюме.<br>Создайте первую анкету!</div>
+        </div>`;
+    } else {
+      list.innerHTML = resumes.map((r, i) => `
+        <div class="resume-card">
+          <div class="rc-header">
+            <div class="rc-avatar">👷</div>
+            <div>
+              <div class="rc-name">${r.name}</div>
+              <div class="rc-spec">${r.specialty}</div>
+            </div>
+          </div>
+          <div class="rc-meta">
+            <span class="rc-tag">💰 от ${Number(r.salary).toLocaleString('ru')} ₽</span>
+            <span class="rc-tag">📍 ${r.region}</span>
+            <span class="rc-tag">🗂 ${catLabelsR[r.category] || r.category}</span>
+            ${r.exp ? `<span class="rc-tag">⏳ ${r.exp}</span>` : ''}
+          </div>
+          <div class="rc-actions">
+            <button class="rc-btn-edit" onclick="openCreateResume(${i})">✏️ Редактировать</button>
+            <button class="rc-btn-del"  onclick="deleteResume(${i})" title="Удалить">🗑</button>
+          </div>
+        </div>`).join('');
+    }
+
+    const count = resumes.length;
+    btn.disabled = count >= MAX_RESUMES;
+    hint.textContent = count > 0 ? `${count} из ${MAX_RESUMES} резюме` : '';
+  }
+
+  function deleteResume(idx) {
+    resumes.splice(idx, 1);
+    renderResumes();
+    showToast('Резюме удалено');
+  }
+
+  function openCreateResume(idx) {
+    crEditIndex = idx;
+    crGender    = '';
+    crExp       = '';
+    crCitizen   = '';
+
+    ['cr-name','cr-phone','cr-telegram','cr-specialty','cr-region','cr-about'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('cr-salary').value = '';
+    document.getElementById('cr-category').value = '';
+    document.getElementById('cert-list').innerHTML = '';
+    document.getElementById('skill-list').innerHTML = '';
+    document.querySelectorAll('.gender-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.exp-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.citizen-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('cr-about').dispatchEvent(new Event('input'));
+
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user?.username;
+    if (tgUser) document.getElementById('cr-telegram').value = tgUser;
+
+    if (idx !== null) {
+      const r = resumes[idx];
+      document.getElementById('cr-screen-title').textContent = 'Редактировать резюме ✏️';
+      document.getElementById('cr-name').value      = r.name;
+      document.getElementById('cr-phone').value     = r.phone;
+      document.getElementById('cr-telegram').value  = r.telegram;
+      document.getElementById('cr-specialty').value = r.specialty;
+      document.getElementById('cr-category').value  = r.category;
+      document.getElementById('cr-salary').value    = r.salary;
+      document.getElementById('cr-region').value    = r.region;
+      document.getElementById('cr-about').value     = r.about;
+      document.getElementById('cr-about').dispatchEvent(new Event('input'));
+      if (r.gender) selectGender(r.gender);
+      if (r.exp) {
+        document.querySelectorAll('.exp-chip').forEach(c => {
+          if (c.textContent.trim() === r.exp) selectExp(c, r.exp);
+        });
+      }
+      if (r.citizen) selectCitizenVal(r.citizen);
+      r.certs.forEach(v => { addDynItem('cert-list','cert','Напр.: Удост. сварщика'); const inp = document.querySelector('#cert-list .dyn-input:last-of-type'); if(inp) inp.value = v; });
+      r.skills.forEach(v => { addDynItem('skill-list','skill','Напр.: Работа в полевых условиях'); const inp = document.querySelector('#skill-list .dyn-input:last-of-type'); if(inp) inp.value = v; });
+    } else {
+      document.getElementById('cr-screen-title').textContent = 'Новое резюме 📄';
+    }
+
+    document.getElementById('cr-form-wrap').style.display = '';
+    document.getElementById('cr-success').classList.remove('active');
+
+    goTo('screen-create-resume');
+  }
+
+  function selectGender(val) {
+    crGender = val;
+    document.getElementById('gender-m').classList.toggle('active', val === 'М');
+    document.getElementById('gender-f').classList.toggle('active', val === 'Ж');
+  }
+  function selectExp(el, val) {
+    crExp = val;
+    document.querySelectorAll('.exp-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function selectCitizen(el, val) {
+    crCitizen = val;
+    document.querySelectorAll('.citizen-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function selectCitizenVal(val) {
+    crCitizen = val;
+    document.querySelectorAll('.citizen-chip').forEach(c => {
+      c.classList.toggle('active', c.textContent.trim().includes(val));
+    });
+  }
+
+  function submitResume() {
+    const name      = document.getElementById('cr-name').value.trim();
+    const phone     = document.getElementById('cr-phone').value.trim();
+    const specialty = document.getElementById('cr-specialty').value.trim();
+    const category  = document.getElementById('cr-category').value;
+    const salary    = document.getElementById('cr-salary').value.trim();
+    const region    = document.getElementById('cr-region').value.trim();
+    const about     = document.getElementById('cr-about').value.trim();
+
+    if (!name)      { shakeFocus('cr-name');      showToast('Введите ФИО'); return; }
+    if (!phone)     { shakeFocus('cr-phone');     showToast('Введите телефон'); return; }
+    if (!crGender)  { showToast('Укажите пол'); return; }
+    if (!specialty) { shakeFocus('cr-specialty'); showToast('Укажите специальность'); return; }
+    if (!category)  { shakeFocus('cr-category');  showToast('Выберите категорию'); return; }
+    if (!crExp)     { showToast('Укажите опыт работы'); return; }
+    if (!salary)    { shakeFocus('cr-salary');    showToast('Укажите желаемую зарплату'); return; }
+    if (!region)    { shakeFocus('cr-region');    showToast('Укажите регион'); return; }
+    if (!about)     { shakeFocus('cr-about');     showToast('Заполните поле "О себе"'); return; }
+
+    const telegram = document.getElementById('cr-telegram').value.trim();
+    const certs    = getListValues('cert-list');
+    const skills   = getListValues('skill-list');
+
+    const resume = { name, phone, telegram, gender: crGender, specialty, category,
+                     exp: crExp, salary, region, citizen: crCitizen, about, certs, skills,
+                     date: new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}) };
+
+    const isNew = crEditIndex === null;
+    if (isNew) {
+      resumes.push(resume);
+    } else {
+      resumes[crEditIndex] = resume;
+    }
+
+    const catLabel = catLabelsR[category] || category;
+    document.getElementById('cr-preview').innerHTML = `
+      <div class="rc-header" style="margin-bottom:10px">
+        <div class="rc-avatar">👷</div>
+        <div>
+          <div class="rc-name">${name}</div>
+          <div class="rc-spec">${specialty}</div>
+        </div>
+      </div>
+      <div class="rc-meta">
+        <span class="rc-tag">💰 от ${Number(salary).toLocaleString('ru')} ₽</span>
+        <span class="rc-tag">📍 ${region}</span>
+        <span class="rc-tag">🗂 ${catLabel}</span>
+        <span class="rc-tag">⏳ ${crExp}</span>
+        ${telegram ? `<span class="rc-tag">✈️ @${telegram}</span>` : ''}
+      </div>`;
+
+    document.getElementById('cr-success-title').textContent = isNew ? 'Резюме создано!' : 'Резюме обновлено!';
+    document.getElementById('cr-form-wrap').style.display = 'none';
+    document.getElementById('cr-success').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── toast ──
   let toastTimer;
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
+    t.textContent = msg;
+    t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
