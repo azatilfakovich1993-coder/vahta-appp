@@ -6,101 +6,299 @@
   <title>Good_Вахта</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    :root {
-      --grad-start: #1a1a2e; --grad-mid: #16213e; --grad-end: #0f3460;
-      --accent: #e94560; --accent2: #f5a623;
-      --card-bg: rgba(255,255,255,0.07); --card-border: rgba(255,255,255,0.12);
-      --text: #ffffff; --text-muted: rgba(255,255,255,0.55); --radius: 18px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
+
+    :root {
+      --grad-start: #1a1a2e;
+      --grad-mid:   #16213e;
+      --grad-end:   #0f3460;
+      --accent:     #e94560;
+      --accent2:    #f5a623;
+      --card-bg:    rgba(255, 255, 255, 0.07);
+      --card-border:rgba(255, 255, 255, 0.12);
+      --text:       #ffffff;
+      --text-muted: rgba(255,255,255,0.55);
+      --radius:     18px;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, var(--grad-start) 0%, var(--grad-mid) 50%, var(--grad-end) 100%);
-      min-height: 100vh; color: var(--text); overflow-x: hidden;
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
     }
-    .screen { display: none; flex-direction: column; align-items: center; min-height: 100vh; padding: 24px 20px 40px; animation: fadeIn .35s ease; }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 20px 40px;
+      animation: fadeIn .35s ease;
+    }
     .screen.active { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .back-btn {
-      align-self: flex-start; display: flex; align-items: center; gap: 6px;
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      color: var(--text-muted); font-size: 14px; padding: 8px 16px;
-      border-radius: 30px; cursor: pointer; transition: all .2s; margin-bottom: 28px; backdrop-filter: blur(10px);
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .back-btn:hover { color: var(--text); background: rgba(255,255,255,.13); }
-    .back-btn svg { width: 16px; height: 16px; }
-    .hero { display: flex; flex-direction: column; align-items: center; margin-bottom: 44px; }
+
+    .back-btn {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all .2s;
+      margin-bottom: 28px;
+      backdrop-filter: blur(10px);
+    }
+    .back-btn:hover  { color: var(--text); background: rgba(255,255,255,.13); }
+    .back-btn svg    { width: 16px; height: 16px; }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 44px;
+    }
     .logo-ring {
-      width: 90px; height: 90px; border-radius: 50%;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 40px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(233,69,96,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(233,69,96,.4);
     }
     .app-title {
-      font-size: 28px; font-weight: 800; letter-spacing: .5px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: .5px;
       background: linear-gradient(90deg, #fff 0%, #f5a623 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .app-subtitle { margin-top: 8px; font-size: 14px; color: var(--text-muted); text-align: center; max-width: 260px; }
-    .trust-strip {
-      display: flex; align-items: center; gap: 8px; margin-top: 16px;
-      background: rgba(29,185,84,.13); border: 1px solid rgba(29,185,84,.35);
-      border-radius: 30px; padding: 8px 18px; font-size: 13px; font-weight: 600; color: #4ddb8a;
+    .app-subtitle {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 260px;
     }
-    .trust-strip .ts-icon { font-size: 16px; }
-    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 380px; }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 380px;
+    }
     .role-card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 28px 16px; cursor: pointer; text-align: center;
-      transition: transform .2s, box-shadow .2s, background .2s; backdrop-filter: blur(12px);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform .2s, box-shadow .2s, background .2s;
+      backdrop-filter: blur(12px);
     }
-    .role-card:hover, .role-card:active { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.35); background: rgba(255,255,255,.12); }
-    .role-card .label { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-    .role-card .desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .role-card:hover,
+    .role-card:active {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      background: rgba(255,255,255,.12);
+    }
+    .role-card .label {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .role-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
     .role-card.employer .icon-wrap {
       background: linear-gradient(135deg, rgba(233,69,96,.25), rgba(233,69,96,.05));
-      border-radius: 50%; width: 66px; height: 66px; display: flex; align-items: center;
-      justify-content: center; margin: 0 auto 14px; font-size: 32px;
+      border-radius: 50%;
+      width: 66px; height: 66px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px; font-size: 32px;
     }
     .role-card.worker .icon-wrap {
       background: linear-gradient(135deg, rgba(245,166,35,.25), rgba(245,166,35,.05));
-      border-radius: 50%; width: 66px; height: 66px; display: flex; align-items: center;
-      justify-content: center; margin: 0 auto 14px; font-size: 32px;
+      border-radius: 50%;
+      width: 66px; height: 66px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px; font-size: 32px;
     }
+
     .stats-row { display: flex; gap: 24px; margin-top: 36px; }
     .stat-item { text-align: center; }
-    .stat-num { font-size: 20px; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-num {
+      font-size: 20px; font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
     .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
     .section-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; text-align: center; }
-    .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: center; }
+    .section-sub   { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: center; }
+
+    .menu-list {
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .menu-item {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 18px 20px;
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer; transition: transform .18s, background .18s;
+      backdrop-filter: blur(10px);
+    }
+    .menu-item:hover, .menu-item:active { transform: translateX(4px); background: rgba(255,255,255,.11); }
+    .menu-item .mi-icon {
+      width: 46px; height: 46px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .mi-icon.red    { background: rgba(233,69,96,.2);  }
+    .mi-icon.orange { background: rgba(245,166,35,.2); }
+    .mi-icon.blue   { background: rgba(80,160,255,.2); }
+    .mi-icon.green  { background: rgba(80,220,140,.2); }
+    .mi-icon.purple { background: rgba(180,100,255,.2);}
+    .mi-text .mi-title { font-size: 15px; font-weight: 600; }
+    .mi-text .mi-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .mi-arrow { margin-left: auto; color: var(--text-muted); font-size: 18px; }
+
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+    .badge-new      { background: var(--accent); color: #fff; }
+    .badge-verified { background: #1db954; color: #fff; }
+
+    .trust-strip {
+      display: flex; align-items: center; gap: 8px; margin-top: 16px;
+      background: rgba(29,185,84,.13); border: 1px solid rgba(29,185,84,.35);
+      border-radius: 30px; padding: 8px 18px;
+      font-size: 13px; font-weight: 600; color: #4ddb8a;
+    }
+    .trust-strip .ts-icon { font-size: 16px; }
+
     .verified-banner {
       display: flex; align-items: center; gap: 10px;
       background: rgba(29,185,84,.1); border: 1px solid rgba(29,185,84,.3);
-      border-radius: var(--radius); padding: 14px 18px; margin-bottom: 16px;
-      width: 100%; max-width: 400px;
+      border-radius: var(--radius); padding: 14px 18px;
+      margin-bottom: 16px; width: 100%; max-width: 400px;
     }
     .verified-banner .vb-icon { font-size: 26px; }
     .verified-banner .vb-text .vb-title { font-size: 14px; font-weight: 700; color: #4ddb8a; }
     .verified-banner .vb-text .vb-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .menu-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-    .menu-item {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 18px 20px; display: flex; align-items: center;
-      gap: 16px; cursor: pointer; transition: transform .18s, background .18s; backdrop-filter: blur(10px);
+
+    .search-wrap { width: 100%; max-width: 400px; position: relative; margin-bottom: 14px; }
+    .search-input {
+      width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 30px; padding: 12px 20px 12px 44px; color: var(--text);
+      font-size: 14px; outline: none; backdrop-filter: blur(10px);
     }
-    .menu-item:hover, .menu-item:active { transform: translateX(4px); background: rgba(255,255,255,.11); }
-    .menu-item .mi-icon { width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .mi-icon.red    { background: rgba(233,69,96,.2); }
-    .mi-icon.orange { background: rgba(245,166,35,.2); }
-    .mi-icon.blue   { background: rgba(80,160,255,.2); }
-    .mi-icon.green  { background: rgba(80,220,140,.2); }
-    .mi-icon.purple { background: rgba(180,100,255,.2); }
-    .mi-text .mi-title { font-size: 15px; font-weight: 600; }
-    .mi-text .mi-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .mi-arrow { margin-left: auto; color: var(--text-muted); font-size: 18px; }
-    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
-    .badge-new      { background: var(--accent); color: #fff; }
-    .badge-verified { background: #1db954; color: #fff; }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+
+    .chips-scroll {
+      width: 100%; max-width: 400px; overflow-x: auto; display: flex;
+      gap: 8px; margin-bottom: 20px; padding-bottom: 4px; scrollbar-width: none;
+    }
+    .chips-scroll::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; padding: 7px 16px; border-radius: 20px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      font-size: 13px; color: var(--text-muted); cursor: pointer;
+      transition: all .18s; white-space: nowrap; backdrop-filter: blur(8px);
+    }
+    .chip.active, .chip:hover { background: rgba(233,69,96,.2); border-color: rgba(233,69,96,.5); color: #fff; }
+
+    .jobs-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+    .job-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 18px 18px 14px; cursor: pointer;
+      transition: transform .18s, background .18s; backdrop-filter: blur(10px);
+    }
+    .job-card:hover, .job-card:active { transform: translateY(-2px); background: rgba(255,255,255,.11); }
+    .jc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .company-logo { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .jc-company-name { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .verified-chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: rgba(29,185,84,.15); border: 1px solid rgba(29,185,84,.3);
+      border-radius: 20px; padding: 1px 7px; font-size: 10px; color: #4ddb8a; font-weight: 600;
+    }
+    .jc-title  { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .jc-salary { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .jc-meta   { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .jc-meta-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); }
+    .schedule-tag {
+      display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      background: rgba(245,166,35,.18); border: 1px solid rgba(245,166,35,.3); color: #f5a623;
+    }
+    .jc-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--card-border);
+    }
+    .jc-date { font-size: 11px; color: var(--text-muted); }
+    .jc-btn {
+      background: linear-gradient(90deg, var(--accent), #c73652); color: #fff;
+      border: none; border-radius: 20px; padding: 7px 18px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .18s;
+    }
+    .jc-btn:hover { opacity: .85; }
+
+    .detail-card {
+      width: 100%; max-width: 400px; background: var(--card-bg);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 20px; margin-bottom: 14px; backdrop-filter: blur(10px);
+    }
+    .detail-logo { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 14px; }
+    .detail-company { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+    .detail-title  { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
+    .detail-salary {
+      font-size: 22px; font-weight: 800; margin-bottom: 14px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .detail-tag {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,.08); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text-muted);
+    }
+    .detail-section-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .detail-section p  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .detail-section ul { padding-left: 18px; }
+    .detail-section ul li { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+    .apply-btn {
+      width: 100%; max-width: 400px; padding: 16px; border: none;
+      background: linear-gradient(90deg, #1db954, #17a847); color: #fff;
+      border-radius: var(--radius); font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px;
+    }
+    .apply-btn:hover { opacity: .88; }
+
     .toast {
       position: fixed; bottom: 28px; left: 50%;
       transform: translateX(-50%) translateY(80px);
@@ -114,6 +312,7 @@
 </head>
 <body>
 
+<!-- SCREEN: HOME -->
 <div id="screen-home" class="screen active">
   <div class="hero">
     <div class="logo-ring">⛏️</div>
@@ -140,6 +339,7 @@
   </div>
 </div>
 
+<!-- SCREEN: РАБОТОДАТЕЛЬ -->
 <div id="screen-employer" class="screen">
   <button class="back-btn" onclick="goTo('screen-home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -188,6 +388,7 @@
   </div>
 </div>
 
+<!-- SCREEN: СОИСКАТЕЛЬ -->
 <div id="screen-worker" class="screen">
   <button class="back-btn" onclick="goTo('screen-home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -195,8 +396,15 @@
   </button>
   <div class="section-title">Кабинет соискателя 👷</div>
   <div class="section-sub">Все работодатели проверены — работайте безопасно</div>
+  <div class="verified-banner">
+    <div class="vb-icon">🛡️</div>
+    <div class="vb-text">
+      <div class="vb-title">Только проверенные работодатели</div>
+      <div class="vb-desc">Все компании на платформе прошли верификацию — никакого обмана</div>
+    </div>
+  </div>
   <div class="menu-list">
-    <div class="menu-item" onclick="showToast('Скоро: Поиск вакансий')">
+    <div class="menu-item" onclick="goTo('screen-jobs')">
       <div class="mi-icon orange">🔎</div>
       <div class="mi-text"><div class="mi-title">Найти вакансию <span class="badge badge-new">NEW</span></div><div class="mi-desc">Только от проверенных работодателей — без мошенников</div></div>
       <div class="mi-arrow">›</div>
@@ -224,15 +432,184 @@
   </div>
 </div>
 
+<!-- SCREEN: ПОИСК ВАКАНСИЙ -->
+<div id="screen-jobs" class="screen">
+  <button class="back-btn" onclick="goTo('screen-worker')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <div class="section-title">Поиск вакансий 🔎</div>
+  <div class="section-sub">Только проверенные работодатели</div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" placeholder="Профессия, город..." id="search-input" oninput="filterJobs()" />
+  </div>
+  <div class="chips-scroll">
+    <div class="chip active" onclick="setFilter(this,'all')">Все</div>
+    <div class="chip" onclick="setFilter(this,'oil')">Нефть и газ</div>
+    <div class="chip" onclick="setFilter(this,'build')">Строительство</div>
+    <div class="chip" onclick="setFilter(this,'mine')">Горнодобыча</div>
+    <div class="chip" onclick="setFilter(this,'food')">Питание / Быт</div>
+  </div>
+  <div class="jobs-list" id="jobs-container"></div>
+</div>
+
+<!-- SCREEN: ДЕТАЛИ ВАКАНСИИ -->
+<div id="screen-job-detail" class="screen">
+  <button class="back-btn" onclick="goTo('screen-jobs')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <div class="detail-card">
+    <div class="detail-logo" id="d-logo"></div>
+    <div class="detail-company" id="d-company"></div>
+    <div class="detail-title" id="d-title"></div>
+    <div class="detail-salary" id="d-salary"></div>
+    <div class="detail-tags" id="d-tags"></div>
+  </div>
+  <div class="detail-card detail-section">
+    <div class="detail-section-title">О вакансии</div>
+    <p id="d-desc"></p>
+  </div>
+  <div class="detail-card detail-section">
+    <div class="detail-section-title">Требования</div>
+    <ul id="d-req"></ul>
+  </div>
+  <div class="detail-card detail-section">
+    <div class="detail-section-title">Условия</div>
+    <ul id="d-cond"></ul>
+  </div>
+  <button class="apply-btn" onclick="showToast('Отклик отправлен! Работодатель свяжется с вами.')">
+    ✅ Откликнуться на вакансию
+  </button>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
-  if (window.Telegram?.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+  }
+
   function goTo(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  const jobs = [
+    {
+      id: 1, emoji: '🔥', color: 'rgba(233,69,96,.25)', category: 'oil',
+      company: 'Газпром Добыча Ноябрьск',
+      title: 'Сварщик НГДО (5–6 разряд)',
+      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес',
+      schedule: '60/30', date: '23 фев 2026',
+      desc: 'Требуется сварщик для выполнения сварочных работ на нефтегазовых объектах Крайнего Севера. Полное обеспечение на вахте за счёт компании.',
+      req: ['Опыт работы от 3 лет', 'Удостоверение сварщика 5–6 разряд', 'Готовность к вахтовому методу', 'Действующая медкнижка'],
+      cond: ['Проживание в благоустроенном общежитии', 'Трёхразовое питание', 'Спецодежда и СИЗ', 'Официальное оформление по ТК РФ', 'Доставка до места вахты и обратно']
+    },
+    {
+      id: 2, emoji: '⚡', color: 'rgba(80,160,255,.25)', category: 'oil',
+      company: 'Роснефть — Самотлорнефтегаз',
+      title: 'Электромонтажник (4–5 разряд)',
+      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес',
+      schedule: '45/15', date: '22 фев 2026',
+      desc: 'Монтаж, наладка и ремонт электрооборудования на объектах нефтедобычи. Работа в составе бригады под руководством прораба.',
+      req: ['Опыт от 2 лет', 'Группа допуска по электробезопасности не ниже III', 'Удостоверение электромонтажника', 'Справка об отсутствии судимостей'],
+      cond: ['Вахтовый посёлок со всеми удобствами', 'Питание 4 раза в день', 'Страховка от НС', 'Квартальные премии', 'Аванс 50%']
+    },
+    {
+      id: 3, emoji: '🚜', color: 'rgba(245,166,35,.25)', category: 'build',
+      company: 'СК Мост',
+      title: 'Машинист экскаватора',
+      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес',
+      schedule: '60/30', date: '21 фев 2026',
+      desc: 'Работа на строительстве федеральной автодороги в Якутии. Управление экскаватором Komatsu PC300. Объект сдаётся в 2027 году.',
+      req: ['Удостоверение машиниста экскаватора', 'Опыт работы от 5 лет', 'Готовность к работе в условиях Крайнего Севера', 'Отсутствие вредных привычек (алкоголь)'],
+      cond: ['Зарплата 2 раза в месяц', 'Тёплое жильё на объекте', 'Питание', 'Надбавка за Крайний Север', 'Перелёт до объекта за счёт компании']
+    },
+    {
+      id: 4, emoji: '⛏️', color: 'rgba(180,100,255,.25)', category: 'mine',
+      company: 'Норильский никель',
+      title: 'Бурильщик скважин',
+      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес',
+      schedule: '30/30', date: '20 фев 2026',
+      desc: 'Бурение скважин на горнодобывающем предприятии. Работа в подземных условиях. Полный социальный пакет и льготы.',
+      req: ['Удостоверение бурильщика', 'Опыт подземных работ от 3 лет', 'Медицинская комиссия (подземные работы)', 'Без судимостей'],
+      cond: ['Корпоративное жильё', 'Льготный выход на пенсию', 'Дополнительный отпуск 8 недель', 'ДМС', 'Компенсация проезда']
+    },
+    {
+      id: 5, emoji: '🍳', color: 'rgba(80,220,140,.25)', category: 'food',
+      company: 'ПАО Лукойл — Западная Сибирь',
+      title: 'Повар вахтового посёлка',
+      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес',
+      schedule: '60/30', date: '19 фев 2026',
+      desc: 'Приготовление горячего питания для работников вахтового посёлка (100–150 человек). Работа в оснащённой столовой нового образца.',
+      req: ['Опыт работы поваром от 2 лет', 'Санитарная книжка', 'Умение работать с большими объёмами', 'Ответственность и аккуратность'],
+      cond: ['Проживание бесплатно', 'Питание бесплатно', 'Спецодежда выдаётся', 'Официальное трудоустройство', 'Возможность карьерного роста до шеф-повара']
+    }
+  ];
+
+  let activeCategory = 'all';
+
+  function renderJobs(list) {
+    const c = document.getElementById('jobs-container');
+    if (!list.length) { c.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:32px 0">Вакансий не найдено</p>'; return; }
+    c.innerHTML = list.map(j => `
+      <div class="job-card" onclick="openJob(${j.id})">
+        <div class="jc-header">
+          <div class="company-logo" style="background:${j.color}">${j.emoji}</div>
+          <div><div class="jc-company-name">${j.company} <span class="verified-chip">✓ Verified</span></div></div>
+        </div>
+        <div class="jc-title">${j.title}</div>
+        <div class="jc-salary">${j.salary}</div>
+        <div class="jc-meta">
+          <span class="jc-meta-item">📍 ${j.location}</span>
+          <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
+        </div>
+        <div class="jc-footer">
+          <span class="jc-date">${j.date}</span>
+          <button class="jc-btn" onclick="event.stopPropagation();openJob(${j.id})">Подробнее →</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function filterJobs() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const filtered = jobs.filter(j =>
+      (activeCategory === 'all' || j.category === activeCategory) &&
+      (j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q) || j.location.toLowerCase().includes(q))
+    );
+    renderJobs(filtered);
+  }
+
+  function setFilter(el, cat) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeCategory = cat;
+    filterJobs();
+  }
+
+  function openJob(id) {
+    const j = jobs.find(x => x.id === id);
+    document.getElementById('d-logo').textContent = j.emoji;
+    document.getElementById('d-logo').style.background = j.color;
+    document.getElementById('d-company').innerHTML = `${j.company} <span class="verified-chip">✓ Verified</span>`;
+    document.getElementById('d-title').textContent = j.title;
+    document.getElementById('d-salary').textContent = j.salary;
+    document.getElementById('d-tags').innerHTML = `
+      <span class="detail-tag">📍 ${j.location}</span>
+      <span class="detail-tag">⏱ Вахта ${j.schedule}</span>
+      <span class="detail-tag">📅 ${j.date}</span>`;
+    document.getElementById('d-desc').textContent = j.desc;
+    document.getElementById('d-req').innerHTML  = j.req.map(r => `<li>${r}</li>`).join('');
+    document.getElementById('d-cond').innerHTML = j.cond.map(c => `<li>${c}</li>`).join('');
+    goTo('screen-job-detail');
+  }
+
+  renderJobs(jobs);
+
   let toastTimer;
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -244,4 +621,3 @@
 </script>
 </body>
 </html>
-
