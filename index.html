@@ -75,77 +75,49 @@
       margin-bottom: 44px;
     }
     .logo-ring {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
+      width: 90px; height: 90px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; margin-bottom: 20px;
       box-shadow: 0 8px 32px rgba(233,69,96,.4);
     }
     .app-title {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: .5px;
+      font-size: 28px; font-weight: 800; letter-spacing: .5px;
       background: linear-gradient(90deg, #fff 0%, #f5a623 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
     .app-subtitle {
-      margin-top: 8px;
-      font-size: 14px;
-      color: var(--text-muted);
-      text-align: center;
-      max-width: 260px;
+      margin-top: 8px; font-size: 14px; color: var(--text-muted);
+      text-align: center; max-width: 260px;
     }
 
     .role-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      width: 100%;
-      max-width: 380px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; width: 100%; max-width: 380px;
     }
     .role-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 28px 16px;
-      cursor: pointer;
-      text-align: center;
-      transition: transform .2s, box-shadow .2s, background .2s;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 28px 16px; cursor: pointer;
+      text-align: center; transition: transform .2s, box-shadow .2s, background .2s;
       backdrop-filter: blur(12px);
     }
-    .role-card:hover,
-    .role-card:active {
+    .role-card:hover, .role-card:active {
       transform: translateY(-4px);
       box-shadow: 0 16px 40px rgba(0,0,0,.35);
       background: rgba(255,255,255,.12);
     }
-    .role-card .label {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .role-card .desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
+    .role-card .icon { font-size: 44px; margin-bottom: 14px; }
+    .role-card .label { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .role-card .desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
     .role-card.employer .icon-wrap {
       background: linear-gradient(135deg, rgba(233,69,96,.25), rgba(233,69,96,.05));
-      border-radius: 50%;
-      width: 66px; height: 66px;
+      border-radius: 50%; width: 66px; height: 66px;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 14px; font-size: 32px;
     }
     .role-card.worker .icon-wrap {
       background: linear-gradient(135deg, rgba(245,166,35,.25), rgba(245,166,35,.05));
-      border-radius: 50%;
-      width: 66px; height: 66px;
+      border-radius: 50%; width: 66px; height: 66px;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 14px; font-size: 32px;
     }
@@ -160,12 +132,9 @@
     .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
     .section-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; text-align: center; }
-    .section-sub   { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: center; }
+    .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-align: center; }
 
-    .menu-list {
-      width: 100%; max-width: 400px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
+    .menu-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
     .menu-item {
       background: var(--card-bg); border: 1px solid var(--card-border);
       border-radius: var(--radius); padding: 18px 20px;
@@ -247,9 +216,9 @@
       background: rgba(29,185,84,.15); border: 1px solid rgba(29,185,84,.3);
       border-radius: 20px; padding: 1px 7px; font-size: 10px; color: #4ddb8a; font-weight: 600;
     }
-    .jc-title  { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .jc-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
     .jc-salary { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 8px; }
-    .jc-meta   { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .jc-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
     .jc-meta-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); }
     .schedule-tag {
       display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
@@ -274,7 +243,7 @@
     }
     .detail-logo { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 14px; }
     .detail-company { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-    .detail-title  { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
+    .detail-title { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
     .detail-salary {
       font-size: 22px; font-weight: 800; margin-bottom: 14px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
@@ -287,17 +256,155 @@
       border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text-muted);
     }
     .detail-section-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
-    .detail-section p  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .detail-section p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
     .detail-section ul { padding-left: 18px; }
     .detail-section ul li { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
     .apply-btn {
       width: 100%; max-width: 400px; padding: 16px; border: none;
       background: linear-gradient(90deg, #1db954, #17a847); color: #fff;
       border-radius: var(--radius); font-size: 16px; font-weight: 700;
-      cursor: pointer; transition: opacity .2s;
-      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px;
+      cursor: pointer; transition: opacity .2s; display: flex;
+      align-items: center; justify-content: center; gap: 8px; margin-top: 4px;
     }
     .apply-btn:hover { opacity: .88; }
+
+    .form-wrap { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .form-label .fl-req { color: var(--accent); }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 13px 16px; color: var(--text);
+      font-size: 14px; font-family: inherit; outline: none;
+      backdrop-filter: blur(10px); transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: rgba(233,69,96,.6);
+      box-shadow: 0 0 0 3px rgba(233,69,96,.12);
+    }
+    .form-input.error, .form-textarea.error { border-color: var(--accent); }
+    .form-textarea { resize: none; min-height: 96px; line-height: 1.5; }
+    .form-select { cursor: pointer; }
+    .form-select option { background: #1a1a2e; color: #fff; }
+
+    .sched-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sched-chip {
+      padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); cursor: pointer; transition: all .18s; backdrop-filter: blur(8px);
+    }
+    .sched-chip.active { background: rgba(245,166,35,.2); border-color: rgba(245,166,35,.5); color: #f5a623; }
+
+    .dyn-list { display: flex; flex-direction: column; gap: 8px; }
+    .dyn-item { display: flex; gap: 8px; align-items: center; }
+    .dyn-input {
+      flex: 1; background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 10px 14px; color: var(--text);
+      font-size: 13px; font-family: inherit; outline: none; transition: border-color .2s;
+    }
+    .dyn-input::placeholder { color: var(--text-muted); }
+    .dyn-input:focus { border-color: rgba(233,69,96,.5); }
+    .dyn-remove {
+      width: 34px; height: 34px; border-radius: 10px; border: none;
+      background: rgba(233,69,96,.15); color: var(--accent);
+      font-size: 18px; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background .18s;
+    }
+    .dyn-remove:hover { background: rgba(233,69,96,.3); }
+    .dyn-add-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.06); border: 1px dashed rgba(255,255,255,.2);
+      border-radius: 12px; padding: 9px 14px; font-size: 13px;
+      color: var(--text-muted); cursor: pointer; transition: all .18s; width: 100%;
+    }
+    .dyn-add-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    .salary-row { display: flex; gap: 10px; }
+    .salary-row .form-input { flex: 1; }
+    .salary-suffix {
+      display: flex; align-items: center; padding: 0 14px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; font-size: 13px; color: var(--text-muted);
+      white-space: nowrap; backdrop-filter: blur(10px);
+    }
+
+    .form-progress { display: flex; align-items: center; gap: 0; width: 100%; max-width: 400px; margin-bottom: 24px; }
+    .fp-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .fp-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); transition: all .3s;
+    }
+    .fp-dot.done   { background: #1db954; border-color: #1db954; color: #fff; }
+    .fp-dot.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; color: #fff; }
+    .fp-label { font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.2; }
+    .fp-line { height: 2px; flex: 1; background: var(--card-border); margin-top: -18px; transition: background .3s; }
+    .fp-line.done { background: #1db954; }
+
+    .form-nav { display: flex; gap: 12px; width: 100%; max-width: 400px; margin-top: 8px; }
+    .btn-prev {
+      flex: 1; padding: 14px; border-radius: var(--radius); border: 1px solid var(--card-border);
+      background: var(--card-bg); color: var(--text-muted); font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all .2s; backdrop-filter: blur(10px);
+    }
+    .btn-prev:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .btn-next {
+      flex: 2; padding: 14px; border-radius: var(--radius); border: none;
+      background: linear-gradient(90deg, var(--accent), #c73652); color: #fff;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s;
+    }
+    .btn-next:hover { opacity: .88; }
+    .btn-submit {
+      flex: 2; padding: 14px; border-radius: var(--radius); border: none;
+      background: linear-gradient(90deg, #1db954, #17a847); color: #fff;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover { opacity: .88; }
+
+    .success-screen {
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; padding: 40px 24px;
+      animation: fadeIn .4s ease;
+    }
+    .success-screen.active { display: flex; }
+    .success-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, #1db954, #17a847);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px; margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(29,185,84,.4);
+    }
+    .success-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .success-sub { font-size: 14px; color: var(--text-muted); max-width: 280px; line-height: 1.5; margin-bottom: 32px; }
+    .preview-card {
+      width: 100%; max-width: 400px; background: var(--card-bg);
+      border: 1px solid var(--card-border); border-radius: var(--radius);
+      padding: 18px; backdrop-filter: blur(10px); text-align: left; margin-bottom: 24px;
+    }
+    .pc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .pc-logo { width: 48px; height: 48px; border-radius: 13px; background: rgba(233,69,96,.25); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .pc-company { font-size: 12px; color: var(--text-muted); }
+    .pc-title  { font-size: 17px; font-weight: 700; }
+    .pc-salary { font-size: 16px; font-weight: 800; color: var(--accent2); margin: 8px 0; }
+    .pc-meta   { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pc-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,.08); border: 1px solid var(--card-border); color: var(--text-muted); }
+    .btn-back-employer {
+      width: 100%; max-width: 400px; padding: 14px; border-radius: var(--radius);
+      border: 1px solid var(--card-border); background: var(--card-bg);
+      color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: all .2s; backdrop-filter: blur(10px);
+    }
+    .btn-back-employer:hover { background: rgba(255,255,255,.1); }
+
+    .char-count { align-self: flex-end; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .char-count.warn { color: var(--accent2); }
+    .char-count.over { color: var(--accent); }
 
     .toast {
       position: fixed; bottom: 28px; left: 50%;
@@ -355,9 +462,12 @@
     </div>
   </div>
   <div class="menu-list">
-    <div class="menu-item" onclick="showToast('Скоро: Создание вакансии')">
+    <div class="menu-item" onclick="openCreateJob()">
       <div class="mi-icon red">📋</div>
-      <div class="mi-text"><div class="mi-title">Создать вакансию <span class="badge badge-new">NEW</span></div><div class="mi-desc">Разместите новое объявление о работе</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Создать вакансию <span class="badge badge-new">NEW</span></div>
+        <div class="mi-desc">Разместите новое объявление о работе</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
     <div class="menu-item" onclick="showToast('Скоро: Мои вакансии')">
@@ -382,7 +492,10 @@
     </div>
     <div class="menu-item" onclick="showToast('Скоро: Верификация компании')">
       <div class="mi-icon green">🛡️</div>
-      <div class="mi-text"><div class="mi-title">Верификация компании <span class="badge badge-verified">✓ Verified</span></div><div class="mi-desc">Пройдите проверку — получите доверие соискателей</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Верификация компании <span class="badge badge-verified">✓ Verified</span></div>
+        <div class="mi-desc">Пройдите проверку — получите доверие соискателей</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
   </div>
@@ -406,7 +519,10 @@
   <div class="menu-list">
     <div class="menu-item" onclick="goTo('screen-jobs')">
       <div class="mi-icon orange">🔎</div>
-      <div class="mi-text"><div class="mi-title">Найти вакансию <span class="badge badge-new">NEW</span></div><div class="mi-desc">Только от проверенных работодателей — без мошенников</div></div>
+      <div class="mi-text">
+        <div class="mi-title">Найти вакансию <span class="badge badge-new">NEW</span></div>
+        <div class="mi-desc">Только от проверенных работодателей — без мошенников</div>
+      </div>
       <div class="mi-arrow">›</div>
     </div>
     <div class="menu-item" onclick="showToast('Скоро: Моё резюме')">
@@ -484,6 +600,111 @@
   </button>
 </div>
 
+<!-- SCREEN: СОЗДАТЬ ВАКАНСИЮ -->
+<div id="screen-create-job" class="screen">
+  <button class="back-btn" onclick="goTo('screen-employer')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <div id="cj-form-wrap" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:0">
+    <div class="section-title">Новая вакансия 📋</div>
+    <div class="section-sub">Заполните форму — займёт не более 3 минут</div>
+    <div class="form-progress">
+      <div class="fp-step"><div class="fp-dot active" id="fp1">1</div><div class="fp-label">Основное</div></div>
+      <div class="fp-line" id="fl1"></div>
+      <div class="fp-step"><div class="fp-dot" id="fp2">2</div><div class="fp-label">Требования</div></div>
+      <div class="fp-line" id="fl2"></div>
+      <div class="fp-step"><div class="fp-dot" id="fp3">3</div><div class="fp-label">Условия</div></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="form-wrap" id="cj-step1">
+      <div class="form-group">
+        <label class="form-label">Название вакансии <span class="fl-req">*</span></label>
+        <input class="form-input" id="cj-title" type="text" placeholder="Сварщик 5–6 разряда, Машинист экскаватора…" maxlength="80" oninput="updateChar('cj-title','cc-title',80)" />
+        <span class="char-count" id="cc-title">0 / 80</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Категория <span class="fl-req">*</span></label>
+        <select class="form-select" id="cj-category">
+          <option value="" disabled selected>Выберите категорию</option>
+          <option value="oil">Нефть и газ</option>
+          <option value="build">Строительство</option>
+          <option value="mine">Горнодобыча</option>
+          <option value="food">Питание / Быт</option>
+          <option value="other">Другое</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Зарплата <span class="fl-req">*</span></label>
+        <div class="salary-row">
+          <input class="form-input" id="cj-salary-from" type="number" placeholder="от 80 000" min="0" />
+          <input class="form-input" id="cj-salary-to" type="number" placeholder="до 150 000" min="0" />
+          <div class="salary-suffix">₽/мес</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Город / регион <span class="fl-req">*</span></label>
+        <input class="form-input" id="cj-location" type="text" placeholder="Ноябрьск, ЯНАО" maxlength="60" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">График вахты <span class="fl-req">*</span></label>
+        <div class="sched-chips" id="sched-chips">
+          <div class="sched-chip" onclick="selectSched(this,'15/15')">15/15</div>
+          <div class="sched-chip" onclick="selectSched(this,'30/30')">30/30</div>
+          <div class="sched-chip" onclick="selectSched(this,'45/15')">45/15</div>
+          <div class="sched-chip" onclick="selectSched(this,'60/30')">60/30</div>
+          <div class="sched-chip" onclick="selectSched(this,'90/30')">90/30</div>
+        </div>
+        <input class="form-input" id="cj-schedule-custom" type="text" placeholder="Свой вариант, напр. 45/30" maxlength="12" style="margin-top:8px" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Описание вакансии <span class="fl-req">*</span></label>
+        <textarea class="form-textarea" id="cj-desc" placeholder="Расскажите об объекте, задачах и условиях…" maxlength="600" oninput="updateChar('cj-desc','cc-desc',600)"></textarea>
+        <span class="char-count" id="cc-desc">0 / 600</span>
+      </div>
+      <div class="form-nav">
+        <button class="btn-next" style="flex:1" onclick="goStep(2)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="form-wrap" id="cj-step2" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Требования к кандидату <span class="fl-req">*</span></label>
+        <div class="dyn-list" id="req-list"></div>
+        <button class="dyn-add-btn" onclick="addDynItem('req-list','req','Например: Опыт от 3 лет')">+ Добавить требование</button>
+      </div>
+      <div class="form-nav">
+        <button class="btn-prev" onclick="goStep(1)">← Назад</button>
+        <button class="btn-next" onclick="goStep(3)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="form-wrap" id="cj-step3" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Условия работы <span class="fl-req">*</span></label>
+        <div class="dyn-list" id="cond-list"></div>
+        <button class="dyn-add-btn" onclick="addDynItem('cond-list','cond','Например: Бесплатное проживание')">+ Добавить условие</button>
+      </div>
+      <div class="form-nav">
+        <button class="btn-prev" onclick="goStep(2)">← Назад</button>
+        <button class="btn-submit" onclick="submitJob()">✅ Опубликовать вакансию</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="cj-success">
+    <div class="success-ring">✅</div>
+    <div class="success-title">Вакансия опубликована!</div>
+    <div class="success-sub">Ваше объявление проверено и уже доступно соискателям на платформе.</div>
+    <div class="preview-card" id="cj-preview"></div>
+    <button class="btn-back-employer" onclick="goTo('screen-employer')">← Вернуться в кабинет</button>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -501,53 +722,43 @@
   const jobs = [
     {
       id: 1, emoji: '🔥', color: 'rgba(233,69,96,.25)', category: 'oil',
-      company: 'Газпром Добыча Ноябрьск',
-      title: 'Сварщик НГДО (5–6 разряд)',
-      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес',
-      schedule: '60/30', date: '23 фев 2026',
+      company: 'Газпром Добыча Ноябрьск', title: 'Сварщик НГДО (5–6 разряд)',
+      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес', schedule: '60/30', date: '23 фев 2026',
       desc: 'Требуется сварщик для выполнения сварочных работ на нефтегазовых объектах Крайнего Севера. Полное обеспечение на вахте за счёт компании.',
-      req: ['Опыт работы от 3 лет', 'Удостоверение сварщика 5–6 разряд', 'Готовность к вахтовому методу', 'Действующая медкнижка'],
-      cond: ['Проживание в благоустроенном общежитии', 'Трёхразовое питание', 'Спецодежда и СИЗ', 'Официальное оформление по ТК РФ', 'Доставка до места вахты и обратно']
+      req: ['Опыт работы от 3 лет','Удостоверение сварщика 5–6 разряд','Готовность к вахтовому методу','Действующая медкнижка'],
+      cond: ['Проживание в благоустроенном общежитии','Трёхразовое питание','Спецодежда и СИЗ','Официальное оформление по ТК РФ','Доставка до места вахты и обратно']
     },
     {
       id: 2, emoji: '⚡', color: 'rgba(80,160,255,.25)', category: 'oil',
-      company: 'Роснефть — Самотлорнефтегаз',
-      title: 'Электромонтажник (4–5 разряд)',
-      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес',
-      schedule: '45/15', date: '22 фев 2026',
+      company: 'Роснефть — Самотлорнефтегаз', title: 'Электромонтажник (4–5 разряд)',
+      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес', schedule: '45/15', date: '22 фев 2026',
       desc: 'Монтаж, наладка и ремонт электрооборудования на объектах нефтедобычи. Работа в составе бригады под руководством прораба.',
-      req: ['Опыт от 2 лет', 'Группа допуска по электробезопасности не ниже III', 'Удостоверение электромонтажника', 'Справка об отсутствии судимостей'],
-      cond: ['Вахтовый посёлок со всеми удобствами', 'Питание 4 раза в день', 'Страховка от НС', 'Квартальные премии', 'Аванс 50%']
+      req: ['Опыт от 2 лет','Группа допуска по электробезопасности не ниже III','Удостоверение электромонтажника','Справка об отсутствии судимостей'],
+      cond: ['Вахтовый посёлок со всеми удобствами','Питание 4 раза в день','Страховка от НС','Квартальные премии','Аванс 50%']
     },
     {
       id: 3, emoji: '🚜', color: 'rgba(245,166,35,.25)', category: 'build',
-      company: 'СК Мост',
-      title: 'Машинист экскаватора',
-      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес',
-      schedule: '60/30', date: '21 фев 2026',
+      company: 'СК Мост', title: 'Машинист экскаватора',
+      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес', schedule: '60/30', date: '21 фев 2026',
       desc: 'Работа на строительстве федеральной автодороги в Якутии. Управление экскаватором Komatsu PC300. Объект сдаётся в 2027 году.',
-      req: ['Удостоверение машиниста экскаватора', 'Опыт работы от 5 лет', 'Готовность к работе в условиях Крайнего Севера', 'Отсутствие вредных привычек (алкоголь)'],
-      cond: ['Зарплата 2 раза в месяц', 'Тёплое жильё на объекте', 'Питание', 'Надбавка за Крайний Север', 'Перелёт до объекта за счёт компании']
+      req: ['Удостоверение машиниста экскаватора','Опыт работы от 5 лет','Готовность к работе в условиях Крайнего Севера','Отсутствие вредных привычек (алкоголь)'],
+      cond: ['Зарплата 2 раза в месяц','Тёплое жильё на объекте','Питание','Надбавка за Крайний Север','Перелёт до объекта за счёт компании']
     },
     {
       id: 4, emoji: '⛏️', color: 'rgba(180,100,255,.25)', category: 'mine',
-      company: 'Норильский никель',
-      title: 'Бурильщик скважин',
-      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес',
-      schedule: '30/30', date: '20 фев 2026',
+      company: 'Норильский никель', title: 'Бурильщик скважин',
+      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес', schedule: '30/30', date: '20 фев 2026',
       desc: 'Бурение скважин на горнодобывающем предприятии. Работа в подземных условиях. Полный социальный пакет и льготы.',
-      req: ['Удостоверение бурильщика', 'Опыт подземных работ от 3 лет', 'Медицинская комиссия (подземные работы)', 'Без судимостей'],
-      cond: ['Корпоративное жильё', 'Льготный выход на пенсию', 'Дополнительный отпуск 8 недель', 'ДМС', 'Компенсация проезда']
+      req: ['Удостоверение бурильщика','Опыт подземных работ от 3 лет','Медицинская комиссия (подземные работы)','Без судимостей'],
+      cond: ['Корпоративное жильё','Льготный выход на пенсию','Дополнительный отпуск 8 недель','ДМС','Компенсация проезда']
     },
     {
       id: 5, emoji: '🍳', color: 'rgba(80,220,140,.25)', category: 'food',
-      company: 'ПАО Лукойл — Западная Сибирь',
-      title: 'Повар вахтового посёлка',
-      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес',
-      schedule: '60/30', date: '19 фев 2026',
+      company: 'ПАО Лукойл — Западная Сибирь', title: 'Повар вахтового посёлка',
+      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес', schedule: '60/30', date: '19 фев 2026',
       desc: 'Приготовление горячего питания для работников вахтового посёлка (100–150 человек). Работа в оснащённой столовой нового образца.',
-      req: ['Опыт работы поваром от 2 лет', 'Санитарная книжка', 'Умение работать с большими объёмами', 'Ответственность и аккуратность'],
-      cond: ['Проживание бесплатно', 'Питание бесплатно', 'Спецодежда выдаётся', 'Официальное трудоустройство', 'Возможность карьерного роста до шеф-повара']
+      req: ['Опыт работы поваром от 2 лет','Санитарная книжка','Умение работать с большими объёмами','Ответственность и аккуратность'],
+      cond: ['Проживание бесплатно','Питание бесплатно','Спецодежда выдаётся','Официальное трудоустройство','Возможность карьерного роста до шеф-повара']
     }
   ];
 
@@ -610,11 +821,163 @@
 
   renderJobs(jobs);
 
+  let cjStep = 1;
+  let cjSchedule = '';
+  const dynCounters = { req: 0, cond: 0 };
+
+  function openCreateJob() { resetJobForm(); goTo('screen-create-job'); }
+
+  function resetJobForm() {
+    cjStep = 1; cjSchedule = '';
+    dynCounters.req = 0; dynCounters.cond = 0;
+    ['cj-title','cj-location','cj-salary-from','cj-salary-to','cj-schedule-custom','cj-desc'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('cj-category').value = '';
+    document.querySelectorAll('.sched-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('req-list').innerHTML = '';
+    document.getElementById('cond-list').innerHTML = '';
+    updateChar('cj-title','cc-title',80);
+    updateChar('cj-desc','cc-desc',600);
+    document.getElementById('cj-form-wrap').style.display = 'flex';
+    document.getElementById('cj-success').classList.remove('active');
+    addDynItem('req-list','req','Например: Опыт от 3 лет');
+    addDynItem('cond-list','cond','Например: Бесплатное проживание');
+    renderStep(1); updateProgress(1);
+  }
+
+  function renderStep(n) {
+    [1,2,3].forEach(i => { document.getElementById('cj-step'+i).style.display = i === n ? 'flex' : 'none'; });
+    cjStep = n; updateProgress(n);
+  }
+
+  function updateProgress(n) {
+    [1,2,3].forEach(i => {
+      const dot = document.getElementById('fp'+i);
+      dot.classList.remove('active','done');
+      if (i < n) dot.classList.add('done');
+      else if (i === n) dot.classList.add('active');
+    });
+    [1,2].forEach(i => { document.getElementById('fl'+i).classList.toggle('done', i < n); });
+  }
+
+  function goStep(n) {
+    if (n > cjStep && !validateStep(cjStep)) return;
+    renderStep(n); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validateStep(step) {
+    if (step === 1) {
+      const title    = document.getElementById('cj-title').value.trim();
+      const cat      = document.getElementById('cj-category').value;
+      const salFrom  = document.getElementById('cj-salary-from').value.trim();
+      const location = document.getElementById('cj-location').value.trim();
+      const desc     = document.getElementById('cj-desc').value.trim();
+      const schedule = cjSchedule || document.getElementById('cj-schedule-custom').value.trim();
+      if (!title)    { shakeFocus('cj-title');       showToast('Введите название вакансии'); return false; }
+      if (!cat)      { shakeFocus('cj-category');    showToast('Выберите категорию'); return false; }
+      if (!salFrom)  { shakeFocus('cj-salary-from'); showToast('Укажите зарплату (от)'); return false; }
+      if (!location) { shakeFocus('cj-location');    showToast('Укажите город'); return false; }
+      if (!schedule) { showToast('Выберите или укажите график вахты'); return false; }
+      if (!desc)     { shakeFocus('cj-desc');        showToast('Добавьте описание вакансии'); return false; }
+    }
+    if (step === 2) {
+      const items = getListValues('req-list');
+      if (!items.length) { showToast('Добавьте хотя бы одно требование'); return false; }
+    }
+    if (step === 3) {
+      const items = getListValues('cond-list');
+      if (!items.length) { showToast('Добавьте хотя бы одно условие'); return false; }
+    }
+    return true;
+  }
+
+  function shakeFocus(id) {
+    const el = document.getElementById(id);
+    el.classList.add('error'); el.focus();
+    setTimeout(() => el.classList.remove('error'), 1200);
+  }
+
+  function selectSched(el, val) {
+    document.querySelectorAll('.sched-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active'); cjSchedule = val;
+    document.getElementById('cj-schedule-custom').value = '';
+  }
+
+  function addDynItem(listId, prefix, ph) {
+    const list = document.getElementById(listId);
+    const idx = dynCounters[prefix]++;
+    const id = `${prefix}-${idx}`;
+    const row = document.createElement('div');
+    row.className = 'dyn-item'; row.id = `${id}-row`;
+    row.innerHTML = `<input class="dyn-input" id="${id}" type="text" placeholder="${ph}" maxlength="120" /><button class="dyn-remove" onclick="removeDynItem('${id}-row')" title="Удалить">×</button>`;
+    list.appendChild(row);
+    document.getElementById(id).focus();
+  }
+
+  function removeDynItem(rowId) { const el = document.getElementById(rowId); if (el) el.remove(); }
+
+  function getListValues(listId) {
+    return Array.from(document.querySelectorAll(`#${listId} .dyn-input`))
+      .map(i => i.value.trim()).filter(Boolean);
+  }
+
+  function updateChar(inputId, counterId, max) {
+    const el = document.getElementById(inputId);
+    const cc = document.getElementById(counterId);
+    if (!el || !cc) return;
+    const len = el.value.length;
+    cc.textContent = `${len} / ${max}`;
+    cc.className = 'char-count' + (len > max * .9 ? (len >= max ? ' over' : ' warn') : '');
+  }
+
+  function submitJob() {
+    if (!validateStep(3)) return;
+    const title    = document.getElementById('cj-title').value.trim();
+    const cat      = document.getElementById('cj-category').value;
+    const salFrom  = document.getElementById('cj-salary-from').value.trim();
+    const salTo    = document.getElementById('cj-salary-to').value.trim();
+    const location = document.getElementById('cj-location').value.trim();
+    const schedule = cjSchedule || document.getElementById('cj-schedule-custom').value.trim();
+    const desc     = document.getElementById('cj-desc').value.trim();
+    const reqs     = getListValues('req-list');
+    const conds    = getListValues('cond-list');
+    const salaryStr = salFrom && salTo
+      ? `${Number(salFrom).toLocaleString('ru')} – ${Number(salTo).toLocaleString('ru')} ₽/мес`
+      : salFrom ? `от ${Number(salFrom).toLocaleString('ru')} ₽/мес`
+               : `до ${Number(salTo).toLocaleString('ru')} ₽/мес`;
+    const catLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', food:'Питание / Быт', other:'Другое' };
+    const today = new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});
+    const newJob = {
+      id: jobs.length + 1, emoji: '📋', color: 'rgba(233,69,96,.25)',
+      category: cat, company: 'Ваша компания',
+      title, location, salary: salaryStr, schedule, date: today, desc, req: reqs, cond: conds
+    };
+    jobs.unshift(newJob); renderJobs(jobs);
+    document.getElementById('cj-preview').innerHTML = `
+      <div class="pc-header">
+        <div class="pc-logo">📋</div>
+        <div>
+          <div class="pc-company">Ваша компания <span class="verified-chip">✓ Verified</span></div>
+          <div class="pc-title">${title}</div>
+        </div>
+      </div>
+      <div class="pc-salary">${salaryStr}</div>
+      <div class="pc-meta">
+        <span class="pc-tag">📍 ${location}</span>
+        <span class="pc-tag">⏱ Вахта ${schedule}</span>
+        <span class="pc-tag">🗂 ${catLabels[cat] || cat}</span>
+        <span class="pc-tag">📅 ${today}</span>
+      </div>`;
+    document.getElementById('cj-form-wrap').style.display = 'none';
+    document.getElementById('cj-success').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   let toastTimer;
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
