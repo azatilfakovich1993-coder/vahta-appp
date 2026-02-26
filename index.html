@@ -657,8 +657,10 @@
       transition: transform .3s cubic-bezier(.34,1.56,.64,1);
       z-index: 9999;
       white-space: nowrap;
+      pointer-events: none;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
+
     /* ─── resume list screen ─── */
     .resume-list {
       width: 100%; max-width: 400px;
@@ -1370,6 +1372,7 @@
         </div>
         <input class="form-input" id="cj-work-schedule-custom" type="text" placeholder="Свой вариант, напр. 4/3" maxlength="12" style="margin-top:8px" />
       </div>
+
       <div class="form-group">
         <label class="form-label">Описание вакансии <span class="fl-req">*</span></label>
         <textarea class="form-textarea" id="cj-desc" placeholder="Расскажите об объекте, задачах и условиях…" maxlength="600" oninput="updateChar('cj-desc','cc-desc',600)"></textarea>
@@ -1421,6 +1424,7 @@
     <button class="btn-back-employer" onclick="goTo('screen-employer')">← Вернуться в кабинет</button>
   </div>
 </div>
+
 <!-- ══════════════════════════════════════
      SCREEN: МОИ РЕЗЮМЕ
 ══════════════════════════════════════ -->
@@ -1453,6 +1457,7 @@
     Мои резюме
   </button>
 
+  <!-- FORM WRAPPER -->
   <div id="cr-form-wrap" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:0">
     <div class="section-title" id="cr-screen-title">Новое резюме 📄</div>
     <div class="section-sub">Заполните анкету — работодатели сами найдут вас</div>
@@ -1462,10 +1467,12 @@
         <label class="form-label">ФИО <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-name" type="text" placeholder="Иванов Иван Иванович" maxlength="80" />
       </div>
+
       <div class="form-group">
         <label class="form-label">Телефон <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-phone" type="tel" placeholder="+7 900 000-00-00" maxlength="20" />
       </div>
+
       <div class="form-group">
         <label class="form-label">Telegram <span class="field-optional">(заполняется автоматически)</span></label>
         <div class="tg-input-wrap">
@@ -1473,6 +1480,7 @@
           <input class="form-input" id="cr-telegram" type="text" placeholder="username" maxlength="40" />
         </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Пол <span class="fl-req">*</span></label>
         <div class="gender-chips">
@@ -1480,10 +1488,12 @@
           <div class="gender-chip" id="gender-f" onclick="selectGender('Ж')">👩 Женский</div>
         </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Специальность <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-specialty" type="text" placeholder="Сварщик, Машинист, Повар…" maxlength="60" />
       </div>
+
       <div class="form-group">
         <label class="form-label">Опыт работы <span class="fl-req">*</span></label>
         <div class="exp-chips" id="exp-chips">
@@ -1493,6 +1503,7 @@
           <div class="exp-chip" onclick="selectExp(this,'5+ лет')">5+ лет</div>
         </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Желаемая зарплата <span class="fl-req">*</span></label>
         <div class="salary-row">
@@ -1500,10 +1511,12 @@
           <div class="salary-suffix">₽/мес</div>
         </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Регион / город <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-region" type="text" placeholder="Москва, Тюмень, Ноябрьск…" maxlength="60" />
       </div>
+
       <div class="form-group">
         <label class="form-label">Гражданство <span class="field-optional">(необязательно)</span></label>
         <div class="citizen-chips">
@@ -1512,11 +1525,13 @@
           <div class="citizen-chip" onclick="selectCitizen(this,'Другое')">🌍 Другое</div>
         </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">О себе <span class="fl-req">*</span></label>
         <textarea class="form-textarea" id="cr-about" placeholder="Кратко о себе, опыте и пожеланиях…" maxlength="400" oninput="updateChar('cr-about','cc-about',400)"></textarea>
         <span class="char-count" id="cc-about">0 / 400</span>
       </div>
+
       <div class="form-group">
         <label class="form-label">Удостоверения <span class="field-optional">(если есть)</span></label>
         <div class="dyn-list" id="cert-list"></div>
@@ -1524,6 +1539,7 @@
           + Добавить удостоверение
         </button>
       </div>
+
       <div class="form-group">
         <label class="form-label">Ключевые навыки <span class="field-optional">(необязательно)</span></label>
         <div class="dyn-list" id="skill-list"></div>
@@ -1531,12 +1547,14 @@
           + Добавить навык
         </button>
       </div>
+
       <div class="form-nav">
         <button class="btn-submit" style="flex:1" onclick="submitResume()">✅ Сохранить резюме</button>
       </div>
     </div>
   </div>
 
+  <!-- SUCCESS -->
   <div class="success-screen" id="cr-success">
     <div class="success-ring">✅</div>
     <div class="success-title" id="cr-success-title">Резюме создано!</div>
@@ -1822,6 +1840,124 @@
 
 <!-- toast -->
 <div id="toast" class="toast"></div>
+<script>
+  // ── Telegram Web App init ──
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+  }
+
+  // ── theme ──
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    document.getElementById('theme-icon').textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('gv-theme', isLight ? 'light' : 'dark');
+  }
+  (function() {
+    if (localStorage.getItem('gv-theme') === 'light') {
+      document.documentElement.classList.add('light');
+      const btn = document.getElementById('theme-icon');
+      if (btn) btn.textContent = '☀️';
+    }
+  })();
+
+  // ── screen navigation ──
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // менеджер-режим: переключаем баннеры в кабинете работодателя
+    if (id === 'screen-employer') {
+      const mgrBanner  = document.getElementById('mgr-banner');
+      const verBanner  = document.getElementById('verified-banner');
+      const isManager  = !!activeCompanyCode;
+      if (mgrBanner) mgrBanner.classList.toggle('visible', isManager);
+      if (verBanner) verBanner.style.display = isManager ? 'none' : '';
+      if (isManager && companyProfile) {
+        const t = document.getElementById('mgr-banner-title');
+        if (t) t.textContent = 'Менеджер: ' + companyProfile.name;
+      }
+    }
+
+    if (id === 'screen-my-resumes')  renderResumes();
+    if (id === 'screen-my-jobs')     renderMyJobs();
+    if (id === 'screen-favorites')   renderFavorites();
+    if (id === 'screen-my-responses') renderMyResponses();
+    if (id === 'screen-resume-db')   { rdbCatFilter = 'all'; document.querySelectorAll('#screen-resume-db .chip').forEach((c,i) => c.classList.toggle('active', i===0)); filterResumeDb(); }
+
+    // Менеджер не может редактировать профиль компании — перенаправляем
+    if (id === 'screen-company-profile' && activeCompanyCode) {
+      showToast('Менеджеры не могут изменять профиль компании');
+      goTo('screen-employer');
+      return;
+    }
+    // Предзаполнение формы профиля компании
+    if (id === 'screen-company-profile' && companyProfile && !activeCompanyCode) {
+      document.getElementById('cp-name').value    = companyProfile.name    || '';
+      document.getElementById('cp-city').value    = companyProfile.city    || '';
+      document.getElementById('cp-phone').value   = companyProfile.phone   || '';
+      document.getElementById('cp-about').value   = companyProfile.about   || '';
+      document.getElementById('cp-about').dispatchEvent(new Event('input'));
+      const ind = document.getElementById('cp-industry');
+      if (ind && companyProfile.industry) ind.value = companyProfile.industry;
+      document.getElementById('cp-website').value = companyProfile.website || '';
+      document.getElementById('cp-email').value   = companyProfile.email   || '';
+      document.getElementById('cp-form-wrap').style.display = '';
+      document.getElementById('cp-success').classList.remove('active');
+    }
+  }
+
+  // ── job data ──
+  const jobs = [
+    {
+      id: 1, emoji: '🔥', color: 'rgba(233,69,96,.25)', category: 'oil',
+      company: 'Газпром Добыча Ноябрьск',
+      title: 'Сварщик НГДО (5–6 разряд)',
+      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес',
+      schedule: '60/30', date: '23 фев 2026',
+      desc: 'Требуется сварщик для выполнения сварочных работ на нефтегазовых объектах Крайнего Севера. Полное обеспечение на вахте за счёт компании.',
+      req: ['Опыт работы от 3 лет', 'Удостоверение сварщика 5–6 разряд', 'Готовность к вахтовому методу', 'Действующая медкнижка'],
+      cond: ['Проживание в благоустроенном общежитии', 'Трёхразовое питание', 'Спецодежда и СИЗ', 'Официальное оформление по ТК РФ', 'Доставка до места вахты и обратно']
+    },
+    {
+      id: 2, emoji: '⚡', color: 'rgba(80,160,255,.25)', category: 'oil',
+      company: 'Роснефть — Самотлорнефтегаз',
+      title: 'Электромонтажник (4–5 разряд)',
+      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес',
+      schedule: '45/15', date: '22 фев 2026',
+      desc: 'Монтаж, наладка и ремонт электрооборудования на объектах нефтедобычи. Работа в составе бригады под руководством прораба.',
+      req: ['Опыт от 2 лет', 'Группа допуска по электробезопасности не ниже III', 'Удостоверение электромонтажника', 'Справка об отсутствии судимостей'],
+      cond: ['Вахтовый посёлок со всеми удобствами', 'Питание 4 раза в день', 'Страховка от НС', 'Квартальные премии', 'Аванс 50%']
+    },
+    {
+      id: 3, emoji: '🚜', color: 'rgba(245,166,35,.25)', category: 'build',
+      company: 'СК Мост',
+      title: 'Машинист экскаватора',
+      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес',
+      schedule: '60/30', date: '21 фев 2026',
+      desc: 'Работа на строительстве федеральной автодороги в Якутии. Управление экскаватором Komatsu PC300. Объект сдаётся в 2027 году.',
+      req: ['Удостоверение машиниста экскаватора', 'Опыт работы от 5 лет', 'Готовность к работе в условиях Крайнего Севера', 'Отсутствие вредных привычек (алкоголь)'],
+      cond: ['Зарплата 2 раза в месяц', 'Тёплое жильё на объекте', 'Питание', 'Надбавка за Крайний Север', 'Перелёт до объекта за счёт компании']
+    },
+    {
+      id: 4, emoji: '⛏️', color: 'rgba(180,100,255,.25)', category: 'mine',
+      company: 'Норильский никель',
+      title: 'Бурильщик скважин',
+      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес',
+      schedule: '30/30', date: '20 фев 2026',
+      desc: 'Бурение скважин на горнодобывающем предприятии. Работа в подземных условиях. Полный социальный пакет и льготы.',
+      req: ['Удостоверение бурильщика', 'Опыт подземных работ от 3 лет', 'Медицинская комиссия (подземные работы)', 'Без судимостей'],
+      cond: ['Корпоративное жильё', 'Льготный выход на пенсию', 'Дополнительный отпуск 8 недель', 'ДМС', 'Компенсация проезда']
+    },
+    {
+      id: 5, emoji: '🍳', color: 'rgba(80,220,140,.25)', category: 'food',
+      company: 'ПАО Лукойл — Западная Сибирь',
+      title: 'Повар вахтового посёлка',
+      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес',
+      schedule: '60/30', date: '19 фев 2026',
+      desc: 'Приготовление горячего питания для работников вахтового посёлка (100–150 человек). Работа в оснащённой столовой нового образца.',
+      req: ['Опыт работы поваром от 2 лет', 'Санитарная книжка', 'Умение работать с большими объёмами', 'Ответственность и аккуратность'],
       cond: ['Проживание бесплатно', 'Питание бесплатно', 'Спецодежда выдаётся', 'Официальное трудоустройство', 'Возможность карьерного роста до шеф-повара']
     }
   ];
@@ -1829,6 +1965,7 @@
   let activeCategory = 'all';
   const jobFilters = { schedule: '', sort: 'default' };
 
+  /* извлечь минимальную зарплату из строки */
   function parseSalary(s) {
     if (typeof s === 'number') return s;
     const n = String(s).replace(/\s/g, '').match(/\d+/);
@@ -1989,7 +2126,7 @@
     favorites:      'vahta_favorites',
     companyProfile: 'vahta_companyProfile',
     userProfile:    'vahta_userProfile',
-    registry:       'vahta_registry',       // { CODE: { name, city, code } }
+    registry:       'vahta_registry',
   };
 
   let activeCompanyCode = null; // null = owner, string = manager mode
@@ -2045,12 +2182,13 @@
   companyProfile = lsLoad(LS.companyProfile, null);
   userProfile    = lsLoad(LS.userProfile,    null);
 
+  // init jobs on load
   renderJobs(jobs);
   updateResponseBadges();
 
-  // ══════════════════════════════════════
+  // ══════════════════════════════════
   //  CREATE JOB FORM LOGIC
-  // ══════════════════════════════════════
+  // ══════════════════════════════════
 
   function openCreateJob() {
     resetJobForm();
