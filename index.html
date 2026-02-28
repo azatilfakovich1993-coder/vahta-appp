@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Good_Вахта</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -903,104 +905,71 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 36px; margin: 0 auto 20px;
     }
-    .photo-avatar {
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      color: transparent;
-    }
 
-    /* ─── clickable avatar wrapper ─── */
-    .avatar-click-wrap {
-      position: relative; display: inline-block; cursor: pointer; margin: 0 auto 4px;
-    }
-    .avatar-click-wrap .avatar-edit-hint {
-      position: absolute; bottom: 0; right: 0;
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--accent); color: #fff;
+    /* ─── photo upload ─── */
+    .photo-upload-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; }
+    .photo-upload-circle {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: var(--card-bg); border: 2px dashed var(--card-border);
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; border: 2px solid var(--grad-start);
-      pointer-events: none;
+      font-size: 34px; cursor: pointer; overflow: hidden;
+      transition: border-color .2s, background .2s; flex-shrink: 0;
     }
-    .avatar-click-wrap input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
+    .photo-upload-circle:hover { border-color: var(--accent); background: rgba(233,69,96,.07); }
+    .photo-upload-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-upload-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; cursor: pointer; text-align: center; }
 
-    /* ─── modal overlay ─── */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.65);
-      display: flex; align-items: flex-end; justify-content: center;
-      z-index: 10000; opacity: 0; pointer-events: none;
-      transition: opacity .25s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal-sheet {
-      width: 100%; max-width: 460px; background: var(--grad-mid);
-      border-radius: 24px 24px 0 0; padding: 20px 20px 36px;
-      border: 1px solid var(--card-border);
-      transform: translateY(100%); transition: transform .3s cubic-bezier(.34,1.2,.64,1);
-    }
-    .modal-overlay.open .modal-sheet { transform: translateY(0); }
-    .modal-handle {
-      width: 40px; height: 4px; border-radius: 4px;
-      background: rgba(255,255,255,.25); margin: 0 auto 18px;
-    }
-    .modal-title { font-size: 17px; font-weight: 800; margin-bottom: 14px; }
-    .modal-job-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; }
-    .modal-job-item {
+    /* ─── candidate detail ─── */
+    .cand-detail-header {
+      display: flex; align-items: center; gap: 16px;
+      width: 100%; max-width: 400px; margin-bottom: 14px;
       background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 14px; padding: 12px 16px; cursor: pointer;
-      transition: background .15s;
+      border-radius: var(--radius); padding: 20px; backdrop-filter: blur(10px);
     }
-    .modal-job-item:hover { background: rgba(255,255,255,.12); }
-    .modal-job-item .mji-title { font-size: 14px; font-weight: 700; }
-    .modal-job-item .mji-salary { font-size: 12px; color: var(--accent2); margin-top: 2px; }
-    .modal-close-btn {
-      width: 100%; margin-top: 14px; padding: 12px; border-radius: var(--radius);
-      border: 1px solid var(--card-border); background: var(--card-bg);
-      color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer;
+    .cand-detail-avatar {
+      width: 72px; height: 72px; border-radius: 18px;
+      background: rgba(245,166,35,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; flex-shrink: 0; overflow: hidden;
     }
-
-    /* ─── contact popup ─── */
-    .contact-popup-item {
-      display: flex; align-items: center; gap: 14px;
+    .cand-detail-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
+    .cand-detail-name { font-size: 18px; font-weight: 800; }
+    .cand-detail-spec { font-size: 14px; color: var(--text-muted); margin-top: 3px; }
+    .cand-detail-card {
+      width: 100%; max-width: 400px;
       background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 14px; padding: 14px 16px; text-decoration: none; color: var(--text);
-      transition: background .15s;
+      border-radius: var(--radius); padding: 18px 20px; backdrop-filter: blur(10px);
+      margin-bottom: 12px;
     }
-    .contact-popup-item:hover { background: rgba(255,255,255,.12); }
-    .contact-popup-icon { font-size: 26px; flex-shrink: 0; }
-    .contact-popup-label { font-size: 13px; color: var(--text-muted); }
-    .contact-popup-value { font-size: 15px; font-weight: 700; }
-
-    /* ─── employer responses screen ─── */
-    .emp-resp-tabs {
-      display: flex; background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 30px; padding: 4px; gap: 4px;
-      margin-bottom: 20px; backdrop-filter: blur(10px); width: 100%; max-width: 400px;
+    .cand-detail-card-title {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px;
     }
-    .rd-meta-tags {
-      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    .cand-detail-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 7px 0; border-bottom: 1px solid var(--card-border); font-size: 14px;
     }
-    .rd-tag {
-      font-size: 11px; padding: 3px 10px; border-radius: 20px;
-      background: rgba(255,255,255,.07); border: 1px solid var(--card-border);
-      color: var(--text-muted);
+    .cand-detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .cand-detail-row-label { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+    .cand-detail-row-val { font-weight: 600; text-align: right; max-width: 60%; }
+    .cand-detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .cand-detail-tag {
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.25); color: var(--text);
     }
-
-    /* ─── job card action buttons ─── */
-    .jc-card-actions {
-      display: flex; gap: 8px; margin-top: 10px; padding-top: 10px;
-      border-top: 1px solid var(--card-border);
+    .cand-contact-btn {
+      width: 100%; max-width: 400px; padding: 14px; border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-size: 15px; font-weight: 700; border: none;
+      cursor: pointer; text-decoration: none; display: block; text-align: center;
+      margin-bottom: 10px;
     }
-    .jc-card-btn {
-      flex: 1; padding: 9px 8px; border-radius: 12px; font-size: 13px; font-weight: 700;
-      cursor: pointer; border: none; transition: opacity .18s;
+    .rc-btn-view {
+      flex: 1; padding: 9px; border-radius: 12px; border: 1px solid rgba(233,69,96,.4);
+      background: rgba(233,69,96,.1); color: var(--accent); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .18s; text-align: center;
     }
-    .jc-card-btn:hover { opacity: .85; }
-    .jc-card-btn-apply   { background: linear-gradient(90deg,#1db954,#17a847); color: #fff; }
-    .jc-card-btn-applied { background: rgba(29,185,84,.15); color: #4ddb8a; cursor: default; }
-    .jc-card-btn-contact { background: linear-gradient(90deg,#1a6fc4,#1499d4); color: #fff; }
+    .rc-btn-view:hover { background: rgba(233,69,96,.2); }
 
     /* ─── empty state ─── */
     .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); width: 100%; max-width: 400px; }
@@ -1060,10 +1029,69 @@
       letter-spacing: 6px; font-size: 22px; font-weight: 800;
       text-align: center; text-transform: uppercase; font-family: monospace;
     }
+
+    /* ─── company-name link ─── */
+    .company-name-link {
+      cursor: pointer; text-decoration: underline dotted;
+      color: inherit; transition: color .15s;
+    }
+    .company-name-link:hover { color: #4ddb8a; }
+
+    /* ─── company info modal ─── */
+    .co-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      backdrop-filter: blur(4px); z-index: 10000;
+      display: flex; align-items: flex-end; justify-content: center;
+      animation: fadeIn .2s ease;
+    }
+    .co-modal {
+      width: 100%; max-width: 480px;
+      background: var(--grad-mid); border: 1px solid var(--card-border);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 24px 20px 32px; max-height: 80vh; overflow-y: auto;
+    }
+    .co-modal-handle {
+      width: 40px; height: 4px; background: var(--card-border);
+      border-radius: 4px; margin: 0 auto 20px;
+    }
+    .co-modal-logo {
+      width: 64px; height: 64px; border-radius: 16px;
+      background: rgba(233,69,96,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; margin-bottom: 14px; overflow: hidden;
+    }
+    .co-modal-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+    .co-modal-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .co-modal-verified { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+    .co-modal-row {
+      display: flex; gap: 10px; padding: 9px 0;
+      border-bottom: 1px solid var(--card-border); font-size: 14px;
+    }
+    .co-modal-row:last-child { border-bottom: none; }
+    .co-modal-row-label { color: var(--text-muted); flex-shrink: 0; min-width: 28px; }
+    .co-modal-row-val { font-weight: 500; word-break: break-word; }
+    .co-modal-about { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--card-border); }
+    .co-modal-close {
+      width: 100%; margin-top: 20px; padding: 14px; border-radius: var(--radius);
+      border: 1px solid var(--card-border); background: var(--card-bg);
+      color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ─── closed job card in favorites ─── */
+    .job-card.job-closed {
+      opacity: 0.55; filter: grayscale(0.5);
+    }
+    .job-card.job-closed .jc-title { color: var(--text-muted); }
+    .job-card.job-closed .jc-salary { -webkit-text-fill-color: var(--text-muted); color: var(--text-muted); }
+    .job-closed-label {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+      color: var(--text-muted); margin-top: 6px;
+    }
   </style>
 </head>
 <body>
-
 <!-- ══════════════════════════════════════
      SCREEN: HOME
 ══════════════════════════════════════ -->
@@ -1192,7 +1220,7 @@
       <div class="mi-arrow">›</div>
     </div>
 
-    <div class="menu-item" onclick="openEmployerResponses()">
+    <div class="menu-item" onclick="goTo('screen-my-jobs')">
       <div class="mi-icon blue">💬</div>
       <div class="mi-text">
         <div class="mi-title">Отклики</div>
@@ -1392,11 +1420,6 @@
   <button class="apply-btn" id="apply-btn" onclick="applyToJob()">
     ✅ Откликнуться на вакансию
   </button>
-  <div id="d-contact-btn-wrap" style="display:none;width:100%;max-width:400px;margin-top:8px">
-    <button class="apply-btn" style="background:linear-gradient(90deg,#1a6fc4,#1499d4)" onclick="openJobContactModal()">
-      📞 Связаться с работодателем
-    </button>
-  </div>
 </div>
 
 
@@ -1482,25 +1505,6 @@
         <span class="char-count" id="cc-desc">0 / 600</span>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Показывать контакт для связи соискателям?</label>
-        <div class="sched-chips" id="cj-show-contact-chips">
-          <div class="sched-chip" id="cj-contact-yes" onclick="toggleContactFields(true)">✅ Да</div>
-          <div class="sched-chip" id="cj-contact-no"  onclick="toggleContactFields(false)">❌ Нет</div>
-        </div>
-      </div>
-
-      <div id="cj-contact-fields" style="display:none;flex-direction:column;gap:16px">
-        <div class="form-group">
-          <label class="form-label">ФИО контактного лица <span class="fl-req">*</span></label>
-          <input class="form-input" id="cj-contact-name" type="text" placeholder="Иванов Иван Иванович" maxlength="80" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Телефон для связи <span class="fl-req">*</span></label>
-          <input class="form-input" id="cj-contact-phone" type="tel" placeholder="+7 900 000-00-00" maxlength="20" />
-        </div>
-      </div>
-
       <div class="form-nav">
         <button class="btn-next" style="flex:1" onclick="goStep(2)">Далее →</button>
       </div>
@@ -1559,7 +1563,9 @@
   <div class="section-title">Мои резюме 📄</div>
   <div class="section-sub">До 3 анкет — для разных специальностей</div>
 
-  <div class="resume-list" id="resume-list"></div>
+  <div class="resume-list" id="resume-list">
+    <!-- заполняется через JS -->
+  </div>
 
   <div style="width:100%;max-width:400px;margin-top:6px">
     <button class="btn-create-resume" id="btn-add-resume" onclick="openCreateResume(null)">
@@ -1585,16 +1591,32 @@
     <div class="section-sub">Заполните анкету — работодатели сами найдут вас</div>
 
     <div class="form-wrap">
+
+      <!-- Фото -->
+      <div class="form-group">
+        <label class="form-label">Фото <span class="field-optional">(необязательно)</span></label>
+        <div class="photo-upload-wrap">
+          <div class="photo-upload-circle" id="cr-photo-circle" onclick="document.getElementById('cr-photo-input').click()">
+            <span id="cr-photo-placeholder">📷</span>
+          </div>
+          <span class="photo-upload-hint">Нажмите для загрузки фото</span>
+          <input type="file" id="cr-photo-input" accept="image/*" style="display:none" onchange="handleResumePhoto(this)" />
+        </div>
+      </div>
+
+      <!-- ФИО -->
       <div class="form-group">
         <label class="form-label">ФИО <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-name" type="text" placeholder="Иванов Иван Иванович" maxlength="80" />
       </div>
 
+      <!-- Телефон -->
       <div class="form-group">
         <label class="form-label">Телефон <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-phone" type="tel" placeholder="+7 900 000-00-00" maxlength="20" />
       </div>
 
+      <!-- Telegram -->
       <div class="form-group">
         <label class="form-label">Telegram <span class="field-optional">(заполняется автоматически)</span></label>
         <div class="tg-input-wrap">
@@ -1603,16 +1625,7 @@
         </div>
       </div>
 
-      <div class="form-group" style="align-items:center">
-        <label class="form-label">Фото для карточки <span class="field-optional">(необязательно)</span></label>
-        <div class="avatar-click-wrap" title="Нажмите чтобы добавить фото">
-          <div class="profile-avatar" id="cr-avatar-preview">👷</div>
-          <div class="avatar-edit-hint">✏️</div>
-          <input type="file" id="cr-photo" accept="image/*" onchange="handleResumePhotoChange(this)" />
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Нажмите на аватар чтобы добавить фото</div>
-      </div>
-
+      <!-- Пол -->
       <div class="form-group">
         <label class="form-label">Пол <span class="fl-req">*</span></label>
         <div class="gender-chips">
@@ -1621,11 +1634,13 @@
         </div>
       </div>
 
+      <!-- Специальность -->
       <div class="form-group">
         <label class="form-label">Специальность <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-specialty" type="text" placeholder="Сварщик, Машинист, Повар…" maxlength="60" />
       </div>
 
+      <!-- Опыт -->
       <div class="form-group">
         <label class="form-label">Опыт работы <span class="fl-req">*</span></label>
         <div class="exp-chips" id="exp-chips">
@@ -1636,6 +1651,7 @@
         </div>
       </div>
 
+      <!-- Желаемая ЗП -->
       <div class="form-group">
         <label class="form-label">Желаемая зарплата <span class="fl-req">*</span></label>
         <div class="salary-row">
@@ -1644,11 +1660,13 @@
         </div>
       </div>
 
+      <!-- Регион -->
       <div class="form-group">
         <label class="form-label">Регион / город <span class="fl-req">*</span></label>
         <input class="form-input" id="cr-region" type="text" placeholder="Москва, Тюмень, Ноябрьск…" maxlength="60" />
       </div>
 
+      <!-- Гражданство -->
       <div class="form-group">
         <label class="form-label">Гражданство <span class="field-optional">(необязательно)</span></label>
         <div class="citizen-chips">
@@ -1658,12 +1676,14 @@
         </div>
       </div>
 
+      <!-- О себе -->
       <div class="form-group">
         <label class="form-label">О себе <span class="fl-req">*</span></label>
         <textarea class="form-textarea" id="cr-about" placeholder="Кратко о себе, опыте и пожеланиях…" maxlength="400" oninput="updateChar('cr-about','cc-about',400)"></textarea>
         <span class="char-count" id="cc-about">0 / 400</span>
       </div>
 
+      <!-- Удостоверения -->
       <div class="form-group">
         <label class="form-label">Удостоверения <span class="field-optional">(если есть)</span></label>
         <div class="dyn-list" id="cert-list"></div>
@@ -1672,6 +1692,7 @@
         </button>
       </div>
 
+      <!-- Ключевые навыки -->
       <div class="form-group">
         <label class="form-label">Ключевые навыки <span class="field-optional">(необязательно)</span></label>
         <div class="dyn-list" id="skill-list"></div>
@@ -1680,9 +1701,11 @@
         </button>
       </div>
 
+      <!-- Submit -->
       <div class="form-nav">
         <button class="btn-submit" style="flex:1" onclick="submitResume()">✅ Сохранить резюме</button>
       </div>
+
     </div>
   </div>
 
@@ -1807,48 +1830,64 @@
 
 
 <!-- ══════════════════════════════════════
-     SCREEN: ПРОФИЛЬ КАНДИДАТА (ДЕТАЛИ)
+     SCREEN: ПРОФИЛЬ КАНДИДАТА
 ══════════════════════════════════════ -->
-<div id="screen-resume-detail" class="screen">
-  <button class="back-btn" onclick="backFromResumeDetail()">
+<div id="screen-candidate-detail" class="screen">
+  <button class="back-btn" onclick="goTo('screen-resume-db')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    Назад
+    База резюме
   </button>
 
-  <div class="section-title" id="rd-title">Профиль кандидата</div>
-  <div class="section-sub" id="rd-sub">Подробная анкета</div>
-
-  <div class="detail-card">
-    <div style="text-align:center;margin-bottom:10px">
-      <div class="profile-avatar" id="rd-avatar">👷</div>
+  <div class="cand-detail-header">
+    <div class="cand-detail-avatar" id="cd-avatar">👷</div>
+    <div style="flex:1;min-width:0">
+      <div class="cand-detail-name" id="cd-name"></div>
+      <div class="cand-detail-spec" id="cd-spec"></div>
     </div>
-    <div class="rc-name" id="rd-name" style="font-size:18px;font-weight:700;text-align:center;margin-bottom:4px"></div>
-    <div class="rc-spec" id="rd-spec" style="text-align:center;margin-bottom:10px"></div>
-    <div class="rd-meta-tags" id="rd-tags"></div>
-    <p id="rd-about" style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:10px"></p>
-    <div id="rd-telegram" style="font-size:13px;margin-bottom:4px"></div>
   </div>
 
-  <!-- Кнопки для работодателя — видны только из базы резюме -->
-  <div id="rd-employer-actions" style="display:none;width:100%;max-width:400px;flex-direction:column;gap:10px;margin-bottom:14px">
-    <button class="apply-btn" style="background:linear-gradient(90deg,var(--accent),#c73652)" onclick="openOfferModal()">
-      📨 Отправить предложение о вакансии
-    </button>
-    <button class="apply-btn" style="background:linear-gradient(90deg,#1a6fc4,#1499d4)" onclick="openContactModal()">
-      📞 Связаться с кандидатом
-    </button>
+  <div class="cand-detail-card">
+    <div class="cand-detail-card-title">Основная информация</div>
+    <div class="cand-detail-row">
+      <span class="cand-detail-row-label">💰 Зарплата</span>
+      <span class="cand-detail-row-val" id="cd-salary"></span>
+    </div>
+    <div class="cand-detail-row">
+      <span class="cand-detail-row-label">📍 Регион</span>
+      <span class="cand-detail-row-val" id="cd-region"></span>
+    </div>
+    <div class="cand-detail-row">
+      <span class="cand-detail-row-label">⏳ Опыт</span>
+      <span class="cand-detail-row-val" id="cd-exp"></span>
+    </div>
+    <div class="cand-detail-row">
+      <span class="cand-detail-row-label">👤 Пол</span>
+      <span class="cand-detail-row-val" id="cd-gender"></span>
+    </div>
+    <div class="cand-detail-row" id="cd-citizen-row">
+      <span class="cand-detail-row-label">🌍 Гражданство</span>
+      <span class="cand-detail-row-val" id="cd-citizen"></span>
+    </div>
   </div>
 
-  <div class="detail-card detail-section" id="rd-certs-wrap" style="display:none">
-    <div class="detail-section-title">Удостоверения</div>
-    <ul id="rd-certs"></ul>
+  <div class="cand-detail-card" id="cd-about-card">
+    <div class="cand-detail-card-title">О себе</div>
+    <div style="font-size:14px;line-height:1.6;color:var(--text)" id="cd-about"></div>
   </div>
 
-  <div class="detail-card detail-section" id="rd-skills-wrap" style="display:none">
-    <div class="detail-section-title">Навыки</div>
-    <ul id="rd-skills"></ul>
+  <div class="cand-detail-card" id="cd-certs-card">
+    <div class="cand-detail-card-title">Сертификаты / Удостоверения</div>
+    <div class="cand-detail-tags" id="cd-certs"></div>
   </div>
+
+  <div class="cand-detail-card" id="cd-skills-card">
+    <div class="cand-detail-card-title">Навыки</div>
+    <div class="cand-detail-tags" id="cd-skills"></div>
+  </div>
+
+  <div id="cd-contact-wrap" style="width:100%;max-width:400px;margin-top:4px"></div>
 </div>
+
 
 <!-- ══════════════════════════════════════
      SCREEN: ПРОФИЛЬ КОМПАНИИ
@@ -1864,13 +1903,12 @@
     <div class="section-sub">Заполните страницу — соискатели выберут вас</div>
 
     <div class="form-wrap">
-      <div style="text-align:center;margin-bottom:4px">
-        <div class="avatar-click-wrap" title="Нажмите чтобы сменить логотип">
-          <div class="profile-avatar" id="cp-avatar">🏗️</div>
-          <div class="avatar-edit-hint">✏️</div>
-          <input type="file" accept="image/*" onchange="handleCompanyLogoChange(this)" />
+      <div class="photo-upload-wrap">
+        <div class="photo-upload-circle" id="cp-logo-circle" onclick="document.getElementById('cp-logo-input').click()">
+          <span id="cp-logo-placeholder">🏗️</span>
         </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;margin-bottom:8px">Нажмите на логотип чтобы сменить</div>
+        <span class="photo-upload-hint">Логотип компании (необязательно)</span>
+        <input type="file" id="cp-logo-input" accept="image/*" style="display:none" onchange="handleCompanyLogo(this)" />
       </div>
 
       <div class="form-group">
@@ -1906,10 +1944,6 @@
         <input class="form-input" id="cp-email" type="email" placeholder="hr@company.ru" maxlength="80" />
       </div>
       <div class="form-group">
-        <label class="form-label">Пароль менеджера <span class="field-optional">(для входа по коду)</span></label>
-        <input class="form-input" id="cp-manager-pass" type="password" placeholder="Придумайте пароль для менеджеров" maxlength="32" />
-      </div>
-      <div class="form-group">
         <label class="form-label">О компании <span class="fl-req">*</span></label>
         <textarea class="form-textarea" id="cp-about" placeholder="Расскажите о направлениях работы и преимуществах…" maxlength="500" oninput="updateChar('cp-about','cc-cp-about',500)"></textarea>
         <span class="char-count" id="cc-cp-about">0 / 500</span>
@@ -1938,22 +1972,6 @@
 
 
 <!-- ══════════════════════════════════════
-     SCREEN: ОТКЛИКИ РАБОТОДАТЕЛЯ
-══════════════════════════════════════ -->
-<div id="screen-employer-responses" class="screen">
-  <button class="back-btn" onclick="goTo('screen-employer')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    Назад
-  </button>
-
-  <div class="section-title">Входящие отклики 💬</div>
-  <div class="section-sub">Кандидаты, откликнувшиеся на ваши вакансии</div>
-
-  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px" id="employer-all-responses-list"></div>
-</div>
-
-
-<!-- ══════════════════════════════════════
      SCREEN: МОИ ОТКЛИКИ (СОИСКАТЕЛЬ)
 ══════════════════════════════════════ -->
 <div id="screen-my-responses" class="screen">
@@ -1971,7 +1989,8 @@
     <div class="tab" onclick="setMyRespTab(this,'accepted')">Приглашения</div>
   </div>
 
-  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px" id="my-responses-list"></div>
+  <div
+  style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px" id="my-responses-list"></div>
 </div>
 
 
@@ -2006,13 +2025,8 @@
 
     <div class="form-wrap">
       <div style="text-align:center;margin-bottom:4px">
-        <div class="avatar-click-wrap" title="Нажмите чтобы сменить фото">
-          <div class="profile-avatar" id="prof-avatar">👤</div>
-          <div class="avatar-edit-hint">✏️</div>
-          <input type="file" accept="image/*" onchange="handleProfilePhotoChange(this)" />
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;margin-bottom:4px">Нажмите на фото чтобы сменить</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px" id="prof-tg-handle"></div>
+        <div class="profile-avatar" id="prof-avatar">👤</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:-12px;margin-bottom:12px" id="prof-tg-handle"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Имя <span class="fl-req">*</span></label>
@@ -2046,76 +2060,31 @@
 </div>
 
 
-<!-- ══ MODAL: выбор вакансии для предложения ══ -->
-<div class="modal-overlay" id="modal-offer" onclick="closeModalOffer(event)">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Выберите вакансию для предложения</div>
-    <div class="modal-job-list" id="modal-offer-jobs"></div>
-    <button class="modal-close-btn" onclick="document.getElementById('modal-offer').classList.remove('open')">Отмена</button>
-  </div>
-</div>
-
-<!-- ══ MODAL: контакты работодателя (вакансия) ══ -->
-<div class="modal-overlay" id="modal-job-contact" onclick="closeModalJobContact(event)">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Контакт работодателя</div>
-    <div style="display:flex;flex-direction:column;gap:10px" id="modal-job-contact-items"></div>
-    <button class="modal-close-btn" onclick="document.getElementById('modal-job-contact').classList.remove('open')">Закрыть</button>
-  </div>
-</div>
-
-<!-- ══ MODAL: контакты соискателя ══ -->
-<div class="modal-overlay" id="modal-contact" onclick="closeModalContact(event)">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Связаться с кандидатом</div>
-    <div style="display:flex;flex-direction:column;gap:10px" id="modal-contact-items"></div>
-    <button class="modal-close-btn" onclick="document.getElementById('modal-contact').classList.remove('open')">Закрыть</button>
-  </div>
-</div>
-
 <!-- toast -->
 <div id="toast" class="toast"></div>
+
+<!-- company info modal -->
+<div id="co-modal-overlay" class="co-modal-overlay" style="display:none" onclick="closeCompanyModal(event)">
+  <div class="co-modal" onclick="event.stopPropagation()">
+    <div class="co-modal-handle"></div>
+    <div class="co-modal-logo" id="co-modal-logo">🏗️</div>
+    <div class="co-modal-name" id="co-modal-name"></div>
+    <div class="co-modal-verified">
+      <span class="verified-chip">✓ Проверен</span>
+    </div>
+    <div id="co-modal-rows"></div>
+    <div class="co-modal-about" id="co-modal-about" style="display:none"></div>
+    <button class="co-modal-close" onclick="closeCompanyModal()">Закрыть</button>
+  </div>
+</div>
+
+
 <script>
   // ── Telegram Web App init ──
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
   }
-
-  // ── Сохраняем chat_id текущего пользователя при старте ──
-  const TG_BOT_TOKEN = '8406340321:AAE6pjKfFflkF4V2peKKWZ6-vPljslWZjlA';
-
-  function getTgChatId() {
-    return window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
-  }
-  function getTgUsername() {
-    return window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null;
-  }
-
-  // Отправить сообщение через Telegram Bot API
-  function sendTgMessage(chatId, text) {
-    if (!chatId) return;
-    fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-    }).catch(() => {});
-  }
-
-  // При старте — сохраняем chat_id текущего пользователя в localStorage
-  (function initTgUser() {
-    const chatId = getTgChatId();
-    const username = getTgUsername();
-    if (chatId) {
-      localStorage.setItem('vahta_my_chat_id', String(chatId));
-    }
-    if (username) {
-      localStorage.setItem('vahta_my_tg_username', username);
-    }
-  })();
 
   // ── theme ──
   function toggleTheme() {
@@ -2154,7 +2123,6 @@
     if (id === 'screen-my-jobs')     renderMyJobs();
     if (id === 'screen-favorites')   renderFavorites();
     if (id === 'screen-my-responses') renderMyResponses();
-    if (id === 'screen-employer-responses') renderEmployerAllResponses();
     if (id === 'screen-resume-db')   { rdbCatFilter = 'all'; document.querySelectorAll('#screen-resume-db .chip').forEach((c,i) => c.classList.toggle('active', i===0)); filterResumeDb(); }
 
     // Менеджер не может редактировать профиль компании — перенаправляем
@@ -2174,14 +2142,13 @@
       if (ind && companyProfile.industry) ind.value = companyProfile.industry;
       document.getElementById('cp-website').value = companyProfile.website || '';
       document.getElementById('cp-email').value   = companyProfile.email   || '';
-      const passInput = document.getElementById('cp-manager-pass');
-      if (passInput) passInput.value = companyProfile.managerPass || '';
-      companyLogoDataUrl = companyProfile.logo || '';
-      const cpAvatar = document.getElementById('cp-avatar');
-      if (cpAvatar && companyLogoDataUrl) {
-        cpAvatar.classList.add('photo-avatar');
-        cpAvatar.style.backgroundImage = `url('${companyLogoDataUrl}')`;
-        cpAvatar.textContent = '';
+      // восстановить логотип
+      cpLogo = companyProfile.logo || '';
+      const logoCircle = document.getElementById('cp-logo-circle');
+      if (logoCircle) {
+        logoCircle.innerHTML = cpLogo
+          ? `<img src="${cpLogo}" alt="Логотип" />`
+          : '<span id="cp-logo-placeholder">🏗️</span>';
       }
       document.getElementById('cp-form-wrap').style.display = '';
       document.getElementById('cp-success').classList.remove('active');
@@ -2189,58 +2156,7 @@
   }
 
   // ── job data ──
-  const jobs = [
-    {
-      id: 1, emoji: '🔥', color: 'rgba(233,69,96,.25)', category: 'oil',
-      company: 'Газпром Добыча Ноябрьск',
-      title: 'Сварщик НГДО (5–6 разряд)',
-      location: 'Ноябрьск, ЯНАО', salary: 'от 120 000 ₽/мес',
-      schedule: '60/30', date: '23 фев 2026',
-      desc: 'Требуется сварщик для выполнения сварочных работ на нефтегазовых объектах Крайнего Севера. Полное обеспечение на вахте за счёт компании.',
-      req: ['Опыт работы от 3 лет', 'Удостоверение сварщика 5–6 разряд', 'Готовность к вахтовому методу', 'Действующая медкнижка'],
-      cond: ['Проживание в благоустроенном общежитии', 'Трёхразовое питание', 'Спецодежда и СИЗ', 'Официальное оформление по ТК РФ', 'Доставка до места вахты и обратно']
-    },
-    {
-      id: 2, emoji: '⚡', color: 'rgba(80,160,255,.25)', category: 'oil',
-      company: 'Роснефть — Самотлорнефтегаз',
-      title: 'Электромонтажник (4–5 разряд)',
-      location: 'Нижневартовск, ХМАО', salary: 'от 95 000 ₽/мес',
-      schedule: '45/15', date: '22 фев 2026',
-      desc: 'Монтаж, наладка и ремонт электрооборудования на объектах нефтедобычи. Работа в составе бригады под руководством прораба.',
-      req: ['Опыт от 2 лет', 'Группа допуска по электробезопасности не ниже III', 'Удостоверение электромонтажника', 'Справка об отсутствии судимостей'],
-      cond: ['Вахтовый посёлок со всеми удобствами', 'Питание 4 раза в день', 'Страховка от НС', 'Квартальные премии', 'Аванс 50%']
-    },
-    {
-      id: 3, emoji: '🚜', color: 'rgba(245,166,35,.25)', category: 'build',
-      company: 'СК Мост',
-      title: 'Машинист экскаватора',
-      location: 'Якутск, Республика Саха', salary: 'от 150 000 ₽/мес',
-      schedule: '60/30', date: '21 фев 2026',
-      desc: 'Работа на строительстве федеральной автодороги в Якутии. Управление экскаватором Komatsu PC300. Объект сдаётся в 2027 году.',
-      req: ['Удостоверение машиниста экскаватора', 'Опыт работы от 5 лет', 'Готовность к работе в условиях Крайнего Севера', 'Отсутствие вредных привычек (алкоголь)'],
-      cond: ['Зарплата 2 раза в месяц', 'Тёплое жильё на объекте', 'Питание', 'Надбавка за Крайний Север', 'Перелёт до объекта за счёт компании']
-    },
-    {
-      id: 4, emoji: '⛏️', color: 'rgba(180,100,255,.25)', category: 'mine',
-      company: 'Норильский никель',
-      title: 'Бурильщик скважин',
-      location: 'Норильск, Красноярский край', salary: 'от 130 000 ₽/мес',
-      schedule: '30/30', date: '20 фев 2026',
-      desc: 'Бурение скважин на горнодобывающем предприятии. Работа в подземных условиях. Полный социальный пакет и льготы.',
-      req: ['Удостоверение бурильщика', 'Опыт подземных работ от 3 лет', 'Медицинская комиссия (подземные работы)', 'Без судимостей'],
-      cond: ['Корпоративное жильё', 'Льготный выход на пенсию', 'Дополнительный отпуск 8 недель', 'ДМС', 'Компенсация проезда']
-    },
-    {
-      id: 5, emoji: '🍳', color: 'rgba(80,220,140,.25)', category: 'food',
-      company: 'ПАО Лукойл — Западная Сибирь',
-      title: 'Повар вахтового посёлка',
-      location: 'Сургут, ХМАО', salary: 'от 75 000 ₽/мес',
-      schedule: '60/30', date: '19 фев 2026',
-      desc: 'Приготовление горячего питания для работников вахтового посёлка (100–150 человек). Работа в оснащённой столовой нового образца.',
-      req: ['Опыт работы поваром от 2 лет', 'Санитарная книжка', 'Умение работать с большими объёмами', 'Ответственность и аккуратность'],
-      cond: ['Проживание бесплатно', 'Питание бесплатно', 'Спецодежда выдаётся', 'Официальное трудоустройство', 'Возможность карьерного роста до шеф-повара']
-    }
-  ];
+  const jobs = [];
 
   let activeCategory = 'all';
   const jobFilters = { schedule: '', sort: 'default' };
@@ -2292,23 +2208,16 @@
   }
 
   function _jobCardHtml(j) {
-    const isFav    = favorites.has(j.id);
-    const applied  = myResponses.some(r => r.jobId === j.id);
+    const isFav = favorites.has(j.id);
     const logoHtml = j.logo
-      ? `<div class="company-logo photo-avatar" style="background-image:url('${j.logo}')"></div>`
+      ? `<div class="company-logo" style="padding:0;overflow:hidden"><img src="${j.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px" /></div>`
       : `<div class="company-logo" style="background:${j.color}">${j.emoji}</div>`;
-    const contactBtn = j.contactPhone
-      ? `<button class="jc-card-btn jc-card-btn-contact" onclick="quickContactJob(${j.id},event)">📞 Связаться</button>`
-      : '';
-    const applyBtnHtml = applied
-      ? `<button class="jc-card-btn jc-card-btn-applied" disabled>✅ Отклик отправлен</button>`
-      : `<button class="jc-card-btn jc-card-btn-apply" onclick="quickApplyJob(${j.id},event)">Откликнуться</button>`;
     return `
       <div class="job-card" onclick="openJob(${j.id})">
         <div class="jc-header">
           ${logoHtml}
           <div style="flex:1">
-            <div class="jc-company-name">${j.company} <span class="verified-chip">✓ Verified</span></div>
+            <div class="jc-company-name"><span class="company-name-link" onclick="showCompanyInfo(${j.id},event)">${j.company}</span> <span class="verified-chip">✓ Проверен</span></div>
           </div>
           <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${j.id},event)" title="${isFav ? 'Убрать из избранного' : 'В избранное'}">${isFav ? '❤️' : '🤍'}</button>
         </div>
@@ -2319,46 +2228,12 @@
           <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
           <span class="jc-meta-item" style="margin-left:auto">📅 ${j.date}</span>
         </div>
-        <div class="jc-card-actions" onclick="event.stopPropagation()">
-          ${applyBtnHtml}
-          ${contactBtn}
-        </div>
       </div>`;
-  }
-
-  // Получить ключевые слова соискателя из всех резюме
-  function _getWorkerKeywords() {
-    if (!resumes.length) return [];
-    const words = new Set();
-    resumes.forEach(r => {
-      if (r.specialty) r.specialty.toLowerCase().split(/[\s,\/\-]+/).filter(w => w.length > 2).forEach(w => words.add(w));
-      if (r.about)     r.about.toLowerCase().split(/[\s,\/\-]+/).filter(w => w.length > 3).forEach(w => words.add(w));
-      (r.skills || []).forEach(s => s.toLowerCase().split(/[\s,\/\-]+/).filter(w => w.length > 2).forEach(w => words.add(w)));
-      (r.certs  || []).forEach(s => s.toLowerCase().split(/[\s,\/\-]+/).filter(w => w.length > 2).forEach(w => words.add(w)));
-    });
-    return [...words];
-  }
-
-  // Оценить релевантность вакансии для соискателя (0=нет, 1=схожая, 2=точная)
-  function _jobRelevance(j, keywords) {
-    if (!keywords.length) return 0;
-    const text = (j.title + ' ' + j.desc + ' ' + (j.req || []).join(' ')).toLowerCase();
-    let score = 0;
-    keywords.forEach(kw => { if (text.includes(kw)) score++; });
-    return score;
-  }
-
-  // Сортировать вакансии: точные → схожие → остальные
-  function _sortJobsByRelevance(list) {
-    const keywords = _getWorkerKeywords();
-    if (!keywords.length) return list;
-    return [...list].sort((a, b) => _jobRelevance(b, keywords) - _jobRelevance(a, keywords));
   }
 
   function renderJobs(list) {
     const c = document.getElementById('jobs-container');
-    let visible = list.filter(j => !j.paused && !j.archived);
-    visible = _sortJobsByRelevance(visible);
+    const visible = list.filter(j => !j.paused && !j.archived);
     if (!visible.length) { c.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:32px 0">Вакансий не найдено</p>'; return; }
     c.innerHTML = visible.map(j => _jobCardHtml(j)).join('');
   }
@@ -2379,11 +2254,7 @@
     if (salMin) result = result.filter(j => parseSalary(j.salary) >= salMin);
     if (salMax) result = result.filter(j => parseSalary(j.salary) <= salMax);
     if (jobFilters.schedule) result = result.filter(j => j.schedule === jobFilters.schedule);
-    if (jobFilters.sort === 'salary') {
-      result = [...result].sort((a, b) => parseSalary(b.salary) - parseSalary(a.salary));
-    } else {
-      result = _sortJobsByRelevance(result);
-    }
+    if (jobFilters.sort === 'salary') result = [...result].sort((a, b) => parseSalary(b.salary) - parseSalary(a.salary));
 
     const cnt = (salMin ? 1 : 0) + (salMax ? 1 : 0) + (jobFilters.schedule ? 1 : 0) + (jobFilters.sort !== 'default' ? 1 : 0);
     _jobFilterBadgeUpdate(cnt);
@@ -2403,19 +2274,9 @@
   function openJob(id) {
     currentJobId = id;
     const j = jobs.find(x => x.id === id);
-    const dLogo = document.getElementById('d-logo');
-    if (j.logo) {
-      dLogo.classList.add('photo-avatar');
-      dLogo.style.backgroundImage = `url('${j.logo}')`;
-      dLogo.style.background = 'transparent';
-      dLogo.textContent = '';
-    } else {
-      dLogo.classList.remove('photo-avatar');
-      dLogo.style.backgroundImage = '';
-      dLogo.style.background = j.color;
-      dLogo.textContent = j.emoji;
-    }
-    document.getElementById('d-company').innerHTML = `${j.company} <span class="verified-chip">✓ Verified</span>`;
+    document.getElementById('d-logo').textContent = j.emoji;
+    document.getElementById('d-logo').style.background = j.color;
+    document.getElementById('d-company').innerHTML = `<span class="company-name-link" onclick="showCompanyInfo(${j.id})">${j.company}</span> <span class="verified-chip">✓ Проверен</span>`;
     document.getElementById('d-title').textContent = j.title;
     document.getElementById('d-salary').textContent = j.salary;
     document.getElementById('d-tags').innerHTML = `
@@ -2425,9 +2286,6 @@
     document.getElementById('d-desc').textContent = j.desc;
     document.getElementById('d-req').innerHTML  = j.req.map(r  => `<li>${r}</li>`).join('');
     document.getElementById('d-cond').innerHTML = j.cond.map(c => `<li>${c}</li>`).join('');
-    // Показываем кнопку "Связаться" если у вакансии есть контакт
-    const contactWrap = document.getElementById('d-contact-btn-wrap');
-    if (contactWrap) contactWrap.style.display = j.contactPhone ? '' : 'none';
     goTo('screen-job-detail');
     _updateApplyBtn();
   }
@@ -2439,7 +2297,8 @@
   let crGender       = '';
   let crExp          = '';
   let crCitizen      = '';
-  let crPhotoDataUrl = '';
+  let crPhoto        = '';
+  let cpLogo         = '';
   const catLabelsR   = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
 
   let myJobs         = [];
@@ -2447,10 +2306,8 @@
   let myResponses    = [];
   const favorites    = new Set();
   let companyProfile = null;
-  let companyLogoDataUrl = '';
   let userProfile    = null;
   let currentJobId   = null;
-  let resumeDetailBackScreen = 'screen-resume-db';
 
   let myJobsTab      = 'active';
   let myRespTab      = 'all';
@@ -2460,6 +2317,95 @@
   let cjSchedule     = '';
   let cjWorkSchedule = '';
   const dynCounters  = {};
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  SUPABASE — синхронизация данных между аккаунтами
+  // ══════════════════════════════════════════════════════════════════════
+  const SUPABASE_URL = 'https://zutiselchauekvvoirgw.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1dGlzZWxjaGF1ZWt2dm9pcmd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMjEwMzIsImV4cCI6MjA4Njg5NzAzMn0.5Bsg4JKtqbJ9MF9yF1ASeCiEebzxRVPoJO8yZzuDG8Y';
+  const SB_ENABLED   = typeof window !== 'undefined' && typeof window.supabase !== 'undefined';
+
+  let _sb = null;
+  if (SB_ENABLED) {
+    try { _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.warn('Supabase init error:', e); }
+  }
+
+  async function sbLoadJobs() {
+    if (!_sb) return;
+    try {
+      const { data, error } = await _sb.from('vacancies').select('*').eq('archived', false).eq('paused', false);
+      if (error) { console.warn('sbLoadJobs:', error.message); return; }
+      if (!data || !data.length) return;
+      data.forEach(j => {
+        if (!jobs.find(x => x.id === j.id)) jobs.push(j);
+      });
+      renderJobs(jobs);
+    } catch(e) { console.warn('sbLoadJobs:', e); }
+  }
+
+  async function sbLoadResumes() {
+    if (!_sb) return;
+    try {
+      const { data, error } = await _sb.from('resumes').select('*').eq('published', true);
+      if (error) { console.warn('sbLoadResumes:', error.message); return; }
+      if (!data || !data.length) return;
+      data.forEach(r => {
+        if (!resumeDbData.find(x => x.id === r.id)) resumeDbData.push(r);
+      });
+    } catch(e) { console.warn('sbLoadResumes:', e); }
+  }
+
+  async function sbSaveJob(job) {
+    if (!_sb) return;
+    try {
+      const { error } = await _sb.from('vacancies').upsert(job, { onConflict: 'id' });
+      if (error) console.warn('sbSaveJob:', error.message);
+    } catch(e) { console.warn('sbSaveJob:', e); }
+  }
+
+  async function sbSaveResume(resume, id) {
+    if (!_sb || resume.published === false) return;
+    try {
+      const { error } = await _sb.from('resumes').upsert({ ...resume, id }, { onConflict: 'id' });
+      if (error) console.warn('sbSaveResume:', error.message);
+    } catch(e) { console.warn('sbSaveResume:', e); }
+  }
+
+  async function sbDeleteResume(id) {
+    if (!_sb) return;
+    try {
+      const { error } = await _sb.from('resumes').delete().eq('id', id);
+      if (error) console.warn('sbDeleteResume:', error.message);
+    } catch(e) { console.warn('sbDeleteResume:', e); }
+  }
+
+  function sbSubscribe() {
+    if (!_sb) return;
+    _sb.channel('public-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vacancies' }, () => {
+        sbLoadJobs();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'resumes' }, () => {
+        sbLoadResumes().then(() => filterResumeDb());
+      })
+      .subscribe();
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  TELEGRAM BOT NOTIFICATIONS
+  // ══════════════════════════════════════════════════════════════════════
+  const TG_BOT_TOKEN = '8406340321:AAE6pjKfFflkF4V2peKKWZ6-vPljslWZjlA';
+
+  async function sendTgMessage(chatId, text) {
+    if (!TG_BOT_TOKEN || TG_BOT_TOKEN === 'ВСТАВЬТЕ_ТОКЕН_БОТА_СЮДА' || !chatId) return;
+    try {
+      await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+      });
+    } catch(e) { console.warn('TG notify error:', e); }
+  }
 
   // ─── localStorage persistence ───────────────────────────────────────
   const LS = {
@@ -2473,7 +2419,7 @@
     registry:       'vahta_registry',
   };
 
-  let activeCompanyCode = null; // null = owner, string = manager mode
+  let activeCompanyCode = null;
 
   function coKey(base) {
     const code = activeCompanyCode || companyProfile?.code;
@@ -2493,23 +2439,37 @@
   function genCompanyCode() {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
   }
+
   function lsSave(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {
+      if (e && (e.name === 'QuotaExceededError' || e.code === 22)) {
+        showToast('⚠️ Недостаточно места в памяти браузера. Фото может не сохраниться.');
+      }
+    }
   }
+
+  // Сжатие изображения через Canvas перед сохранением
+  function compressImage(dataUrl, maxSize, quality, callback) {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else        { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  }
+
   function lsLoad(key, fallback) {
     try { const s = localStorage.getItem(key); return s !== null ? JSON.parse(s) : fallback; } catch(e) { return fallback; }
   }
 
-  const resumeDbData = [
-    { id:101, name:'Алексей Петров',  specialty:'Сварщик 5 разряда',      category:'oil',   exp:'3–5 лет', salary:110000, region:'Тюмень',          gender:'М', certs:['Удост. сварщика НАКС'],       skills:['НГДО','Крайний Север'] },
-    { id:102, name:'Дмитрий Козлов',  specialty:'Машинист экскаватора',   category:'build', exp:'5+ лет',  salary:145000, region:'Новосибирск',      gender:'М', certs:['Права кат. C','Удост. машиниста'], skills:['Komatsu PC300','PC400'] },
-    { id:103, name:'Сергей Антонов',  specialty:'Бурильщик',              category:'mine',  exp:'5+ лет',  salary:125000, region:'Норильск',         gender:'М', certs:['Удост. бурильщика'],          skills:['Подземные работы'] },
-    { id:104, name:'Олег Семёнов',    specialty:'Электромонтажник',       category:'oil',   exp:'1–3 года',salary:85000,  region:'Сургут',           gender:'М', certs:['Группа допуска III'],         skills:['ПУЭ','КИПиА'] },
-    { id:105, name:'Нина Захарова',   specialty:'Повар',                  category:'food',  exp:'3–5 лет', salary:70000,  region:'Ханты-Мансийск',   gender:'Ж', certs:['Санитарная книжка'],          skills:['Работа на большие объёмы'] },
-    { id:106, name:'Виктор Чернов',   specialty:'Сварщик 6 разряда',      category:'oil',   exp:'5+ лет',  salary:135000, region:'Ноябрьск',         gender:'М', certs:['Удост. сварщика 6 р.','НАКС'], skills:['Аргонная сварка'] },
-    { id:107, name:'Максим Лебедев',  specialty:'Монтажник трубопроводов',category:'oil',   exp:'3–5 лет', salary:100000, region:'Нефтеюганск',      gender:'М', certs:['Удост. монтажника'],          skills:['НГДО','Сварка под давлением'] },
-    { id:108, name:'Ирина Соколова',  specialty:'Повар-технолог',         category:'food',  exp:'5+ лет',  salary:80000,  region:'Тюмень',           gender:'Ж', certs:['Санитарная книжка','ХАССП'],  skills:['Шеф-повар','Планирование меню'] },
-  ];
+  const resumeDbData = [];
 
   // ─── restore saved data from localStorage ───────────────────────────
   resumes.push(...lsLoad(LS.resumes, []));
@@ -2525,15 +2485,19 @@
   myResponses.push(...lsLoad(LS.myResponses, []));
   companyProfile = lsLoad(LS.companyProfile, null);
   userProfile    = lsLoad(LS.userProfile,    null);
-  companyLogoDataUrl = companyProfile && companyProfile.logo ? companyProfile.logo : '';
 
-  // init jobs on load
   renderJobs(jobs);
   updateResponseBadges();
 
-  // ══════════════════════════════════
+  if (SB_ENABLED) {
+    sbLoadJobs();
+    sbLoadResumes();
+    sbSubscribe();
+  }
+
+  // ══════════════════════════════════════
   //  CREATE JOB FORM LOGIC
-  // ══════════════════════════════════
+  // ══════════════════════════════════════
 
   function openCreateJob() {
     resetJobForm();
@@ -2547,15 +2511,10 @@
     dynCounters.req = 0;
     dynCounters.cond = 0;
 
-    ['cj-title','cj-location','cj-salary-from','cj-salary-to','cj-schedule-custom','cj-work-schedule-custom','cj-desc','cj-contact-name','cj-contact-phone'].forEach(id => {
+    ['cj-title','cj-location','cj-salary-from','cj-salary-to','cj-schedule-custom','cj-work-schedule-custom','cj-desc'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-    cjShowContact = false;
-    const cf = document.getElementById('cj-contact-fields');
-    if (cf) cf.style.display = 'none';
-    document.getElementById('cj-contact-yes')?.classList.remove('active');
-    document.getElementById('cj-contact-no')?.classList.remove('active');
     document.querySelectorAll('#sched-chips .sched-chip, #work-sched-chips .sched-chip').forEach(c => c.classList.remove('active'));
     document.getElementById('req-list').innerHTML = '';
     document.getElementById('cond-list').innerHTML = '';
@@ -2631,16 +2590,6 @@
     setTimeout(() => el.classList.remove('error'), 1200);
   }
 
-  let cjShowContact = false;
-
-  function toggleContactFields(show) {
-    cjShowContact = show;
-    document.getElementById('cj-contact-yes').classList.toggle('active', show);
-    document.getElementById('cj-contact-no').classList.toggle('active', !show);
-    const fields = document.getElementById('cj-contact-fields');
-    fields.style.display = show ? 'flex' : 'none';
-  }
-
   function selectSched(el, val) {
     document.querySelectorAll('#sched-chips .sched-chip').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
@@ -2711,30 +2660,34 @@
     const today = new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});
 
     const newId = Date.now();
-    const contactName  = cjShowContact ? (document.getElementById('cj-contact-name')?.value.trim() || '') : '';
-    const contactPhone = cjShowContact ? (document.getElementById('cj-contact-phone')?.value.trim() || '') : '';
-    if (cjShowContact && !contactPhone) { showToast('Укажите телефон для связи'); return; }
-
+    const _ownerChatId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || companyProfile?.ownerChatId || null;
     const newJob = {
       id: newId,
       emoji: '📋', color: 'rgba(233,69,96,.25)',
+      logo: companyProfile?.logo || '',
       category: 'other',
       company: companyProfile ? companyProfile.name : 'Ваша компания',
+      companyInfo: companyProfile ? {
+        name: companyProfile.name, industry: companyProfile.industry,
+        city: companyProfile.city, about: companyProfile.about,
+        website: companyProfile.website, phone: companyProfile.phone,
+        email: companyProfile.email, logo: companyProfile.logo
+      } : null,
+      ownerChatId: _ownerChatId,
       title, location, salary: salaryStr, schedule, workSchedule, date: today,
-      desc, req: reqs, cond: conds,
-      logo: companyProfile && companyProfile.logo ? companyProfile.logo : '',
-      contactName, contactPhone
+      desc, req: reqs, cond: conds
     };
     jobs.unshift(newJob);
     myJobs.unshift({ ...newJob, paused: false, archived: false });
     saveMyJobsData();
+    sbSaveJob({ ...newJob, paused: false, archived: false });
     renderJobs(jobs);
 
     document.getElementById('cj-preview').innerHTML = `
       <div class="pc-header">
         <div class="pc-logo">📋</div>
         <div>
-          <div class="pc-company">Ваша компания <span class="verified-chip">✓ Verified</span></div>
+          <div class="pc-company">Ваша компания <span class="verified-chip">✓ Проверен</span></div>
           <div class="pc-title">${title}</div>
         </div>
       </div>
@@ -2750,7 +2703,6 @@
     document.getElementById('cj-success').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
   // ══════════════════════════════════════
   //  RESUME LOGIC
   // ══════════════════════════════════════
@@ -2775,10 +2727,10 @@
       list.innerHTML = resumes.map((r, i) => {
         const isPub = r.published !== false;
         const avatarHtml = r.photo
-          ? `<div class="rc-avatar photo-avatar" style="background-image:url('${r.photo}')"></div>`
+          ? `<div class="rc-avatar" style="background:none;padding:0;overflow:hidden"><img src="${r.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" /></div>`
           : `<div class="rc-avatar">${r.gender === 'Ж' ? '👩' : '👷'}</div>`;
         return `
-        <div class="resume-card" onclick="openResumeDetailFromMy(${i})">
+        <div class="resume-card">
           <div class="rc-header">
             ${avatarHtml}
             <div>
@@ -2796,9 +2748,9 @@
             ${r.exp ? `<span class="rc-tag">⏳ ${r.exp}</span>` : ''}
           </div>
           <div class="rc-actions">
-            <button class="rc-btn-edit" onclick="event.stopPropagation(); openCreateResume(${i})">✏️ Редактировать</button>
-            <button class="rc-btn-pub ${isPub ? 'pub-btn-hide' : 'pub-btn-show'}" onclick="event.stopPropagation(); toggleResumePublished(${i})">${isPub ? '🔒 Скрыть' : '👁 Открыть'}</button>
-            <button class="rc-btn-del"  onclick="event.stopPropagation(); deleteResume(${i})" title="Удалить">🗑</button>
+            <button class="rc-btn-edit" onclick="openCreateResume(${i})">✏️ Редактировать</button>
+            <button class="rc-btn-pub ${isPub ? 'pub-btn-hide' : 'pub-btn-show'}" onclick="toggleResumePublished(${i})">${isPub ? '🔒 Скрыть' : '👁 Открыть'}</button>
+            <button class="rc-btn-del"  onclick="deleteResume(${i})" title="Удалить">🗑</button>
           </div>
         </div>`;
       }).join('');
@@ -2829,18 +2781,15 @@
     crGender    = '';
     crExp       = '';
     crCitizen   = '';
-    crPhotoDataUrl = '';
-    // Сбрасываем превью аватара
-    const crAv = document.getElementById('cr-avatar-preview');
-    if (crAv) {
-      crAv.classList.remove('photo-avatar');
-      crAv.style.backgroundImage = '';
-      crAv.textContent = '👷';
-    }
+    crPhoto     = '';
 
     ['cr-name','cr-phone','cr-telegram','cr-specialty','cr-region','cr-about'].forEach(id => {
       document.getElementById(id).value = '';
     });
+    const photoCircle = document.getElementById('cr-photo-circle');
+    if (photoCircle) photoCircle.innerHTML = '<span id="cr-photo-placeholder">📷</span>';
+    const photoInput = document.getElementById('cr-photo-input');
+    if (photoInput) photoInput.value = '';
     document.getElementById('cr-salary').value = '';
     document.getElementById('cert-list').innerHTML = '';
     document.getElementById('skill-list').innerHTML = '';
@@ -2869,6 +2818,11 @@
       document.getElementById('cr-region').value    = r.region;
       document.getElementById('cr-about').value     = r.about;
       document.getElementById('cr-about').dispatchEvent(new Event('input'));
+      if (r.photo) {
+        crPhoto = r.photo;
+        const circle = document.getElementById('cr-photo-circle');
+        if (circle) circle.innerHTML = `<img src="${crPhoto}" alt="Фото" />`;
+      }
       if (r.gender)   selectGender(r.gender);
       if (r.exp) {
         document.querySelectorAll('.exp-chip').forEach(c => {
@@ -2876,15 +2830,6 @@
         });
       }
       if (r.citizen)  selectCitizenVal(r.citizen);
-      if (r.photo) {
-        crPhotoDataUrl = r.photo;
-        const crAv = document.getElementById('cr-avatar-preview');
-        if (crAv) {
-          crAv.classList.add('photo-avatar');
-          crAv.style.backgroundImage = `url('${r.photo}')`;
-          crAv.textContent = '';
-        }
-      }
       r.certs.forEach(v => { addDynItem('cert-list','cert','Напр.: Удост. сварщика'); const inp = document.querySelector('#cert-list .dyn-input:last-of-type'); if(inp) inp.value = v; });
       r.skills.forEach(v => { addDynItem('skill-list','skill','Напр.: Работа в полевых условиях'); const inp = document.querySelector('#skill-list .dyn-input:last-of-type'); if(inp) inp.value = v; });
     } else {
@@ -2943,7 +2888,7 @@
     const prevPublished = crEditIndex !== null ? (resumes[crEditIndex].published !== false) : true;
     const resume = { name, phone, telegram, gender: crGender, specialty, category: 'other',
                      exp: crExp, salary, region, citizen: crCitizen, about, certs, skills,
-                     photo: crPhotoDataUrl || '',
+                     photo: crPhoto,
                      published: prevPublished,
                      date: new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}) };
 
@@ -2954,14 +2899,15 @@
       resumes[crEditIndex] = resume;
     }
     lsSave(LS.resumes, resumes);
+    const _sbResumeId = 'usr_' + (window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'local') + '_' + (isNew ? resumes.length - 1 : crEditIndex);
+    sbSaveResume(resume, _sbResumeId);
 
-    const previewAvatar = crPhotoDataUrl
-      ? `<div class="rc-avatar photo-avatar" style="background-image:url('${crPhotoDataUrl}')"></div>`
+    const _previewAvatar = crPhoto
+      ? `<div class="rc-avatar" style="background:none;padding:0;overflow:hidden"><img src="${crPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" /></div>`
       : `<div class="rc-avatar">${crGender === 'Ж' ? '👩' : '👷'}</div>`;
-
     document.getElementById('cr-preview').innerHTML = `
       <div class="rc-header" style="margin-bottom:10px">
-        ${previewAvatar}
+        ${_previewAvatar}
         <div>
           <div class="rc-name">${name}</div>
           <div class="rc-spec">${specialty}</div>
@@ -3007,10 +2953,6 @@
       const idx = myJobs.indexOf(j);
       const respCount = (jobResponses[j.id] || []).length;
       const paused = j.paused;
-      const isArchivedTab = (myJobsTab === 'archived');
-      const archiveBtnLabel = isArchivedTab ? '↩ Вернуть' : '🗑';
-      const archiveBtnTitle = isArchivedTab ? 'Вернуть из архива' : 'В архив';
-      const archiveHandler = isArchivedTab ? `restoreMyJob(${idx})` : `archiveMyJob(${idx})`;
       return `
         <div class="my-job-card">
           <div class="mjc-header">
@@ -3035,7 +2977,7 @@
           <div class="mjc-actions">
             <button class="mjc-btn" onclick="openJobResponsesScreen(${idx})">💬 Отклики (${respCount})</button>
             <button class="mjc-btn" onclick="toggleJobPause(${idx})">${paused ? '▶ Возобновить' : '⏸ Пауза'}</button>
-            <button class="mjc-btn-danger" onclick="${archiveHandler}" title="${archiveBtnTitle}">${archiveBtnLabel}</button>
+            <button class="mjc-btn-danger" onclick="archiveMyJob(${idx})" title="В архив">🗑</button>
           </div>
         </div>`;
     }).join('');
@@ -3062,19 +3004,6 @@
     showToast('Вакансия перемещена в архив');
   }
 
-  function restoreMyJob(idx) {
-    const jobId = myJobs[idx].id;
-    myJobs[idx].archived = false;
-    const exists = jobs.find(j => j.id === jobId);
-    if (!exists) {
-      jobs.unshift(myJobs[idx]);
-    }
-    saveMyJobsData();
-    renderMyJobs();
-    renderJobs(jobs);
-    showToast('Вакансия восстановлена из архива');
-  }
-
   // ══════════════════════════════════════
   //  ОТКЛИКИ ПО ВАКАНСИИ (РАБОТОДАТЕЛЬ)
   // ══════════════════════════════════════
@@ -3098,19 +3027,14 @@
         </div>`;
       return;
     }
-    list.innerHTML = responses.map((r, i) => {
-      const avatarHtml = r.photo
-        ? `<div class="resp-avatar photo-avatar" style="background-image:url('${r.photo}')"></div>`
-        : `<div class="resp-avatar">${r.gender === 'Ж' ? '👩' : '👷'}</div>`;
-      return `
+    list.innerHTML = responses.map((r, i) => `
       <div class="response-card">
-        <div class="resp-header" style="cursor:pointer" onclick="openApplicantProfile(${jobId},${i})">
-          ${avatarHtml}
+        <div class="resp-header">
+          <div class="resp-avatar">${r.gender === 'Ж' ? '👩' : '👷'}</div>
           <div>
             <div class="resp-name">${r.name}</div>
             <div class="resp-spec">${r.specialty}</div>
           </div>
-          <div style="margin-left:auto;font-size:12px;color:var(--text-muted)">Профиль ›</div>
         </div>
         <div class="resp-meta">
           <span class="resp-tag">⏳ ${r.exp}</span>
@@ -3128,62 +3052,47 @@
                <button class="resp-btn-decline" onclick="declineResponse(${jobId},${i})" title="Отклонить">✕</button>`
           }
         </div>
-      </div>`;
-    }).join('');
-  }
-
-  // Открыть полный профиль соискателя из отклика
-  function openApplicantProfile(jobId, idx) {
-    const r = (jobResponses[jobId] || [])[idx];
-    if (!r) return;
-    resumeDetailBackScreen = 'screen-job-responses';
-    currentResumeForOffer = r;
-    document.getElementById('rd-title').textContent = 'Профиль кандидата';
-    document.getElementById('rd-sub').textContent = 'Анкета из отклика';
-    _fillResumeDetail(r);
-    const actEl = document.getElementById('rd-employer-actions');
-    if (actEl) actEl.style.display = 'flex';
-    goTo('screen-resume-detail');
+      </div>`).join('');
   }
 
   function acceptResponse(jobId, idx) {
-    jobResponses[jobId][idx].status = 'accepted';
+    const resp = jobResponses[jobId][idx];
+    resp.status = 'accepted';
     _updateMyRespStatus(jobId, 'accepted');
     saveJobResponsesData();
     lsSave(LS.myResponses, myResponses);
-    // Уведомление соискателю в Telegram (по chat_id из отклика)
-    const resp = jobResponses[jobId][idx];
-    const job  = myJobs.find(j => j.id === jobId) || jobs.find(j => j.id === jobId);
-    const compName = companyProfile ? companyProfile.name : 'Работодатель';
-    if (resp.applicantChatId) {
-      const msg = `🎉 *Вас пригласили на работу!*\n\n` +
-        `Компания *${compName}* приняла ваш отклик:\n\n` +
-        `💼 *${job ? job.title : '—'}*\n` +
-        `💰 ${job ? job.salary : ''}\n\n` +
-        `Откройте Good_Вахта → Мои отклики, чтобы увидеть приглашение.`;
-      sendTgMessage(resp.applicantChatId, msg);
-    }
     renderJobResponses(jobId);
     updateResponseBadges();
+    // Уведомить соискателя в Telegram
+    if (resp.applicantChatId) {
+      const job = myJobs.find(j => j.id == jobId) || jobs.find(j => j.id == jobId);
+      const jobTitle = job ? job.title : 'вакансию';
+      const companyName = companyProfile ? companyProfile.name : (job ? job.company : '');
+      sendTgMessage(resp.applicantChatId, `✅ <b>Приглашение!</b>\nКомпания «${companyName}» приглашает вас на вакансию «${jobTitle}».\nОткройте Good_Вахта → Мои отклики для деталей.`);
+    }
     showToast('Приглашение отправлено кандидату');
   }
 
   function declineResponse(jobId, idx) {
-    jobResponses[jobId][idx].status = 'declined';
+    const resp = jobResponses[jobId][idx];
+    resp.status = 'declined';
     _updateMyRespStatus(jobId, 'declined');
     saveJobResponsesData();
     lsSave(LS.myResponses, myResponses);
     renderJobResponses(jobId);
     updateResponseBadges();
+    // Уведомить соискателя в Telegram об отказе
+    if (resp.applicantChatId) {
+      const job = myJobs.find(j => j.id == jobId) || jobs.find(j => j.id == jobId);
+      const jobTitle = job ? job.title : 'вакансию';
+      sendTgMessage(resp.applicantChatId, `❌ <b>Уведомление об отказе</b>\nК сожалению, ваш отклик на вакансию «${jobTitle}» был отклонён. Не расстраивайтесь — продолжайте искать!\nОткройте Good_Вахта → Мои отклики.`);
+    }
     showToast('Отклик отклонён');
   }
 
   function _updateMyRespStatus(jobId, status) {
     const r = myResponses.find(x => x.jobId === jobId);
-    if (r) {
-      r.status = status;
-      if (status === 'accepted') r.isNew = true; // флаг нового приглашения
-    }
+    if (r) r.status = status;
   }
 
   function updateResponseBadges() {
@@ -3191,10 +3100,9 @@
     const eb = document.getElementById('employer-resp-badge');
     if (eb) { eb.textContent = pendingEmployer; eb.classList.toggle('visible', pendingEmployer > 0); }
 
-    // Для соискателя: новые приглашения (isNew) + предложения (offer) + ожидающие
-    const newForWorker = myResponses.filter(r => r.isNew || r.type === 'offer').length;
+    const pendingWorker = myResponses.filter(r => r.status === 'pending').length;
     const wb = document.getElementById('worker-resp-badge');
-    if (wb) { wb.textContent = newForWorker; wb.classList.toggle('visible', newForWorker > 0); }
+    if (wb) { wb.textContent = pendingWorker; wb.classList.toggle('visible', pendingWorker > 0); }
   }
 
   // ══════════════════════════════════════
@@ -3202,57 +3110,38 @@
   // ══════════════════════════════════════
   function applyToJob() {
     if (!currentJobId) return;
-    if (!resumes.length) {
-      showToast('Сначала создайте резюме — Кабинет соискателя → Моё резюме');
-      return;
-    }
     if (myResponses.find(r => r.jobId === currentJobId)) {
       showToast('Вы уже откликнулись на эту вакансию');
       return;
     }
     const j = jobs.find(x => x.id === currentJobId);
     const today = new Date().toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' });
-    myResponses.push({ jobId: currentJobId, title: j.title, company: j.company, salary: j.salary, date: today, status: 'pending' });
+    const _tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const _applicantChatId = _tgUser?.id || null;
+    myResponses.unshift({ jobId: currentJobId, title: j.title, company: j.company, salary: j.salary, date: today, status: 'pending' });
     if (!jobResponses[currentJobId]) jobResponses[currentJobId] = [];
     const r = resumes[0] || null;
-    const applicantName   = r ? r.name : 'Анонимный соискатель';
-    const applicantTg     = r ? r.telegram : '';
-    const applicantChatId = localStorage.getItem('vahta_my_chat_id') || null;
-    jobResponses[currentJobId].push({
-      name:     applicantName,
-      specialty:r ? r.specialty: '—',
-      exp:      r ? r.exp      : '—',
-      salary:   r ? r.salary   : 0,
-      region:   r ? r.region   : '—',
-      telegram: applicantTg,
-      phone:    r ? (r.phone || '') : '',
-      gender:   r ? r.gender   : 'М',
-      about:    r ? r.about    : '',
-      photo:    r && r.photo ? r.photo : '',
-      certs:    r ? (r.certs || []) : [],
-      skills:   r ? (r.skills || []) : [],
-      applicantChatId,
+    jobResponses[currentJobId].unshift({
+      name:           r ? r.name     : 'Анонимный соискатель',
+      specialty:      r ? r.specialty: '—',
+      exp:            r ? r.exp      : '—',
+      salary:         r ? r.salary   : 0,
+      region:         r ? r.region   : '—',
+      telegram:       r ? r.telegram : '',
+      gender:         r ? r.gender   : 'М',
+      about:          r ? r.about    : '',
+      applicantChatId: _applicantChatId,
       date: today, status: 'pending'
     });
     lsSave(LS.myResponses, myResponses);
     saveJobResponsesData();
     _updateApplyBtn();
     updateResponseBadges();
-
-    // Уведомление работодателю в Telegram (chat_id владельца)
-    const ownerChatId = companyProfile ? companyProfile.ownerChatId : null;
-    if (ownerChatId) {
-      const msg = `🔔 *Новый отклик на вакансию!*\n\n` +
-        `Кандидат: *${applicantName}*\n` +
-        `Специальность: ${r ? r.specialty : '—'}\n` +
-        `Опыт: ${r ? r.exp : '—'}\n` +
-        (applicantTg ? `Telegram: @${applicantTg}\n` : '') +
-        `\nВакансия: *${j.title}*\n` +
-        `💰 ${j.salary}\n\n` +
-        `Откройте Good_Вахта → Отклики, чтобы рассмотреть кандидата.`;
-      sendTgMessage(ownerChatId, msg);
+    // Уведомить работодателя о новом отклике
+    if (j.ownerChatId) {
+      const _appName = r ? r.name : 'Соискатель';
+      sendTgMessage(j.ownerChatId, `📩 <b>Новый отклик!</b>\nНа вакансию «${j.title}» откликнулся ${_appName}.\nОткройте раздел «Отклики» в Good_Вахта.`);
     }
-
     showToast('Отклик отправлен! Работодатель свяжется с вами.');
   }
 
@@ -3278,8 +3167,7 @@
 
   function renderFavorites() {
     const list = document.getElementById('favorites-list');
-    const favJobs = jobs.filter(j => favorites.has(j.id));
-    if (!favJobs.length) {
+    if (!favorites.size) {
       list.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">❤️</div>
@@ -3288,7 +3176,53 @@
         </div>`;
       return;
     }
-    list.innerHTML = favJobs.map(j => _jobCardHtml(j)).join('');
+    const items = [];
+    favorites.forEach(id => {
+      const j = jobs.find(x => x.id === id);
+      if (j) {
+        items.push(j);
+      } else {
+        // Вакансия удалена из публичного списка — ищем в архиве работодателя
+        const archived = myJobs.find(x => x.id === id);
+        if (archived) items.push({ ...archived, _isClosed: true });
+      }
+    });
+    if (!items.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">❤️</div>
+          <div class="empty-title">Избранное пусто</div>
+          <div class="empty-desc">Нажмите ❤️ на карточке вакансии, чтобы сохранить её здесь</div>
+        </div>`;
+      return;
+    }
+    list.innerHTML = items.map(j => {
+      const isClosed = j._isClosed || j.paused || j.archived;
+      if (isClosed) return _jobCardHtmlClosed(j);
+      return _jobCardHtml(j);
+    }).join('');
+  }
+
+  function _jobCardHtmlClosed(j) {
+    const logoHtml = j.logo
+      ? `<div class="company-logo" style="padding:0;overflow:hidden;filter:grayscale(1)"><img src="${j.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px" /></div>`
+      : `<div class="company-logo" style="background:${j.color || 'rgba(200,200,200,.2)'};filter:grayscale(0.8)">${j.emoji || '📋'}</div>`;
+    return `
+      <div class="job-card job-closed" style="cursor:default">
+        <div class="jc-header">
+          ${logoHtml}
+          <div style="flex:1">
+            <div class="jc-company-name">${j.company}</div>
+          </div>
+          <button class="fav-btn active" onclick="toggleFavorite(${j.id},event)" title="Убрать из избранного" style="pointer-events:auto">❤️</button>
+        </div>
+        <div class="jc-title">${j.title}</div>
+        <div class="jc-salary">${j.salary}</div>
+        <div class="jc-meta">
+          <span class="jc-meta-item">📍 ${j.location}</span>
+        </div>
+        <div><span class="job-closed-label">🔒 Временно закрыта</span></div>
+      </div>`;
   }
 
   // ══════════════════════════════════════
@@ -3305,52 +3239,28 @@
   function renderMyResponses() {
     const list = document.getElementById('my-responses-list');
     let data = myResponses;
-    if (myRespTab === 'pending')  data = myResponses.filter(r => (r.status === 'pending' || r.status === 'viewed') && r.type !== 'offer');
-    if (myRespTab === 'accepted') data = myResponses.filter(r => r.status === 'accepted' || r.type === 'offer');
+    if (myRespTab === 'pending')  data = myResponses.filter(r => r.status === 'pending' || r.status === 'viewed');
+    if (myRespTab === 'accepted') data = myResponses.filter(r => r.status === 'accepted');
     if (!data.length) {
       const msgs = { all:['✅','Откликов нет','Откликнитесь на понравившиеся вакансии'], pending:['⏳','Нет активных заявок','Все отклики рассмотрены'], accepted:['🎉','Приглашений нет','Работодатели ещё не пригласили вас'] };
       const [icon, title, desc] = msgs[myRespTab] || msgs.all;
       list.innerHTML = `<div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div></div>`;
       return;
     }
-    const statusMap = {
-      pending: ['На рассмотрении','rs-pending'],
-      viewed:  ['Просмотрено','rs-viewed'],
-      accepted:['🎉 Приглашение!','rs-accepted'],
-      declined:['Отказ','rs-declined'],
-      offer:   ['📨 Предложение','rs-accepted']
-    };
+    const statusMap = { pending:['На рассмотрении','rs-pending'], viewed:['Просмотрено','rs-viewed'], accepted:['Приглашение!','rs-accepted'], declined:['Отказ','rs-declined'] };
     list.innerHTML = data.map(r => {
       const [statusText, statusClass] = statusMap[r.status] || ['На рассмотрении','rs-pending'];
-      const isOffer = r.type === 'offer';
-      const isNew   = r.isNew;
-      const jobObj  = jobs.find(x => x.id === r.jobId);
       return `
-        <div class="my-resp-card" style="${(isOffer||isNew) ? 'border-color:rgba(233,69,96,.4)' : ''}" onclick="openJobFromResponse(${r.jobId})">
-          ${isNew  ? '<div style="font-size:11px;font-weight:700;color:#4ddb8a;margin-bottom:6px">🎉 НОВОЕ ПРИГЛАШЕНИЕ!</div>' : ''}
-          ${isOffer ? '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px">📨 ПРЕДЛОЖЕНИЕ ОТ РАБОТОДАТЕЛЯ</div>' : ''}
-          <div class="mrc-company">${r.company} <span class="verified-chip">✓ Verified</span></div>
+        <div class="my-resp-card">
+          <div class="mrc-company">${r.company} <span class="verified-chip">✓ Проверен</span></div>
           <div class="mrc-title">${r.title}</div>
           <div class="mrc-salary">${r.salary}</div>
           <div class="mrc-footer">
             <span class="mrc-date">📅 ${r.date}</span>
             <span class="resp-status-badge ${statusClass}">${statusText}</span>
           </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Нажмите чтобы открыть вакансию ›</div>
         </div>`;
     }).join('');
-    // Сбрасываем флаги isNew после показа
-    let changed = false;
-    myResponses.forEach(r => { if (r.isNew) { r.isNew = false; changed = true; } });
-    if (changed) { lsSave(LS.myResponses, myResponses); updateResponseBadges(); }
-  }
-
-  // Открыть вакансию из карточки отклика соискателя
-  function openJobFromResponse(jobId) {
-    if (!jobId) return;
-    const j = jobs.find(x => x.id === jobId);
-    if (!j) { showToast('Вакансия не найдена или снята с публикации'); return; }
-    openJob(j.id);
   }
 
   // ══════════════════════════════════════
@@ -3430,12 +3340,12 @@
       c.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Резюме не найдены</div><div class="empty-desc">Попробуйте изменить фильтры или поисковый запрос</div></div>`;
       return;
     }
-    c.innerHTML = result.map(r => {
+    c.innerHTML = result.map((r, idx) => {
       const avatarHtml = r.photo
-        ? `<div class="rc-avatar photo-avatar" style="background-image:url('${r.photo}')"></div>`
+        ? `<div class="rc-avatar" style="background:none;padding:0;overflow:hidden"><img src="${r.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" /></div>`
         : `<div class="rc-avatar">${r.gender === 'Ж' ? '👩' : '👷'}</div>`;
       return `
-      <div class="resume-card" onclick="openResumeDetailFromDb(${r.id})">
+      <div class="resume-card">
         <div class="rc-header">
           ${avatarHtml}
           <div>
@@ -3451,9 +3361,10 @@
           ${r.certs && r.certs.length ? `<span class="rc-tag">📜 ${r.certs[0]}</span>` : ''}
         </div>
         <div class="rc-actions">
+          <button class="rc-btn-view" onclick="openCandidateProfile(${idx})">👤 Профиль</button>
           ${r.telegram
-            ? `<a class="rc-btn-edit resp-tag-tg-link" href="https://t.me/${r.telegram}" target="_blank" onclick="event.stopPropagation()">✈️ Написать @${r.telegram}</a>`
-            : `<button class="rc-btn-edit" onclick="event.stopPropagation(); showToast('Telegram не указан')">💬 Связаться</button>`}
+            ? `<a class="rc-btn-edit resp-tag-tg-link" href="https://t.me/${r.telegram}" target="_blank">✈️ Написать</a>`
+            : `<button class="rc-btn-edit" onclick="showToast('Telegram не указан')">💬 Связаться</button>`}
         </div>
       </div>`;
     }).join('');
@@ -3506,22 +3417,6 @@
   }
 
   function exitManagerMode() {
-    if (!activeCompanyCode) {
-      showToast('Вы не в режиме менеджера');
-      return;
-    }
-    const registry = lsLoad(LS.registry, {});
-    const company  = registry[activeCompanyCode];
-    const expectedPass = (company && company.managerPass || '').trim();
-    if (expectedPass) {
-      const input = prompt('Введите пароль менеджера для выхода из кабинета');
-      if (input === null) return;
-      if (input.trim() !== expectedPass) {
-        showToast('❌ Неверный пароль менеджера');
-        return;
-      }
-    }
-
     activeCompanyCode = null;
     companyProfile    = lsLoad(LS.companyProfile, null);
 
@@ -3550,26 +3445,16 @@
     if (!phone)    { shakeFocus('cp-phone');    showToast('Введите телефон'); return; }
     if (!about)    { shakeFocus('cp-about');    showToast('Заполните описание компании'); return; }
     const existingCode = companyProfile?.code || genCompanyCode();
-    const managerPass = (document.getElementById('cp-manager-pass')?.value || '').trim();
-    // Сохраняем chat_id владельца для уведомлений
-    const ownerChatId = getTgChatId() || localStorage.getItem('vahta_my_chat_id') || (companyProfile && companyProfile.ownerChatId) || null;
-    const ownerTgUsername = getTgUsername() || localStorage.getItem('vahta_my_tg_username') || (companyProfile && companyProfile.ownerTgUsername) || null;
     companyProfile = { name, industry, city, phone, about,
-      website: document.getElementById('cp-website').value.trim(),
-      email:   document.getElementById('cp-email').value.trim(),
-      logo:    companyLogoDataUrl || (companyProfile && companyProfile.logo) || '',
-      managerPass: managerPass || (companyProfile && companyProfile.managerPass) || '',
-      code:    existingCode,
-      ownerChatId, ownerTgUsername };
+      website:     document.getElementById('cp-website').value.trim(),
+      email:       document.getElementById('cp-email').value.trim(),
+      logo:        cpLogo || companyProfile?.logo || '',
+      code:        existingCode,
+      ownerChatId: window.Telegram?.WebApp?.initDataUnsafe?.user?.id || companyProfile?.ownerChatId || null };
     lsSave(LS.companyProfile, companyProfile);
 
     const registry = lsLoad(LS.registry, {});
-    registry[existingCode] = {
-      name,
-      city,
-      code: existingCode,
-      managerPass: companyProfile.managerPass || ''
-    };
+    registry[existingCode] = { name, city, code: existingCode };
     lsSave(LS.registry, registry);
 
     saveMyJobsData();
@@ -3594,22 +3479,9 @@
     if (userProfile) {
       document.getElementById('prof-name').value  = userProfile.name;
       document.getElementById('prof-phone').value = userProfile.phone;
-      document.getElementById('prof-city').value  = userProfile.city  || '';
-      document.getElementById('prof-about').value = userProfile.about || '';
+      document.getElementById('prof-city').value  = userProfile.city;
+      document.getElementById('prof-about').value = userProfile.about;
       document.getElementById('prof-about').dispatchEvent(new Event('input'));
-      profPhotoDataUrl = userProfile.photo || '';
-      const av = document.getElementById('prof-avatar');
-      if (av) {
-        if (profPhotoDataUrl) {
-          av.classList.add('photo-avatar');
-          av.style.backgroundImage = `url('${profPhotoDataUrl}')`;
-          av.textContent = '';
-        } else {
-          av.classList.remove('photo-avatar');
-          av.style.backgroundImage = '';
-          av.textContent = '👤';
-        }
-      }
     }
     document.getElementById('prof-form-wrap').style.display = '';
     document.getElementById('prof-success').classList.remove('active');
@@ -3621,474 +3493,155 @@
     const phone = document.getElementById('prof-phone').value.trim();
     if (!name)  { shakeFocus('prof-name');  showToast('Введите имя'); return; }
     if (!phone) { shakeFocus('prof-phone'); showToast('Введите телефон'); return; }
-    userProfile = {
-      name, phone,
-      city:  document.getElementById('prof-city').value.trim(),
-      about: document.getElementById('prof-about').value.trim(),
-      photo: profPhotoDataUrl || (userProfile && userProfile.photo) || ''
-    };
+    userProfile = { name, phone, city: document.getElementById('prof-city').value.trim(), about: document.getElementById('prof-about').value.trim() };
     lsSave(LS.userProfile, userProfile);
     document.getElementById('prof-form-wrap').style.display = 'none';
     document.getElementById('prof-success').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleResumePhotoChange(input) {
-    const file = input.files && input.files[0];
-    if (!file) { crPhotoDataUrl = ''; return; }
-    if (!file.type || !file.type.startsWith('image/')) {
-      showToast('Выберите файл изображения');
-      input.value = '';
-      return;
-    }
+  // ══════════════════════════════════════
+  //  ФОТО — ЗАГРУЗКА И ОБРАБОТКА
+  // ══════════════════════════════════════
+
+  function handleResumePhoto(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) { showToast('Фото не должно быть больше 5 МБ'); input.value = ''; return; }
     const reader = new FileReader();
-    reader.onload = e => {
-      crPhotoDataUrl = e.target.result || '';
-      const av = document.getElementById('cr-avatar-preview');
-      if (av && crPhotoDataUrl) {
-        av.classList.add('photo-avatar');
-        av.style.backgroundImage = `url('${crPhotoDataUrl}')`;
-        av.textContent = '';
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function handleCompanyLogoChange(input) {
-    const file = input.files && input.files[0];
-    if (!file) { companyLogoDataUrl = ''; return; }
-    if (!file.type || !file.type.startsWith('image/')) {
-      showToast('Выберите файл изображения');
-      input.value = '';
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      companyLogoDataUrl = e.target.result || '';
-      const cpAvatar = document.getElementById('cp-avatar');
-      if (cpAvatar && companyLogoDataUrl) {
-        cpAvatar.classList.add('photo-avatar');
-        cpAvatar.style.backgroundImage = `url('${companyLogoDataUrl}')`;
-        cpAvatar.textContent = '';
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function _fillResumeDetail(r) {
-    const avatar = document.getElementById('rd-avatar');
-    if (r.photo) {
-      avatar.classList.add('photo-avatar');
-      avatar.style.backgroundImage = `url('${r.photo}')`;
-      avatar.textContent = '';
-    } else {
-      avatar.classList.remove('photo-avatar');
-      avatar.style.backgroundImage = '';
-      avatar.textContent = r.gender === 'Ж' ? '👩' : '👷';
-    }
-    document.getElementById('rd-name').textContent = r.name || '';
-    document.getElementById('rd-spec').textContent = r.specialty || '';
-    const tags = [];
-    if (r.salary)  tags.push(`<span class="rd-tag">💰 от ${Number(r.salary).toLocaleString('ru')} ₽</span>`);
-    if (r.region)  tags.push(`<span class="rd-tag">📍 ${r.region}</span>`);
-    if (r.exp)     tags.push(`<span class="rd-tag">⏳ ${r.exp}</span>`);
-    if (r.category) tags.push(`<span class="rd-tag">🗂 ${catLabelsR[r.category] || r.category}</span>`);
-    document.getElementById('rd-tags').innerHTML = tags.join('');
-    document.getElementById('rd-about').textContent = r.about || '';
-    const tg = document.getElementById('rd-telegram');
-    if (r.telegram) {
-      tg.innerHTML = `<a href="https://t.me/${r.telegram}" target="_blank">✈️ @${r.telegram}</a>`;
-    } else {
-      tg.textContent = '';
-    }
-    const certWrap = document.getElementById('rd-certs-wrap');
-    const certList = document.getElementById('rd-certs');
-    const skillsWrap = document.getElementById('rd-skills-wrap');
-    const skillsList = document.getElementById('rd-skills');
-    const certs = r.certs || [];
-    const skills = r.skills || [];
-    if (certs.length) {
-      certWrap.style.display = '';
-      certList.innerHTML = certs.map(c => `<li>${c}</li>`).join('');
-    } else {
-      certWrap.style.display = 'none';
-      certList.innerHTML = '';
-    }
-    if (skills.length) {
-      skillsWrap.style.display = '';
-      skillsList.innerHTML = skills.map(s => `<li>${s}</li>`).join('');
-    } else {
-      skillsWrap.style.display = 'none';
-      skillsList.innerHTML = '';
-    }
-  }
-
-  let currentResumeForOffer = null; // текущий кандидат для предложения
-
-  function openResumeDetailFromDb(id) {
-    let r = resumeDbData.find(x => x.id === id);
-    if (!r) {
-      r = resumes.filter(x => x.published !== false).find((x, i) => 1000 + i === id) || null;
-    }
-    if (!r) return;
-    resumeDetailBackScreen = 'screen-resume-db';
-    currentResumeForOffer = r;
-    document.getElementById('rd-title').textContent = 'Профиль кандидата';
-    document.getElementById('rd-sub').textContent = 'Анкета из базы резюме';
-    _fillResumeDetail(r);
-    // показываем кнопки работодателя
-    const actEl = document.getElementById('rd-employer-actions');
-    if (actEl) actEl.style.display = 'flex';
-    goTo('screen-resume-detail');
-  }
-
-  function openResumeDetailFromMy(idx) {
-    const r = resumes[idx];
-    if (!r) return;
-    resumeDetailBackScreen = 'screen-my-resumes';
-    currentResumeForOffer = null;
-    document.getElementById('rd-title').textContent = 'Моё резюме';
-    document.getElementById('rd-sub').textContent = 'Подробная информация по анкете';
-    _fillResumeDetail(r);
-    const actEl = document.getElementById('rd-employer-actions');
-    if (actEl) actEl.style.display = 'none';
-    goTo('screen-resume-detail');
-  }
-
-  function backFromResumeDetail() {
-    goTo(resumeDetailBackScreen || 'screen-resume-db');
-  }
-
-  // ══════════════════════════════════════
-  //  ПРЕДЛОЖЕНИЕ О ВАКАНСИИ (РАБОТОДАТЕЛЬ → СОИСКАТЕЛЬ)
-  // ══════════════════════════════════════
-
-  function openOfferModal() {
-    const activeJobs = myJobs.filter(j => !j.archived && !j.paused);
-    const list = document.getElementById('modal-offer-jobs');
-    if (!activeJobs.length) {
-      list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px">У вас нет активных вакансий.<br>Сначала создайте вакансию.</div>';
-    } else {
-      list.innerHTML = activeJobs.map((j, i) => `
-        <div class="modal-job-item" onclick="sendJobOffer(${myJobs.indexOf(j)})">
-          <div class="mji-title">${j.title}</div>
-          <div class="mji-salary">${j.salary} · 📍 ${j.location}</div>
-        </div>`).join('');
-    }
-    document.getElementById('modal-offer').classList.add('open');
-  }
-
-  function closeModalOffer(e) {
-    if (e.target === document.getElementById('modal-offer')) {
-      document.getElementById('modal-offer').classList.remove('open');
-    }
-  }
-
-  function sendJobOffer(jobIdx) {
-    document.getElementById('modal-offer').classList.remove('open');
-    if (!currentResumeForOffer) return;
-    const j = myJobs[jobIdx];
-    const r = currentResumeForOffer;
-    const compName = companyProfile ? companyProfile.name : 'Работодатель';
-    const today = new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});
-
-    // Сохраняем предложение в myResponses соискателя (если это его резюме из resumes)
-    const isLocalResume = resumes.some(x => x.name === r.name && x.specialty === r.specialty);
-    if (isLocalResume) {
-      const existing = myResponses.find(x => x.jobId === j.id && x.type === 'offer');
-      if (!existing) {
-        myResponses.push({
-          jobId: j.id, title: j.title, company: compName,
-          salary: j.salary, date: today, status: 'offer', type: 'offer'
-        });
-        lsSave(LS.myResponses, myResponses);
-        updateResponseBadges();
-      }
-    }
-
-    // Уведомление соискателю в Telegram (по chat_id если есть, иначе по username)
-    const offerChatId = r.applicantChatId || null;
-    const offerMsg = `📨 *Предложение о вакансии!*\n\n` +
-      `Компания *${compName}* приглашает вас рассмотреть вакансию:\n\n` +
-      `💼 *${j.title}*\n` +
-      `💰 ${j.salary}\n` +
-      `📍 ${j.location}\n` +
-      `⏱ Вахта ${j.schedule}\n\n` +
-      `Откройте приложение Good_Вахта → Мои отклики, чтобы ответить на предложение.`;
-    if (offerChatId) {
-      sendTgMessage(offerChatId, offerMsg);
-    }
-
-    showToast(`✅ Предложение отправлено кандидату ${r.name}`);
-  }
-
-  // ══════════════════════════════════════
-  //  КОНТАКТЫ КАНДИДАТА
-  // ══════════════════════════════════════
-
-  function openContactModal() {
-    if (!currentResumeForOffer) return;
-    const r = currentResumeForOffer;
-    const items = [];
-    if (r.telegram) {
-      items.push(`
-        <a class="contact-popup-item" href="https://t.me/${r.telegram}" target="_blank">
-          <div class="contact-popup-icon">✈️</div>
-          <div>
-            <div class="contact-popup-label">Telegram</div>
-            <div class="contact-popup-value">@${r.telegram}</div>
-          </div>
-        </a>`);
-    }
-    if (r.phone) {
-      items.push(`
-        <a class="contact-popup-item" href="tel:${r.phone}">
-          <div class="contact-popup-icon">📞</div>
-          <div>
-            <div class="contact-popup-label">Телефон</div>
-            <div class="contact-popup-value">${r.phone}</div>
-          </div>
-        </a>`);
-    }
-    if (!items.length) {
-      items.push('<div style="text-align:center;color:var(--text-muted);padding:20px">Кандидат не указал контакты</div>');
-    }
-    document.getElementById('modal-contact-items').innerHTML = items.join('');
-    document.getElementById('modal-contact').classList.add('open');
-  }
-
-  function closeModalContact(e) {
-    if (e.target === document.getElementById('modal-contact')) {
-      document.getElementById('modal-contact').classList.remove('open');
-    }
-  }
-
-  // ══════════════════════════════════════
-  //  ОТКЛИКИ РАБОТОДАТЕЛЯ (все входящие)
-  // ══════════════════════════════════════
-
-  function openEmployerResponses() {
-    renderEmployerAllResponses();
-    goTo('screen-employer-responses');
-  }
-
-  function renderEmployerAllResponses() {
-    const list = document.getElementById('employer-all-responses-list');
-    const allResponses = [];
-    Object.entries(jobResponses).forEach(([jobId, resps]) => {
-      const job = myJobs.find(j => String(j.id) === String(jobId)) || jobs.find(j => String(j.id) === String(jobId));
-      resps.forEach((r, i) => {
-        allResponses.push({ ...r, jobId: Number(jobId), jobTitle: job ? job.title : '—', respIdx: i });
+    reader.onload = function(e) {
+      compressImage(e.target.result, 400, 0.75, function(compressed) {
+        crPhoto = compressed;
+        const circle = document.getElementById('cr-photo-circle');
+        if (circle) circle.innerHTML = `<img src="${crPhoto}" alt="Фото" />`;
       });
-    });
-
-    if (!allResponses.length) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">💬</div>
-          <div class="empty-title">Откликов пока нет</div>
-          <div class="empty-desc">Когда соискатели откликнутся на ваши вакансии — они появятся здесь</div>
-        </div>`;
-      return;
-    }
-
-    list.innerHTML = allResponses.map(r => {
-      const avatarHtml = r.photo
-        ? `<div class="resp-avatar photo-avatar" style="background-image:url('${r.photo}')"></div>`
-        : `<div class="resp-avatar">${r.gender === 'Ж' ? '👩' : '👷'}</div>`;
-      return `
-      <div class="response-card">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">📋 Вакансия: <b>${r.jobTitle}</b></div>
-        <div class="resp-header" style="cursor:pointer" onclick="openApplicantProfileFromAll(${r.jobId},${r.respIdx})">
-          ${avatarHtml}
-          <div>
-            <div class="resp-name">${r.name}</div>
-            <div class="resp-spec">${r.specialty}</div>
-          </div>
-          <div style="margin-left:auto;font-size:12px;color:var(--text-muted)">Профиль ›</div>
-        </div>
-        <div class="resp-meta">
-          <span class="resp-tag">⏳ ${r.exp}</span>
-          <span class="resp-tag">💰 от ${Number(r.salary||0).toLocaleString('ru')} ₽</span>
-          <span class="resp-tag">📍 ${r.region}</span>
-          ${r.telegram ? `<a class="resp-tag resp-tag-tg" href="https://t.me/${r.telegram}" target="_blank" onclick="event.stopPropagation()">✈️ @${r.telegram}</a>` : ''}
-        </div>
-        ${r.about ? `<p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:12px">${r.about}</p>` : ''}
-        <div class="resp-actions">
-          ${r.status === 'accepted'
-            ? `<div style="flex:1;text-align:center;font-size:13px;color:#4ddb8a;font-weight:700">✅ Приглашение отправлено</div>`
-            : r.status === 'declined'
-            ? `<div style="flex:1;text-align:center;font-size:13px;color:var(--accent);font-weight:700">❌ Отклонено</div>`
-            : `<button class="resp-btn-accept" onclick="acceptResponseFromAll(${r.jobId},${r.respIdx})">✅ Пригласить</button>
-               <button class="resp-btn-decline" onclick="declineResponseFromAll(${r.jobId},${r.respIdx})" title="Отклонить">✕</button>`
-          }
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function openApplicantProfileFromAll(jobId, idx) {
-    const r = (jobResponses[jobId] || [])[idx];
-    if (!r) return;
-    resumeDetailBackScreen = 'screen-employer-responses';
-    currentResumeForOffer = r;
-    document.getElementById('rd-title').textContent = 'Профиль кандидата';
-    document.getElementById('rd-sub').textContent = 'Анкета из отклика';
-    _fillResumeDetail(r);
-    const actEl = document.getElementById('rd-employer-actions');
-    if (actEl) actEl.style.display = 'flex';
-    goTo('screen-resume-detail');
-  }
-
-  function acceptResponseFromAll(jobId, idx) {
-    if (!jobResponses[jobId] || !jobResponses[jobId][idx]) return;
-    jobResponses[jobId][idx].status = 'accepted';
-    _updateMyRespStatus(jobId, 'accepted');
-    saveJobResponsesData();
-    lsSave(LS.myResponses, myResponses);
-    // Уведомление соискателю в Telegram (по chat_id)
-    const resp = jobResponses[jobId][idx];
-    const job  = myJobs.find(j => j.id === jobId) || jobs.find(j => j.id === jobId);
-    const compName = companyProfile ? companyProfile.name : 'Работодатель';
-    if (resp.applicantChatId) {
-      const msg = `🎉 *Вас пригласили на работу!*\n\n` +
-        `Компания *${compName}* приняла ваш отклик:\n\n` +
-        `💼 *${job ? job.title : '—'}*\n` +
-        `💰 ${job ? job.salary : ''}\n\n` +
-        `Откройте Good_Вахта → Мои отклики, чтобы увидеть приглашение.`;
-      sendTgMessage(resp.applicantChatId, msg);
-    }
-    renderEmployerAllResponses();
-    updateResponseBadges();
-    showToast('Приглашение отправлено кандидату');
-  }
-
-  function declineResponseFromAll(jobId, idx) {
-    if (!jobResponses[jobId] || !jobResponses[jobId][idx]) return;
-    jobResponses[jobId][idx].status = 'declined';
-    _updateMyRespStatus(jobId, 'declined');
-    saveJobResponsesData();
-    lsSave(LS.myResponses, myResponses);
-    renderEmployerAllResponses();
-    updateResponseBadges();
-    showToast('Отклик отклонён');
-  }
-
-  // ══════════════════════════════════════
-  //  БЫСТРЫЙ ОТКЛИК / СВЯЗАТЬСЯ С КАРТОЧКИ
-  // ══════════════════════════════════════
-
-  function quickApplyJob(jobId, event) {
-    if (event) event.stopPropagation();
-    // Проверка наличия резюме
-    if (!resumes.length) {
-      showToast('Сначала создайте резюме — Кабинет соискателя → Моё резюме');
-      return;
-    }
-    if (myResponses.find(r => r.jobId === jobId)) {
-      showToast('Вы уже откликнулись на эту вакансию');
-      return;
-    }
-    const j = jobs.find(x => x.id === jobId);
-    if (!j) return;
-    const today = new Date().toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' });
-    myResponses.push({ jobId, title: j.title, company: j.company, salary: j.salary, date: today, status: 'pending' });
-    if (!jobResponses[jobId]) jobResponses[jobId] = [];
-    const r = resumes[0];
-    const applicantChatId = localStorage.getItem('vahta_my_chat_id') || null;
-    jobResponses[jobId].push({
-      name: r.name, specialty: r.specialty, exp: r.exp, salary: r.salary,
-      region: r.region, telegram: r.telegram, phone: r.phone || '',
-      gender: r.gender, about: r.about, photo: r.photo || '',
-      certs: r.certs || [], skills: r.skills || [],
-      applicantChatId, date: today, status: 'pending'
-    });
-    lsSave(LS.myResponses, myResponses);
-    saveJobResponsesData();
-    updateResponseBadges();
-    filterJobs(); // перерисовать карточки (кнопка станет "Отклик отправлен")
-    // Уведомление работодателю
-    const ownerChatId = companyProfile ? companyProfile.ownerChatId : null;
-    if (ownerChatId) {
-      sendTgMessage(ownerChatId,
-        `🔔 *Новый отклик!*\n\nКандидат: *${r.name}*\nСпециальность: ${r.specialty}\nВакансия: *${j.title}*\n💰 ${j.salary}\n\nОткройте Good_Вахта → Отклики.`);
-    }
-    showToast('✅ Отклик отправлен!');
-  }
-
-  function quickContactJob(jobId, event) {
-    if (event) event.stopPropagation();
-    const j = jobs.find(x => x.id === jobId);
-    if (!j || !j.contactPhone) return;
-    _showJobContactModal(j);
-  }
-
-  function openJobContactModal() {
-    const j = jobs.find(x => x.id === currentJobId);
-    if (!j) return;
-    _showJobContactModal(j);
-  }
-
-  function _showJobContactModal(j) {
-    const items = [];
-    if (j.contactPhone) {
-      items.push(`
-        <a class="contact-popup-item" href="tel:${j.contactPhone}">
-          <div class="contact-popup-icon">📞</div>
-          <div>
-            ${j.contactName ? `<div class="contact-popup-label">${j.contactName}</div>` : ''}
-            <div class="contact-popup-value">${j.contactPhone}</div>
-          </div>
-        </a>`);
-    }
-    if (j.contactTelegram) {
-      items.push(`
-        <a class="contact-popup-item" href="https://t.me/${j.contactTelegram}" target="_blank">
-          <div class="contact-popup-icon">✈️</div>
-          <div>
-            <div class="contact-popup-label">Telegram</div>
-            <div class="contact-popup-value">@${j.contactTelegram}</div>
-          </div>
-        </a>`);
-    }
-    document.getElementById('modal-job-contact-items').innerHTML = items.join('');
-    document.getElementById('modal-job-contact').classList.add('open');
-  }
-
-  function closeModalJobContact(e) {
-    if (e.target === document.getElementById('modal-job-contact')) {
-      document.getElementById('modal-job-contact').classList.remove('open');
-    }
-  }
-
-  // ══════════════════════════════════════
-  //  TELEGRAM BOT NOTIFICATIONS (helpers)
-  // ══════════════════════════════════════
-
-  // ══════════════════════════════════════
-  //  PROFILE PHOTO (МОЙ ПРОФИЛЬ)
-  // ══════════════════════════════════════
-  let profPhotoDataUrl = '';
-
-  function handleProfilePhotoChange(input) {
-    const file = input.files && input.files[0];
-    if (!file) { profPhotoDataUrl = ''; return; }
-    if (!file.type || !file.type.startsWith('image/')) {
-      showToast('Выберите файл изображения');
-      input.value = '';
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      profPhotoDataUrl = e.target.result || '';
-      const av = document.getElementById('prof-avatar');
-      if (av && profPhotoDataUrl) {
-        av.classList.add('photo-avatar');
-        av.style.backgroundImage = `url('${profPhotoDataUrl}')`;
-        av.textContent = '';
-      }
     };
     reader.readAsDataURL(file);
+  }
+
+  function handleCompanyLogo(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) { showToast('Логотип не должен быть больше 5 МБ'); input.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      compressImage(e.target.result, 300, 0.8, function(compressed) {
+        cpLogo = compressed;
+        const circle = document.getElementById('cp-logo-circle');
+        if (circle) circle.innerHTML = `<img src="${cpLogo}" alt="Логотип" />`;
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ══════════════════════════════════════
+  //  ПРОФИЛЬ КАНДИДАТА (ПОЛНЫЙ ПРОСМОТР)
+  // ══════════════════════════════════════
+
+  function openCandidateProfile(dataIdx) {
+    const allResumes = [...resumeDbData, ...resumes.filter(r => r.published !== false).map((r, i) => ({ ...r, _dbIdx: i }))];
+    const r = allResumes[dataIdx];
+    if (!r) return;
+
+    const avatar = document.getElementById('cd-avatar');
+    if (r.photo) {
+      avatar.innerHTML = `<img src="${r.photo}" alt="Фото" />`;
+    } else {
+      avatar.innerHTML = r.gender === 'Ж' ? '👩' : '👷';
+    }
+
+    document.getElementById('cd-name').textContent    = r.name;
+    document.getElementById('cd-spec').textContent    = r.specialty;
+    document.getElementById('cd-salary').textContent  = `от ${Number(r.salary || 0).toLocaleString('ru')} ₽/мес`;
+    document.getElementById('cd-region').textContent  = r.region || '—';
+    document.getElementById('cd-exp').textContent     = r.exp || '—';
+    document.getElementById('cd-gender').textContent  = r.gender === 'М' ? 'Мужской' : r.gender === 'Ж' ? 'Женский' : '—';
+
+    const citizenRow = document.getElementById('cd-citizen-row');
+    if (r.citizen) {
+      document.getElementById('cd-citizen').textContent = r.citizen;
+      citizenRow.style.display = '';
+    } else {
+      citizenRow.style.display = 'none';
+    }
+
+    const aboutCard = document.getElementById('cd-about-card');
+    if (r.about) {
+      document.getElementById('cd-about').textContent = r.about;
+      aboutCard.style.display = '';
+    } else {
+      aboutCard.style.display = 'none';
+    }
+
+    const certsCard = document.getElementById('cd-certs-card');
+    if (r.certs && r.certs.length) {
+      document.getElementById('cd-certs').innerHTML = r.certs.map(c => `<span class="cand-detail-tag">📜 ${c}</span>`).join('');
+      certsCard.style.display = '';
+    } else {
+      certsCard.style.display = 'none';
+    }
+
+    const skillsCard = document.getElementById('cd-skills-card');
+    if (r.skills && r.skills.length) {
+      document.getElementById('cd-skills').innerHTML = r.skills.map(s => `<span class="cand-detail-tag">⚙️ ${s}</span>`).join('');
+      skillsCard.style.display = '';
+    } else {
+      skillsCard.style.display = 'none';
+    }
+
+    const contactWrap = document.getElementById('cd-contact-wrap');
+    let contactHtml = '';
+    if (r.phone) {
+      contactHtml += `<a class="cand-contact-btn" href="tel:${r.phone}">📞 Позвонить ${r.phone}</a>`;
+    }
+    if (r.telegram) {
+      contactHtml += `<a class="cand-contact-btn" style="background:linear-gradient(135deg,#2196F3,#21CBF3)" href="https://t.me/${r.telegram}" target="_blank">✈️ Написать @${r.telegram}</a>`;
+    }
+    contactWrap.innerHTML = contactHtml;
+
+    goTo('screen-candidate-detail');
+  }
+
+  // ══════════════════════════════════════
+  //  ИНФОРМАЦИЯ О КОМПАНИИ (МОДАЛЬНОЕ ОКНО)
+  // ══════════════════════════════════════
+  function showCompanyInfo(jobId, event) {
+    if (event) event.stopPropagation();
+    const j = jobs.find(x => x.id === jobId) || myJobs.find(x => x.id === jobId);
+    if (!j) return;
+
+    const ci = j.companyInfo || (companyProfile && companyProfile.name === j.company ? companyProfile : null);
+
+    const logoEl = document.getElementById('co-modal-logo');
+    const logo = ci?.logo || j.logo || '';
+    logoEl.innerHTML = logo ? `<img src="${logo}" alt="Логотип" />` : '🏗️';
+
+    document.getElementById('co-modal-name').textContent = j.company;
+
+    const industryLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
+    const rows = [];
+    if (ci?.city || j.location)   rows.push({ icon:'📍', label: 'Город', val: ci?.city || j.location });
+    if (ci?.industry)              rows.push({ icon:'🏭', label: 'Отрасль', val: industryLabels[ci.industry] || ci.industry });
+    if (ci?.phone)                 rows.push({ icon:'📞', label: 'Телефон', val: ci.phone });
+    if (ci?.email)                 rows.push({ icon:'✉️', label: 'Email', val: ci.email });
+    if (ci?.website)               rows.push({ icon:'🌐', label: 'Сайт', val: ci.website });
+
+    document.getElementById('co-modal-rows').innerHTML = rows.map(r =>
+      `<div class="co-modal-row"><span class="co-modal-row-label">${r.icon}</span><span class="co-modal-row-val">${r.val}</span></div>`
+    ).join('');
+
+    const aboutEl = document.getElementById('co-modal-about');
+    if (ci?.about) { aboutEl.textContent = ci.about; aboutEl.style.display = ''; }
+    else            { aboutEl.style.display = 'none'; }
+
+    document.getElementById('co-modal-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCompanyModal(event) {
+    if (event && event.target !== document.getElementById('co-modal-overlay')) return;
+    document.getElementById('co-modal-overlay').style.display = 'none';
+    document.body.style.overflow = '';
   }
 
   // ── toast ──
@@ -4103,4 +3656,3 @@
 </script>
 </body>
 </html>
-<!-- 
