@@ -477,6 +477,12 @@
     .job-card.job-closed .jc-title { color: var(--text-muted); }
     .job-card.job-closed .jc-salary { -webkit-text-fill-color: var(--text-muted); color: var(--text-muted); }
     .job-closed-label { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); color: var(--text-muted); margin-top: 6px; }
+    .jc-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .jc-apply-btn { flex: 1; padding: 9px 10px; border-radius: 12px; border: none; background: linear-gradient(90deg, var(--accent), #c73652); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .18s; }
+    .jc-apply-btn:hover { opacity: .85; }
+    .jc-apply-btn:disabled { opacity: .55; cursor: default; }
+    .jc-contact-btn { flex: 1; padding: 9px 10px; border-radius: 12px; border: none; background: linear-gradient(90deg,#2196F3,#1565C0); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .18s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+    .jc-contact-btn:hover { opacity: .85; }
   </style>
 </head>
 <body>
@@ -1417,6 +1423,10 @@
           <span class="jc-meta-item">📍 ${j.location}</span>
           <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
           <span class="jc-meta-item" style="margin-left:auto">📅 ${j.date}</span>
+        </div>
+        <div class="jc-actions">
+          <button class="jc-apply-btn" onclick="applyFromCard(${j.id},event)">${myResponses.find(r=>r.jobId===j.id) ? '✅ Отклик отправлен' : '✅ Откликнуться'}</button>
+          ${j.contactPhone ? `<a class="jc-contact-btn" href="tel:${j.contactPhone}" onclick="event.stopPropagation()">📞 Связаться</a>` : ''}
         </div>
       </div>`;
   }
@@ -2457,6 +2467,43 @@
       sendTgMessage(j.ownerChatId, `📩 <b>Новый отклик!</b>\nНа вакансию «${j.title}» откликнулся ${_appName}.\nОткройте раздел «Отклики» в Good_Вахта.`);
     }
     showToast('Отклик отправлен! Работодатель свяжется с вами.');
+  }
+
+  function applyFromCard(jobId, event) {
+    if (event) event.stopPropagation();
+    if (myResponses.find(r => r.jobId === jobId)) {
+      showToast('Вы уже откликнулись на эту вакансию');
+      return;
+    }
+    const j = jobs.find(x => x.id === jobId);
+    if (!j) return;
+    const today = new Date().toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' });
+    const _tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const _applicantChatId = _tgUser?.id || null;
+    myResponses.unshift({ jobId, title: j.title, company: j.company, salary: j.salary, date: today, status: 'pending' });
+    if (!jobResponses[jobId]) jobResponses[jobId] = [];
+    const r = resumes[0] || null;
+    jobResponses[jobId].unshift({
+      name:           r ? r.name     : 'Анонимный соискатель',
+      specialty:      r ? r.specialty: '—',
+      exp:            r ? r.exp      : '—',
+      salary:         r ? r.salary   : 0,
+      region:         r ? r.region   : '—',
+      telegram:       r ? r.telegram : '',
+      gender:         r ? r.gender   : 'М',
+      about:          r ? r.about    : '',
+      applicantChatId: _applicantChatId,
+      date: today, status: 'pending'
+    });
+    lsSave(LS.myResponses, myResponses);
+    saveJobResponsesData();
+    updateResponseBadges();
+    if (j.ownerChatId) {
+      const _appName = r ? r.name : 'Соискатель';
+      sendTgMessage(j.ownerChatId, `📩 <b>Новый отклик!</b>\nНа вакансию «${j.title}» откликнулся ${_appName}.\nОткройте раздел «Отклики» в Good_Вахта.`);
+    }
+    showToast('Отклик отправлен! Работодатель свяжется с вами.');
+    filterJobs();
   }
 
   function _updateApplyBtn() {
