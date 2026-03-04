@@ -392,6 +392,8 @@
     .resp-btn-accept:hover { opacity: .85; }
     .resp-btn-decline { width: 42px; height: 42px; border-radius: 12px; border: none; background: rgba(233,69,96,.12); color: var(--accent); font-size: 18px; cursor: pointer; transition: background .18s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .resp-btn-decline:hover { background: rgba(233,69,96,.28); }
+    .resp-btn-profile { padding: 9px 14px; border-radius: 12px; border: none; background: rgba(99,102,241,.12); color: #818cf8; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .18s; flex-shrink: 0; }
+    .resp-btn-profile:hover { background: rgba(99,102,241,.25); }
     .my-resp-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 16px 18px; backdrop-filter: blur(10px); width: 100%; max-width: 400px; }
     .mrc-company { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .mrc-title   { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
@@ -2306,6 +2308,7 @@
           </div>
           ${r.about ? `<p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:12px">${r.about}</p>` : ''}
           <div class="resp-actions">
+            <button class="resp-btn-profile" onclick="openResponseCandidateProfile(${r.jobId},${r._idx})">👤 Профиль</button>
             ${r.status==='accepted'
               ? `<div style="flex:1;text-align:center;font-size:13px;color:#4ddb8a;font-weight:700">✅ Приглашение отправлено</div>`
               : r.status==='declined'
@@ -2366,6 +2369,7 @@
         </div>
         ${r.about ? `<p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:12px">${r.about}</p>` : ''}
         <div class="resp-actions">
+          <button class="resp-btn-profile" onclick="openResponseCandidateProfile(${jobId},${i})">👤 Профиль</button>
           ${r.status === 'accepted'
             ? `<div style="flex:1;text-align:center;font-size:13px;color:#4ddb8a;font-weight:700">✅ Приглашение отправлено</div>`
             : r.status === 'declined'
@@ -2909,7 +2913,26 @@
     const allResumes = [...resumeDbData, ...resumes.filter(r => r.published !== false).map((r, i) => ({ ...r, _dbIdx: i }))];
     const r = allResumes[dataIdx];
     if (!r) return;
+    openCandidateProfileData(r);
+  }
 
+  function openResponseCandidateProfile(jobId, idx) {
+    const r = (jobResponses[jobId] || [])[idx];
+    if (!r) return;
+    openCandidateProfileData(r);
+  }
+
+  function openAllRespCandidateProfile(allIdx) {
+    const all = [];
+    Object.entries(jobResponses).forEach(([jobId, resps]) => {
+      resps.forEach((r, i) => all.push({ ...r, jobId: Number(jobId), _idx: i }));
+    });
+    const r = all[allIdx];
+    if (!r) return;
+    openCandidateProfileData(r);
+  }
+
+  function openCandidateProfileData(r) {
     // Аватар
     const avatar = document.getElementById('cd-avatar');
     if (r.photo) {
