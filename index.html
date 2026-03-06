@@ -767,6 +767,9 @@
           <div class="sched-chip" onclick="selectJobCategory(this,'food')">🍽 Питание/быт</div>
           <div class="sched-chip" onclick="selectJobCategory(this,'other')">🔧 Другое</div>
         </div>
+        <div id="cj-custom-cat-wrap" style="display:none;margin-top:8px">
+          <input class="form-input" id="cj-custom-cat" placeholder="Укажите свою отрасль" maxlength="50">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Зарплата <span class="fl-req">*</span></label>
@@ -922,7 +925,7 @@
       <!-- Категория -->
       <div class="form-group">
         <label class="form-label">Категория <span class="fl-req">*</span></label>
-        <select class="form-select" id="cr-category">
+        <select class="form-select" id="cr-category" onchange="document.getElementById('cr-custom-cat-wrap').style.display=this.value==='other'?'block':'none'">
           <option value="" disabled selected>Выберите категорию</option>
           <option value="oil">Нефть и газ</option>
           <option value="build">Строительство</option>
@@ -931,6 +934,9 @@
           <option value="food">Питание / Быт</option>
           <option value="other">Другое</option>
         </select>
+        <div id="cr-custom-cat-wrap" style="display:none;margin-top:8px">
+          <input class="form-input" id="cr-custom-cat" placeholder="Укажите свою категорию" maxlength="50">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Опыт работы <span class="fl-req">*</span></label>
@@ -1550,7 +1556,14 @@
   let cjStep         = 1;
   let cjSchedule     = '';
   let cjWorkSchedule = '';
-  let cjCategory     = 'other';
+  let cjCategory     = '';
+
+  function selectJobCategory(el, cat) {
+    document.querySelectorAll('#cj-cat-chips .sched-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    cjCategory = cat;
+    document.getElementById('cj-custom-cat-wrap').style.display = cat === 'other' ? 'block' : 'none';
+  }
   const dynCounters  = {};
 
   // ══════════════════════════════════════════════════════════════════════
@@ -1769,7 +1782,10 @@
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-    document.querySelectorAll('#sched-chips .sched-chip, #work-sched-chips .sched-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#sched-chips .sched-chip, #work-sched-chips .sched-chip, #cj-cat-chips .sched-chip').forEach(c => c.classList.remove('active'));
+    cjCategory = '';
+    document.getElementById('cj-custom-cat-wrap').style.display = 'none';
+    document.getElementById('cj-custom-cat').value = '';
     document.getElementById('req-list').innerHTML = '';
     document.getElementById('cond-list').innerHTML = '';
     updateChar('cj-title','cc-title',80);
@@ -1822,11 +1838,15 @@
       const desc     = document.getElementById('cj-desc').value.trim();
       const schedule = cjSchedule || document.getElementById('cj-schedule-custom').value.trim();
 
-      if (!title)    { shakeFocus('cj-title');       showToast('Введите название вакансии'); return false; }
-      if (!salFrom)  { shakeFocus('cj-salary-from'); showToast('Укажите зарплату (от)'); return false; }
-      if (!location) { shakeFocus('cj-location');    showToast('Укажите город'); return false; }
-      if (!schedule) { showToast('Выберите или укажите график вахты'); return false; }
-      if (!desc)     { shakeFocus('cj-desc');        showToast('Добавьте описание вакансии'); return false; }
+      if (!title)      { shakeFocus('cj-title');       showToast('Введите название вакансии'); return false; }
+      if (!salFrom)    { shakeFocus('cj-salary-from'); showToast('Укажите зарплату (от)'); return false; }
+      if (!location)   { shakeFocus('cj-location');    showToast('Укажите город'); return false; }
+      if (!cjCategory) { showToast('Выберите отрасль'); return false; }
+      if (cjCategory === 'other' && !document.getElementById('cj-custom-cat').value.trim()) {
+        shakeFocus('cj-custom-cat'); showToast('Укажите свою отрасль'); return false;
+      }
+      if (!schedule)   { showToast('Выберите или укажите график вахты'); return false; }
+      if (!desc)       { shakeFocus('cj-desc');        showToast('Добавьте описание вакансии'); return false; }
     }
     if (step === 2) {
       const items = getListValues('req-list');
@@ -1924,7 +1944,8 @@
       id: newId,
       emoji: '📋', color: 'rgba(233,69,96,.25)',
       logo: companyProfile?.logo || '',
-      category: 'other',
+      category: cjCategory || 'other',
+      categoryCustom: cjCategory === 'other' ? document.getElementById('cj-custom-cat').value.trim() : '',
       company: companyProfile ? companyProfile.name : 'Ваша компания',
       companyInfo: companyProfile ? {
         name: companyProfile.name, industry: companyProfile.industry,
@@ -2062,6 +2083,8 @@
     if (photoInput) photoInput.value = '';
     document.getElementById('cr-salary').value = '';
     document.getElementById('cr-category').value = '';
+    document.getElementById('cr-custom-cat-wrap').style.display = 'none';
+    document.getElementById('cr-custom-cat').value = '';
     document.getElementById('cert-list').innerHTML = '';
     document.getElementById('skill-list').innerHTML = '';
     document.querySelectorAll('.gender-chip').forEach(c => c.classList.remove('active'));
@@ -2087,7 +2110,13 @@
       document.getElementById('cr-phone').value     = r.phone;
       document.getElementById('cr-telegram').value  = r.telegram;
       document.getElementById('cr-specialty').value = r.specialty;
-      if (r.category) document.getElementById('cr-category').value = r.category;
+      if (r.category) {
+        document.getElementById('cr-category').value = r.category;
+        if (r.category === 'other') {
+          document.getElementById('cr-custom-cat-wrap').style.display = 'block';
+          document.getElementById('cr-custom-cat').value = r.categoryCustom || '';
+        }
+      }
       document.getElementById('cr-salary').value    = r.salary;
       document.getElementById('cr-region').value    = r.region;
       document.getElementById('cr-about').value     = r.about;
@@ -2156,6 +2185,8 @@
     if (!crGender)  { showToast('Укажите пол'); return; }
     if (!specialty) { shakeFocus('cr-specialty'); showToast('Укажите специальность'); return; }
     if (!category)  { shakeFocus('cr-category');  showToast('Выберите категорию'); return; }
+    const categoryCustom = category === 'other' ? document.getElementById('cr-custom-cat').value.trim() : '';
+    if (category === 'other' && !categoryCustom) { shakeFocus('cr-custom-cat'); showToast('Укажите свою категорию'); return; }
     if (!crExp)     { showToast('Укажите опыт работы'); return; }
     if (!salary)    { shakeFocus('cr-salary');    showToast('Укажите желаемую зарплату'); return; }
     if (!region)    { shakeFocus('cr-region');    showToast('Укажите регион'); return; }
@@ -2166,7 +2197,7 @@
     const skills   = getListValues('skill-list');
 
     const prevPublished = crEditIndex !== null ? (resumes[crEditIndex].published !== false) : true;
-    const resume = { name, phone, telegram, gender: crGender, specialty, category,
+    const resume = { name, phone, telegram, gender: crGender, specialty, category, categoryCustom,
                      exp: crExp, salary, region, citizen: crCitizen, about, certs, skills,
                      photo: crPhoto,
                      published: prevPublished,
