@@ -1453,8 +1453,10 @@
         <div class="jc-salary">${j.salary}</div>
         <div class="jc-meta">
           <span class="jc-meta-item">📍 ${j.location}</span>
-          <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
+                    <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
+          ${j.category ? `<span class="schedule-tag">🏭 ${_catLabelJob(j)}</span>` : ''}
           <span class="jc-meta-item" style="margin-left:auto">📅 ${j.date}</span>
+
         </div>
         <div class="jc-actions">
           <button class="jc-apply-btn" onclick="applyFromCard(${j.id},event)">${myResponses.find(r=>r.jobId===j.id) ? '✅ Отклик отправлен' : '✅ Откликнуться'}</button>
@@ -1513,7 +1515,8 @@
     document.getElementById('d-salary').textContent = j.salary;
     document.getElementById('d-tags').innerHTML = `
       <span class="detail-tag">📍 ${j.location}</span>
-      <span class="detail-tag">⏱ Вахта ${j.schedule}</span>
+            <span class="detail-tag">⏱ Вахта ${j.schedule}</span>
+      ${j.category ? `<span class="detail-tag">🏭 ${_catLabelJob(j)}</span>` : ''}
       <span class="detail-tag">📅 ${j.date}</span>`;
     document.getElementById('d-desc').textContent = j.desc;
     document.getElementById('d-req').innerHTML  = j.req.map(r  => `<li>${r}</li>`).join('');
@@ -1539,7 +1542,11 @@
   let crCitizen      = '';
   let crPhoto        = ''; // base64 фото соискателя
   let cpLogo         = ''; // base64 логотип компании
-  const catLabelsR   = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
+  const catLabelsJ   = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
+  function _catLabelJob(j) {
+    if (j.category === 'other' && j.categoryCustom) return j.categoryCustom;
+    return catLabelsJ[j.category] || j.category || '';
+  }
 
   let myJobs         = [];
   let jobResponses   = {};
@@ -2275,8 +2282,10 @@
           <div class="mjc-meta">
             <span class="mjc-meta-item">💰 ${j.salary}</span>
             <span class="mjc-meta-item">📍 ${j.location}</span>
-            <span class="mjc-meta-item">⏱ Вахта ${j.schedule}</span>
+                        <span class="mjc-meta-item">⏱ Вахта ${j.schedule}</span>
+            ${j.category ? `<span class="mjc-meta-item">🏭 ${_catLabelJob(j)}</span>` : ''}
           </div>
+
           <div class="mjc-stats">
             <div class="mjc-stat">
               <div class="mjc-stat-num">${respCount}</div>
@@ -2649,10 +2658,11 @@
         <div class="jc-title">${j.title}</div>
         <div class="jc-salary">${j.salary}</div>
         <div class="jc-meta">
-          <span class="jc-meta-item">📍 ${j.location}</span>
+                    <span class="jc-meta-item">📍 ${j.location}</span>
+          ${j.category ? `<span class="schedule-tag" style="opacity:.6">🏭 ${_catLabelJob(j)}</span>` : ''}
         </div>
         <div><span class="job-closed-label">🔒 Временно закрыта</span></div>
-      </div>`;
+
   }
 
   // ══════════════════════════════════════
