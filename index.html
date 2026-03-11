@@ -445,6 +445,36 @@
     .cp-code-copy-btn { padding: 8px 20px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: background .18s; }
     .cp-code-copy-btn:hover { background: rgba(255,255,255,.12); }
     .cp-code-hint { font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.5; }
+    /* ── Верификация ── */
+    .verify-block { width: 100%; max-width: 400px; background: linear-gradient(135deg,rgba(245,166,35,.12),rgba(245,166,35,.05)); border: 1px solid rgba(245,166,35,.35); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+    .verify-block-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #f5a623; }
+    .verify-block-desc  { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+    .verify-block-price { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 14px; }
+    .verify-block-price span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+    .btn-verify { width: 100%; padding: 14px; border: none; border-radius: var(--radius); background: linear-gradient(90deg,#f5a623,#e87d1e); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-verify:hover { opacity: .88; }
+    .verify-pending-block { width: 100%; max-width: 400px; background: rgba(29,185,84,.1); border: 1px solid rgba(29,185,84,.3); border-radius: var(--radius); padding: 18px; text-align: center; margin-bottom: 16px; }
+    .verify-pending-icon { font-size: 32px; margin-bottom: 8px; }
+    .verify-pending-title { font-size: 15px; font-weight: 700; color: #4ddb8a; margin-bottom: 4px; }
+    .verify-pending-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .vb-unverified { background: rgba(245,166,35,.10) !important; border-color: rgba(245,166,35,.35) !important; }
+    .vb-unverified .vb-title { color: #f5a623 !important; }
+    /* verify modal */
+    .vmodal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 300; }
+    .vmodal { background: linear-gradient(160deg,var(--grad-start),var(--grad-mid)); border: 1px solid var(--card-border); border-radius: 28px 28px 0 0; padding: 28px 24px 36px; width: 100%; max-width: 480px; }
+    .vmodal-handle { width: 36px; height: 4px; background: rgba(255,255,255,.25); border-radius: 2px; margin: 0 auto 20px; }
+    .vmodal-icon { font-size: 44px; text-align: center; margin-bottom: 12px; }
+    .vmodal-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+    .vmodal-sub { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.5; margin-bottom: 20px; }
+    .vmodal-price-row { display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,.07); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; }
+    .vmodal-price { font-size: 32px; font-weight: 900; }
+    .vmodal-price-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .vmodal-perks { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .vmodal-perk { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .vmodal-perk-icon { font-size: 20px; flex-shrink: 0; }
+    .vmodal-btn-pay { width: 100%; padding: 16px; border: none; border-radius: var(--radius); background: linear-gradient(90deg,#f5a623,#e87d1e); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; margin-bottom: 10px; }
+    .vmodal-btn-pay:hover { opacity: .88; }
+    .vmodal-btn-cancel { width: 100%; padding: 12px; border: 1px solid var(--card-border); border-radius: var(--radius); background: transparent; color: var(--text-muted); font-size: 14px; cursor: pointer; }
 
     /* ─── manager banner ─── */
     .mgr-banner { width: 100%; max-width: 400px; background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.35); border-radius: var(--radius); padding: 14px 18px; display: none; align-items: center; gap: 12px; margin-bottom: 20px; }
@@ -566,11 +596,12 @@
     <button class="mgr-exit-btn" onclick="exitManagerMode()">Выйти</button>
   </div>
   <div class="verified-banner" id="verified-banner">
-    <div class="vb-icon">✅</div>
+    <div class="vb-icon" id="vb-icon">✅</div>
     <div class="vb-text">
-      <div class="vb-title">Верифицированный работодатель</div>
-      <div class="vb-desc">Ваш аккаунт проверен — соискатели вам доверяют</div>
+      <div class="vb-title" id="vb-title">Верифицированный работодатель</div>
+      <div class="vb-desc" id="vb-desc">Ваш аккаунт проверен — соискатели вам доверяют</div>
     </div>
+    <button class="btn-verify" id="vb-pay-btn" style="display:none;width:auto;padding:8px 14px;font-size:13px" onclick="openVerifyModal()">Получить ✓</button>
   </div>
   <div class="menu-list">
     <div class="menu-item" onclick="goTo('screen-resume-db')">
@@ -961,7 +992,7 @@
         <input class="form-input" id="cr-region" type="text" placeholder="Москва, Тюмень, Ноябрьск…" maxlength="60" />
       </div>
       <div class="form-group">
-       <label class="form-label">Гражданство <span class="required-star">*</span></label>
+        <label class="form-label">Гражданство <span class="required-star">*</span></label>
         <div class="citizen-chips">
           <div class="citizen-chip" onclick="selectCitizen(this,'Россия')">🇷🇺 Россия</div>
           <div class="citizen-chip" onclick="selectCitizen(this,'СНГ')">🌐 СНГ</div>
@@ -1214,6 +1245,19 @@
       <button class="cp-code-copy-btn" onclick="copyCompanyCode()">📋 Скопировать код</button>
       <div class="cp-code-hint">Поделитесь этим кодом с коллегами — они войдут в кабинет как менеджеры и смогут управлять вакансиями</div>
     </div>
+    <!-- Блок верификации (показывается только если не верифицирован) -->
+    <div class="verify-block" id="cp-verify-block" style="display:none">
+      <div class="verify-block-title">🏅 Получите знак «Проверен»</div>
+      <div class="verify-block-desc">Галочка рядом с названием компании повышает доверие соискателей и увеличивает количество откликов.</div>
+      <div class="verify-block-price">490 ₽ <span>разовая оплата</span></div>
+      <button class="btn-verify" onclick="openVerifyModal()">Получить верификацию</button>
+    </div>
+    <!-- Блок ожидания подтверждения -->
+    <div class="verify-pending-block" id="cp-verify-pending" style="display:none">
+      <div class="verify-pending-icon">⏳</div>
+      <div class="verify-pending-title">Оплата получена — ждём подтверждения</div>
+      <div class="verify-pending-desc">Обычно занимает до 24 часов. Как только статус будет обновлён — галочка появится автоматически.</div>
+    </div>
     <button class="btn-back-employer" onclick="goTo('screen-employer')">← Вернуться в кабинет</button>
   </div>
 </div>
@@ -1293,6 +1337,27 @@
 </div>
 
 
+<!-- verify modal -->
+<div id="verify-modal-overlay" class="vmodal-overlay" style="display:none" onclick="closeVerifyModal(event)">
+  <div class="vmodal" onclick="event.stopPropagation()">
+    <div class="vmodal-handle"></div>
+    <div class="vmodal-icon">🏅</div>
+    <div class="vmodal-title">Верификация компании</div>
+    <div class="vmodal-sub">Получите знак «✓ Проверен» рядом с названием компании — соискатели видят его во всех вакансиях</div>
+    <div class="vmodal-price-row">
+      <div class="vmodal-price">490 ₽</div>
+      <div class="vmodal-price-sub">разовая оплата<br>навсегда</div>
+    </div>
+    <div class="vmodal-perks">
+      <div class="vmodal-perk"><span class="vmodal-perk-icon">✓</span> Галочка «Проверен» во всех вакансиях</div>
+      <div class="vmodal-perk"><span class="vmodal-perk-icon">📈</span> Больше откликов от соискателей</div>
+      <div class="vmodal-perk"><span class="vmodal-perk-icon">🛡️</span> Признак надёжного работодателя</div>
+    </div>
+    <button class="vmodal-btn-pay" onclick="startVerification()">Оплатить 490 ₽ через ЮКасса</button>
+    <button class="vmodal-btn-cancel" onclick="closeVerifyModal()">Отмена</button>
+  </div>
+</div>
+
 <!-- toast -->
 <div id="toast" class="toast"></div>
 
@@ -1302,7 +1367,7 @@
     <div class="co-modal-handle"></div>
     <div class="co-modal-logo" id="co-modal-logo">🏗️</div>
     <div class="co-modal-name" id="co-modal-name"></div>
-    <div class="co-modal-verified"><span class="verified-chip">✓ Проверен</span></div>
+    <div class="co-modal-verified" id="co-modal-verified"></div>
     <div id="co-modal-rows"></div>
     <div class="co-modal-about" id="co-modal-about" style="display:none"></div>
     <button class="co-modal-jobs-btn" onclick="showCompanyJobs()">🔍 Все вакансии компании</button>
@@ -1343,6 +1408,7 @@
       const isManager  = !!activeCompanyCode;
       if (mgrBanner) mgrBanner.classList.toggle('visible', isManager);
       if (verBanner) verBanner.style.display = isManager ? 'none' : '';
+      if (!isManager) updateVerifyBanner();
       if (isManager && companyProfile) {
         const t = document.getElementById('mgr-banner-title');
         if (t) t.textContent = 'Менеджер: ' + companyProfile.name;
@@ -1448,7 +1514,7 @@
         <div class="jc-header">
           ${logoHtml}
           <div style="flex:1">
-            <div class="jc-company-name"><span class="company-name-link" onclick="showCompanyInfo(${j.id},event)">${j.company}</span> <span class="verified-chip">✓ Проверен</span></div>
+            <div class="jc-company-name"><span class="company-name-link" onclick="showCompanyInfo(${j.id},event)">${j.company}</span>${j.verified ? ' <span class="verified-chip">✓ Проверен</span>' : ''}</div>
           </div>
           <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${j.id},event)" title="${isFav ? 'Убрать из избранного' : 'В избранное'}">${isFav ? '❤️' : '🤍'}</button>
         </div>
@@ -1512,7 +1578,7 @@
     const j = jobs.find(x => x.id === id);
     document.getElementById('d-logo').textContent = j.emoji;
     document.getElementById('d-logo').style.background = j.color;
-    document.getElementById('d-company').innerHTML = `<span class="company-name-link" onclick="showCompanyInfo(${j.id})">${j.company}</span> <span class="verified-chip">✓ Проверен</span>`;
+    document.getElementById('d-company').innerHTML = `<span class="company-name-link" onclick="showCompanyInfo(${j.id})">${j.company}</span>${j.verified ? ' <span class="verified-chip">✓ Проверен</span>' : ''}`;
     document.getElementById('d-title').textContent = j.title;
     document.getElementById('d-salary').textContent = j.salary;
     document.getElementById('d-tags').innerHTML = `
@@ -2079,6 +2145,7 @@
       category: cjCategory || 'other',
       categoryCustom: cjCategory === 'other' ? document.getElementById('cj-custom-cat').value.trim() : '',
       company: companyProfile ? companyProfile.name : 'Ваша компания',
+      verified: companyProfile?.verified || false,
       companyInfo: companyProfile ? {
         name: companyProfile.name, industry: companyProfile.industry,
         city: companyProfile.city, about: companyProfile.about,
@@ -2101,7 +2168,7 @@
       <div class="pc-header">
         <div class="pc-logo">📋</div>
         <div>
-          <div class="pc-company">Ваша компания <span class="verified-chip">✓ Проверен</span></div>
+          <div class="pc-company">Ваша компания${companyProfile?.verified ? ' <span class="verified-chip">✓ Проверен</span>' : ''}</div>
           <div class="pc-title">${title}</div>
         </div>
       </div>
@@ -2324,7 +2391,6 @@
     if (!region)    { shakeFocus('cr-region');    showToast('Укажите регион'); return; }
     if (!about)     { shakeFocus('cr-about');     showToast('Заполните поле "О себе"'); return; }
     if (!crCitizen) { showToast('Укажите гражданство'); return; }
-
 
     const telegram = document.getElementById('cr-telegram').value.trim();
     const certs    = getListValues('cert-list');
@@ -2832,7 +2898,7 @@
       const [statusText, statusClass] = statusMap[r.status] || ['На рассмотрении','rs-pending'];
       return `
         <div class="my-resp-card">
-          <div class="mrc-company">${r.company} <span class="verified-chip">✓ Проверен</span></div>
+          <div class="mrc-company">${r.company}${r.verified ? ' <span class="verified-chip">✓ Проверен</span>' : ''}</div>
           <div class="mrc-title">${r.title}</div>
           <div class="mrc-salary">${r.salary}</div>
           <div class="mrc-footer">
@@ -3050,6 +3116,7 @@
 
     document.getElementById('cp-form-wrap').style.display = 'none';
     document.getElementById('cp-success').classList.add('active');
+    updateVerifyBlocks();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -3224,6 +3291,7 @@
     logoEl.innerHTML = logo ? `<img src="${logo}" alt="Логотип" />` : '🏗️';
 
     document.getElementById('co-modal-name').textContent = j.company;
+    document.getElementById('co-modal-verified').innerHTML = j.verified ? '<span class="verified-chip">✓ Проверен</span>' : '';
     window._coModalCompany = j.company;
 
     const industryLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
@@ -3259,6 +3327,157 @@
     const searchEl = document.getElementById('search-input');
     if (searchEl) { searchEl.value = company; filterJobs(); }
     showToast(`🏢 Вакансии: ${company}`);
+  }
+
+  // ══════════════════════════════════════
+  //  ВЕРИФИКАЦИЯ КОМПАНИИ
+  // ══════════════════════════════════════
+
+  function openVerifyModal() {
+    document.getElementById('verify-modal-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeVerifyModal(event) {
+    if (event && event.target !== document.getElementById('verify-modal-overlay')) return;
+    document.getElementById('verify-modal-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  async function startVerification() {
+    if (!companyProfile) { showToast('Сначала сохраните профиль компании'); return; }
+    closeVerifyModal();
+    showToast('Создаём платёж…');
+
+    const returnUrl = window.location.origin + window.location.pathname
+      + '?verify_pending=1&code=' + encodeURIComponent(companyProfile.code);
+
+    try {
+      const resp = await fetch(
+        'https://zutiselchauekvvoirgw.supabase.co/functions/v1/create-payment',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_KEY
+          },
+          body: JSON.stringify({
+            description: 'Верификация компании ' + companyProfile.name + ' (код: ' + companyProfile.code + ')',
+            returnUrl: returnUrl,
+            code: companyProfile.code
+          })
+        }
+      );
+
+      const data = await resp.json();
+
+      if (data.url) {
+        companyProfile.verificationPending = true;
+        lsSave(LS.companyProfile, companyProfile);
+        if (_sb) {
+          _sb.from('company_verifications')
+            .upsert({ code: companyProfile.code, company_name: companyProfile.name, payment_id: data.paymentId || null, verified: false }, { onConflict: 'code' })
+            .then(({ error }) => { if (error) console.warn('verify upsert:', error.message); });
+        }
+        window.location.href = data.url;
+      } else {
+        showToast('Ошибка: ' + (data.error || 'попробуйте позже'));
+      }
+    } catch(e) {
+      console.error('startVerification:', e);
+      showToast('Ошибка соединения. Попробуйте позже.');
+    }
+  }
+
+  async function checkVerificationStatus() {
+    if (!companyProfile || !_sb) return;
+    try {
+      const { data, error } = await _sb
+        .from('company_verifications')
+        .select('verified')
+        .eq('code', companyProfile.code)
+        .maybeSingle();
+      if (error) { console.warn('checkVerificationStatus:', error.message); return; }
+      if (data && data.verified && !companyProfile.verified) {
+        companyProfile.verified = true;
+        companyProfile.verificationPending = false;
+        lsSave(LS.companyProfile, companyProfile);
+        _applyVerifiedToJobs();
+        showToast('🎉 Ваша компания верифицирована!');
+        updateVerifyBanner();
+        updateVerifyBlocks();
+      }
+    } catch(e) { console.warn('checkVerificationStatus:', e); }
+  }
+
+  function _applyVerifiedToJobs() {
+    // проставляем verified=true во все вакансии этой компании
+    [jobs, myJobs].forEach(arr => {
+      arr.forEach(j => { if (j.company === companyProfile.name) j.verified = true; });
+    });
+    renderJobs(jobs);
+  }
+
+  function updateVerifyBanner() {
+    const banner = document.getElementById('verified-banner');
+    const icon   = document.getElementById('vb-icon');
+    const title  = document.getElementById('vb-title');
+    const desc   = document.getElementById('vb-desc');
+    const payBtn = document.getElementById('vb-pay-btn');
+    if (!banner || activeCompanyCode) return;
+
+    if (companyProfile?.verified) {
+      banner.classList.remove('vb-unverified');
+      if (icon)   icon.textContent  = '✅';
+      if (title)  title.textContent = 'Верифицированный работодатель';
+      if (desc)   desc.textContent  = 'Ваш аккаунт проверен — соискатели вам доверяют';
+      if (payBtn) payBtn.style.display = 'none';
+    } else {
+      banner.classList.add('vb-unverified');
+      if (icon)   icon.textContent  = '⚠️';
+      if (title)  title.textContent = 'Аккаунт не верифицирован';
+      if (desc)   desc.textContent  = companyProfile?.verificationPending
+        ? 'Оплата получена — ожидаем подтверждения (до 24 ч)'
+        : 'Получите знак «✓ Проверен» — соискатели больше доверяют проверенным компаниям';
+      if (payBtn) payBtn.style.display = companyProfile?.verificationPending ? 'none' : '';
+    }
+  }
+
+  function updateVerifyBlocks() {
+    const blockEl   = document.getElementById('cp-verify-block');
+    const pendingEl = document.getElementById('cp-verify-pending');
+    if (!blockEl || !pendingEl) return;
+    if (companyProfile?.verified) {
+      blockEl.style.display   = 'none';
+      pendingEl.style.display = 'none';
+    } else if (companyProfile?.verificationPending) {
+      blockEl.style.display   = 'none';
+      pendingEl.style.display = '';
+    } else if (companyProfile) {
+      blockEl.style.display   = '';
+      pendingEl.style.display = 'none';
+    }
+  }
+
+  // Обработка возврата с ЮКасса
+  (function handlePaymentReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verify_pending') === '1') {
+      const code = params.get('code');
+      if (code && companyProfile && companyProfile.code === code && !companyProfile.verificationPending) {
+        companyProfile.verificationPending = true;
+        lsSave(LS.companyProfile, companyProfile);
+      }
+      // убираем параметры из URL
+      history.replaceState({}, '', window.location.pathname);
+      // проверяем статус через 2 сек (на случай мгновенной оплаты)
+      setTimeout(() => checkVerificationStatus(), 2000);
+    }
+  })();
+
+  // Проверяем статус при загрузке (если есть ожидающий платёж)
+  if (companyProfile?.verificationPending && !companyProfile?.verified) {
+    checkVerificationStatus();
   }
 
   // ── toast ──
