@@ -472,7 +472,8 @@
     .co-modal-row-label { color: var(--text-muted); flex-shrink: 0; min-width: 28px; }
     .co-modal-row-val { font-weight: 500; word-break: break-word; }
     .co-modal-about { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--card-border); }
-    .co-modal-close { width: 100%; margin-top: 20px; padding: 14px; border-radius: var(--radius); border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
+    .co-modal-jobs-btn { width: 100%; margin-top: 14px; padding: 13px; border-radius: var(--radius); border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .co-modal-close { width: 100%; margin-top: 10px; padding: 14px; border-radius: var(--radius); border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
 
     /* ─── closed job card ─── */
     .job-card.job-closed { opacity: 0.55; filter: grayscale(0.5); }
@@ -1303,6 +1304,7 @@
     <div class="co-modal-verified"><span class="verified-chip">✓ Проверен</span></div>
     <div id="co-modal-rows"></div>
     <div class="co-modal-about" id="co-modal-about" style="display:none"></div>
+    <button class="co-modal-jobs-btn" onclick="showCompanyJobs()">🔍 Все вакансии компании</button>
     <button class="co-modal-close" onclick="closeCompanyModal()">Закрыть</button>
   </div>
 </div>
@@ -1453,10 +1455,9 @@
         <div class="jc-salary">${j.salary}</div>
         <div class="jc-meta">
           <span class="jc-meta-item">📍 ${j.location}</span>
-                    <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
+          <span class="schedule-tag">⏱ Вахта ${j.schedule}</span>
           ${j.category ? `<span class="schedule-tag">🏭 ${_catLabelJob(j)}</span>` : ''}
           <span class="jc-meta-item" style="margin-left:auto">📅 ${j.date}</span>
-
         </div>
         <div class="jc-actions">
           <button class="jc-apply-btn" onclick="applyFromCard(${j.id},event)">${myResponses.find(r=>r.jobId===j.id) ? '✅ Отклик отправлен' : '✅ Откликнуться'}</button>
@@ -1515,7 +1516,7 @@
     document.getElementById('d-salary').textContent = j.salary;
     document.getElementById('d-tags').innerHTML = `
       <span class="detail-tag">📍 ${j.location}</span>
-            <span class="detail-tag">⏱ Вахта ${j.schedule}</span>
+      <span class="detail-tag">⏱ Вахта ${j.schedule}</span>
       ${j.category ? `<span class="detail-tag">🏭 ${_catLabelJob(j)}</span>` : ''}
       <span class="detail-tag">📅 ${j.date}</span>`;
     document.getElementById('d-desc').textContent = j.desc;
@@ -1542,7 +1543,7 @@
   let crCitizen      = '';
   let crPhoto        = ''; // base64 фото соискателя
   let cpLogo         = ''; // base64 логотип компании
-    const catLabelsR   = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
+  const catLabelsR   = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
   const catLabelsJ   = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
   function _catLabelJob(j) {
     if (j.category === 'other' && j.categoryCustom) return j.categoryCustom;
@@ -1565,6 +1566,30 @@
   let cjSchedule     = '';
   let cjWorkSchedule = '';
   let cjCategory     = '';
+  let cjEditIndex    = null;
+
+  function _parseSalaryStr(str) {
+    const n = s => parseInt(s.replace(/[\s\u00A0]/g, '')) || '';
+    if (!str) return { from: '', to: '' };
+    if (str.includes('–')) { const [l,r] = str.split('–'); return { from: n(l), to: n(r) }; }
+    if (str.startsWith('от')) return { from: n(str), to: '' };
+    return { from: '', to: n(str) };
+  }
+
+  function _addDynItemVal(listId, prefix, ph, val) {
+    const list = document.getElementById(listId);
+    if (!(prefix in dynCounters)) dynCounters[prefix] = 0;
+    const idx = dynCounters[prefix]++;
+    const id = `${prefix}-${idx}`;
+    const row = document.createElement('div');
+    row.className = 'dyn-item';
+    row.id = `${id}-row`;
+    row.innerHTML = `
+      <input class="dyn-input" id="${id}" type="text" placeholder="${ph}" maxlength="120" />
+      <button class="dyn-remove" onclick="removeDynItem('${id}-row')" title="Удалить">×</button>`;
+    list.appendChild(row);
+    document.getElementById(id).value = val || '';
+  }
 
   function selectJobCategory(el, cat) {
     document.querySelectorAll('#cj-cat-chips .sched-chip').forEach(c => c.classList.remove('active'));
@@ -1782,6 +1807,8 @@
     cjStep = 1;
     cjSchedule = '';
     cjWorkSchedule = '';
+    cjEditIndex = null;
+    document.querySelector('#screen-create-job .section-title').textContent = 'Новая вакансия 📋';
     dynCounters.req = 0;
     dynCounters.cond = 0;
 
@@ -1809,6 +1836,80 @@
 
     renderStep(1);
     updateProgress(1);
+  }
+
+  function openEditJob(idx) {
+    cjEditIndex = idx;
+    const j = myJobs[idx];
+    resetJobForm();
+    cjEditIndex = idx; // resetJobForm обнуляет, восстанавливаем
+
+    document.querySelector('#screen-create-job .section-title').textContent = 'Редактировать вакансию ✏️';
+
+    // Шаг 1
+    document.getElementById('cj-title').value = j.title || '';
+    updateChar('cj-title','cc-title',80);
+    const sal = _parseSalaryStr(j.salary);
+    document.getElementById('cj-salary-from').value = sal.from;
+    document.getElementById('cj-salary-to').value   = sal.to;
+    document.getElementById('cj-location').value    = j.location || '';
+
+    // Chips вахты
+    const stdSch = ['15/15','30/30','45/15','60/30','90/30'];
+    if (stdSch.includes(j.schedule)) {
+      document.querySelectorAll('#sched-chips .sched-chip').forEach(c => {
+        if (c.textContent.trim() === j.schedule) { c.classList.add('active'); cjSchedule = j.schedule; }
+      });
+    } else { document.getElementById('cj-schedule-custom').value = j.schedule || ''; }
+
+    // Chips графика работы
+    const stdWrk = ['5/2','6/1','7/0'];
+    if (j.workSchedule && stdWrk.includes(j.workSchedule)) {
+      document.querySelectorAll('#work-sched-chips .sched-chip').forEach(c => {
+        if (c.textContent.trim() === j.workSchedule) { c.classList.add('active'); cjWorkSchedule = j.workSchedule; }
+      });
+    } else if (j.workSchedule) {
+      document.getElementById('cj-work-schedule-custom').value = j.workSchedule;
+    }
+
+    // Категория
+    if (j.category) {
+      document.querySelectorAll('#cj-cat-chips .sched-chip').forEach(c => {
+        if (c.dataset && c.getAttribute('onclick') && c.getAttribute('onclick').includes(`'${j.category}'`)) {
+          c.classList.add('active'); cjCategory = j.category;
+        }
+      });
+      if (j.category === 'other' && j.categoryCustom) {
+        document.getElementById('cj-custom-cat-wrap').style.display = 'block';
+        document.getElementById('cj-custom-cat').value = j.categoryCustom;
+      }
+    }
+
+    // Шаг 2: описание
+    document.getElementById('cj-desc').value = j.desc || '';
+    updateChar('cj-desc','cc-desc',600);
+
+    // Требования
+    document.getElementById('req-list').innerHTML = '';
+    dynCounters.req = 0;
+    if (j.req && j.req.length) {
+      j.req.forEach(v => _addDynItemVal('req-list','req','Например: Опыт от 3 лет', v));
+    } else {
+      addDynItem('req-list','req','Например: Опыт от 3 лет');
+    }
+
+    // Шаг 3: условия и контакты
+    document.getElementById('cond-list').innerHTML = '';
+    dynCounters.cond = 0;
+    if (j.cond && j.cond.length) {
+      j.cond.forEach(v => _addDynItemVal('cond-list','cond','Например: Бесплатное проживание', v));
+    } else {
+      addDynItem('cond-list','cond','Например: Бесплатное проживание');
+    }
+    document.getElementById('cj-contact-name').value  = j.contactName  || '';
+    document.getElementById('cj-contact-phone').value = j.contactPhone || '';
+
+    goTo('screen-create-job');
   }
 
   function renderStep(n) {
@@ -1944,6 +2045,28 @@
         : `до ${Number(salTo).toLocaleString('ru')} ₽/мес`;
 
     const today = new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});
+
+    // ── Ветка редактирования ──
+    if (cjEditIndex !== null) {
+      const oldId = myJobs[cjEditIndex].id;
+      const updatedJob = { ...myJobs[cjEditIndex],
+        title, location, salary: salaryStr, schedule, workSchedule,
+        category: cjCategory || 'other',
+        categoryCustom: cjCategory === 'other' ? document.getElementById('cj-custom-cat').value.trim() : '',
+        desc, req: reqs, cond: conds, contactName, contactPhone };
+      myJobs[cjEditIndex] = updatedJob;
+      const jIdx = jobs.findIndex(j => j.id === oldId);
+      if (jIdx !== -1) jobs[jIdx] = { ...jobs[jIdx], ...updatedJob };
+      saveMyJobsData();
+      sbSaveJob({ ...updatedJob });
+      renderJobs(jobs);
+      document.querySelector('#cj-success .success-title').textContent = 'Вакансия обновлена! ✏️';
+      document.querySelector('#cj-success .success-sub').textContent = 'Изменения сохранены и уже видны соискателям.';
+      document.getElementById('cj-form-wrap').style.display = 'none';
+      document.getElementById('cj-success').classList.add('active');
+      cjEditIndex = null;
+      return;
+    }
 
     // add to jobs array so immediately visible in search
     const newId = Date.now();
@@ -2283,10 +2406,9 @@
           <div class="mjc-meta">
             <span class="mjc-meta-item">💰 ${j.salary}</span>
             <span class="mjc-meta-item">📍 ${j.location}</span>
-                        <span class="mjc-meta-item">⏱ Вахта ${j.schedule}</span>
+            <span class="mjc-meta-item">⏱ Вахта ${j.schedule}</span>
             ${j.category ? `<span class="mjc-meta-item">🏭 ${_catLabelJob(j)}</span>` : ''}
           </div>
-
           <div class="mjc-stats">
             <div class="mjc-stat">
               <div class="mjc-stat-num">${respCount}</div>
@@ -2299,6 +2421,7 @@
           </div>
           <div class="mjc-actions">
             <button class="mjc-btn" onclick="openJobResponsesScreen(${idx})">💬 Отклики (${respCount})</button>
+            <button class="mjc-btn" onclick="openEditJob(${idx})">✏️ Редактировать</button>
             <button class="mjc-btn" onclick="toggleJobPause(${idx})">${paused ? '▶ Возобновить' : '⏸ Пауза'}</button>
             <button class="mjc-btn-danger" onclick="archiveMyJob(${idx})" title="В архив">🗑</button>
           </div>
@@ -2659,7 +2782,7 @@
         <div class="jc-title">${j.title}</div>
         <div class="jc-salary">${j.salary}</div>
         <div class="jc-meta">
-                    <span class="jc-meta-item">📍 ${j.location}</span>
+          <span class="jc-meta-item">📍 ${j.location}</span>
           ${j.category ? `<span class="schedule-tag" style="opacity:.6">🏭 ${_catLabelJob(j)}</span>` : ''}
         </div>
         <div><span class="job-closed-label">🔒 Временно закрыта</span></div>
@@ -3085,6 +3208,7 @@
     logoEl.innerHTML = logo ? `<img src="${logo}" alt="Логотип" />` : '🏗️';
 
     document.getElementById('co-modal-name').textContent = j.company;
+    window._coModalCompany = j.company;
 
     const industryLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
     const rows = [];
@@ -3110,6 +3234,15 @@
     if (event && event.target !== document.getElementById('co-modal-overlay')) return;
     document.getElementById('co-modal-overlay').style.display = 'none';
     document.body.style.overflow = '';
+  }
+
+  function showCompanyJobs() {
+    const company = window._coModalCompany;
+    closeCompanyModal();
+    goTo('screen-jobs');
+    const searchEl = document.getElementById('search-input');
+    if (searchEl) { searchEl.value = company; filterJobs(); }
+    showToast(`🏢 Вакансии: ${company}`);
   }
 
   // ── toast ──
