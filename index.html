@@ -2419,11 +2419,13 @@
               <div class="mjc-stat-label">опубликована</div>
             </div>
           </div>
-          <div class="mjc-actions">
+                   <div class="mjc-actions">
             <button class="mjc-btn" onclick="openJobResponsesScreen(${idx})">💬 Отклики (${respCount})</button>
-            <button class="mjc-btn" onclick="openEditJob(${idx})">✏️ Редактировать</button>
+            ${myJobsTab === 'archived'
+              ? `<button class="mjc-btn" onclick="restoreMyJob(${idx})">♻️ Восстановить</button>`
+              : `<button class="mjc-btn" onclick="openEditJob(${idx})">✏️ Редактировать</button>
             <button class="mjc-btn" onclick="toggleJobPause(${idx})">${paused ? '▶ Возобновить' : '⏸ Пауза'}</button>
-            <button class="mjc-btn-danger" onclick="archiveMyJob(${idx})" title="В архив">🗑</button>
+            <button class="mjc-btn-danger" onclick="archiveMyJob(${idx})" title="В архив">🗑</button>`}
           </div>
         </div>`;
     }).join('');
@@ -2449,6 +2451,16 @@
     renderJobs(jobs);
     showToast('Вакансия перемещена в архив');
   }
+    function restoreMyJob(idx) {
+    myJobs[idx].archived = false;
+    myJobs[idx].paused = false;
+    jobs.push(myJobs[idx]);
+    saveMyJobsData();
+    renderMyJobs();
+    renderJobs(jobs);
+    showToast('✅ Вакансия восстановлена и снова видна соискателям');
+  }
+
 
   // ══════════════════════════════════════
   //  ВСЕ ОТКЛИКИ РАБОТОДАТЕЛЯ
