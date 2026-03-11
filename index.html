@@ -358,6 +358,7 @@
     .tg-input-wrap .form-input { padding-left: 36px; }
     .tg-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted); pointer-events: none; }
     .field-optional { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+    .required-star { color: #e94560; font-size: 13px; }
     .tab-bar { display: flex; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 30px; padding: 4px; gap: 4px; margin-bottom: 20px; backdrop-filter: blur(10px); }
     .tab { flex: 1; text-align: center; padding: 9px 10px; border-radius: 24px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all .2s; white-space: nowrap; }
     .tab.active { background: linear-gradient(90deg, var(--accent), #c73652); color: #fff; }
@@ -960,7 +961,7 @@
         <input class="form-input" id="cr-region" type="text" placeholder="Москва, Тюмень, Ноябрьск…" maxlength="60" />
       </div>
       <div class="form-group">
-        <label class="form-label">Гражданство <span class="field-optional">(необязательно)</span></label>
+       <label class="form-label">Гражданство <span class="required-star">*</span></label>
         <div class="citizen-chips">
           <div class="citizen-chip" onclick="selectCitizen(this,'Россия')">🇷🇺 Россия</div>
           <div class="citizen-chip" onclick="selectCitizen(this,'СНГ')">🌐 СНГ</div>
@@ -2322,6 +2323,8 @@
     if (!salary)    { shakeFocus('cr-salary');    showToast('Укажите желаемую зарплату'); return; }
     if (!region)    { shakeFocus('cr-region');    showToast('Укажите регион'); return; }
     if (!about)     { shakeFocus('cr-about');     showToast('Заполните поле "О себе"'); return; }
+    if (!crCitizen) { showToast('Укажите гражданство'); return; }
+
 
     const telegram = document.getElementById('cr-telegram').value.trim();
     const certs    = getListValues('cert-list');
@@ -2442,15 +2445,16 @@
   }
 
   function archiveMyJob(idx) {
-    const jobId = myJobs[idx].id;
-    myJobs[idx].archived = true;
-    const jIdx = jobs.findIndex(j => j.id === jobId);
-    if (jIdx !== -1) jobs.splice(jIdx, 1);
-    saveMyJobsData();
-    renderMyJobs();
-    renderJobs(jobs);
-    showToast('Вакансия перемещена в архив');
-  }
+  const jobId = myJobs[idx].id;
+  myJobs[idx].archived = true;
+  const jIdx = jobs.findIndex(j => j.id === jobId);
+  if (jIdx !== -1) jobs.splice(jIdx, 1);
+  saveMyJobsData();
+  sbSaveJob({ ...myJobs[idx], archived: true });
+  renderMyJobs();
+  renderJobs(jobs);
+  showToast('Вакансия перемещена в архив');
+}
     function restoreMyJob(idx) {
     myJobs[idx].archived = false;
     myJobs[idx].paused = false;
