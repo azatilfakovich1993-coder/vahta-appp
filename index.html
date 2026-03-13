@@ -2150,7 +2150,8 @@
         name: companyProfile.name, industry: companyProfile.industry,
         city: companyProfile.city, about: companyProfile.about,
         website: companyProfile.website, phone: companyProfile.phone,
-        email: companyProfile.email, logo: companyProfile.logo
+              email: companyProfile.email, logo: companyProfile.logo,
+        code: companyProfile.code
       } : null,
       ownerChatId: _ownerChatId,
       title, location, salary: salaryStr, schedule, workSchedule, date: today,
@@ -3101,6 +3102,22 @@
       code:        existingCode,
       ownerChatId: window.Telegram?.WebApp?.initDataUnsafe?.user?.id || companyProfile?.ownerChatId || null };
     lsSave(LS.companyProfile, companyProfile);
+        if (_sb) {
+      _sb.from('companies').upsert({
+        code:     companyProfile.code,
+        name:     companyProfile.name,
+        industry: companyProfile.industry,
+        city:     companyProfile.city,
+        phone:    companyProfile.phone,
+        email:    companyProfile.email,
+        website:  companyProfile.website,
+        about:    companyProfile.about,
+        logo:     companyProfile.logo,
+        verified: companyProfile.verified || false,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'code' })
+      .then(({ error }) => { if (error) console.warn('companies upsert:', error.message); });
+    }
 
     // Регистрируем компанию в реестре для поиска менеджерами
     const registry = lsLoad(LS.registry, {});
@@ -3278,29 +3295,38 @@
   // ══════════════════════════════════════
   //  ИНФОРМАЦИЯ О КОМПАНИИ (МОДАЛЬНОЕ ОКНО)
   // ══════════════════════════════════════
-  function showCompanyInfo(jobId, event) {
+  async function showCompanyInfo(jobId, event) {
     if (event) event.stopPropagation();
     const j = jobs.find(x => x.id === jobId) || myJobs.find(x => x.id === jobId);
     if (!j) return;
 
-    // Берём companyInfo из вакансии или из текущего профиля компании (если это вакансия текущего работодателя)
-    const ci = j.companyInfo || (companyProfile && companyProfile.name === j.company ? companyProfile : null);
+    const ci = j.companyInfo || (companyProfile?.name === j.company ? companyProfile : null);
+    _renderCoModal(j, ci);
 
+    const code = j.companyInfo?.code || (companyProfile?.name === j.company ? companyProfile?.code : null);
+    if (_sb && code) {
+      const { data } = await _sb.from('companies').select('*').eq('code', code).maybeSingle();
+      if (data) _renderCoModal(j, data);
+    }
+  }
+
+  function _renderCoModal(j, ci) {
     const logoEl = document.getElementById('co-modal-logo');
     const logo = ci?.logo || j.logo || '';
     logoEl.innerHTML = logo ? `<img src="${logo}" alt="Логотип" />` : '🏗️';
 
-    document.getElementById('co-modal-name').textContent = j.company;
-    document.getElementById('co-modal-verified').innerHTML = j.verified ? '<span class="verified-chip">✓ Проверен</span>' : '';
-    window._coModalCompany = j.company;
+    document.getElementById('co-modal-name').textContent = j.company || ci?.name || '';
+    const isVerified = ci?.verified || j.verified || false;
+    document.getElementById('co-modal-verified').innerHTML = isVerified ? '<span class="verified-chip">✓ Проверен</span>' : '';
+    window._coModalCompany = j.company || ci?.name;
 
     const industryLabels = { oil:'Нефть и газ', build:'Строительство', mine:'Горнодобыча', prod:'Производство', food:'Питание / Быт', other:'Другое' };
     const rows = [];
-    if (ci?.city || j.location)   rows.push({ icon:'📍', label: 'Город', val: ci?.city || j.location });
-    if (ci?.industry)              rows.push({ icon:'🏭', label: 'Отрасль', val: industryLabels[ci.industry] || ci.industry });
-    if (ci?.phone)                 rows.push({ icon:'📞', label: 'Телефон', val: ci.phone });
-    if (ci?.email)                 rows.push({ icon:'✉️', label: 'Email', val: ci.email });
-    if (ci?.website)               rows.push({ icon:'🌐', label: 'Сайт', val: ci.website });
+    if (ci?.city || j.location)  rows.push({ icon:'📍', val: ci?.city || j.location });
+    if (ci?.industry)             rows.push({ icon:'🏭', val: industryLabels[ci.industry] || ci.industry });
+    if (ci?.phone)                rows.push({ icon:'📞', val: ci.phone });
+    if (ci?.email)                rows.push({ icon:'✉️', val: ci.email });
+    if (ci?.website)              rows.push({ icon:'🌐', val: ci.website });
 
     document.getElementById('co-modal-rows').innerHTML = rows.map(r =>
       `<div class="co-modal-row"><span class="co-modal-row-label">${r.icon}</span><span class="co-modal-row-val">${r.val}</span></div>`
@@ -3308,7 +3334,7 @@
 
     const aboutEl = document.getElementById('co-modal-about');
     if (ci?.about) { aboutEl.textContent = ci.about; aboutEl.style.display = ''; }
-    else            { aboutEl.style.display = 'none'; }
+    else           { aboutEl.style.display = 'none'; }
 
     document.getElementById('co-modal-overlay').style.display = 'flex';
     document.body.style.overflow = 'hidden';
