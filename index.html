@@ -3398,8 +3398,6 @@
       const data = await resp.json();
 
       if (data.url) {
-        companyProfile.verificationPending = true;
-        lsSave(LS.companyProfile, companyProfile);
         if (_sb) {
           _sb.from('company_verifications')
             .upsert({ code: companyProfile.code, company_name: companyProfile.name, payment_id: data.paymentId || null, verified: false }, { onConflict: 'code' })
