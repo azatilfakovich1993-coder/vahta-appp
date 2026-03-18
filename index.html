@@ -1504,8 +1504,15 @@
     if (btn) btn.classList.toggle('has-filters', cnt > 0);
   }
 
+  function _isCompanyVerified(j) {
+    if (j.verified) return true;
+    if (companyProfile && companyProfile.verified && companyProfile.name === j.company) return true;
+    return false;
+  }
+
   function _jobCardHtml(j) {
     const isFav = favorites.has(j.id);
+    const isVerified = _isCompanyVerified(j);
     const logoHtml = j.logo
       ? `<div class="company-logo" style="padding:0;overflow:hidden"><img src="${j.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px" /></div>`
       : `<div class="company-logo" style="background:${j.color}">${j.emoji}</div>`;
@@ -1514,7 +1521,7 @@
         <div class="jc-header">
           ${logoHtml}
           <div style="flex:1">
-            <div class="jc-company-name"><span class="company-name-link" onclick="showCompanyInfo(${j.id},event)">${j.company}</span>${j.verified ? ' <span class="verified-chip">✓ Проверен</span>' : ''}</div>
+            <div class="jc-company-name"><span class="company-name-link" onclick="showCompanyInfo(${j.id},event)">${j.company}</span>${isVerified ? ' <span class="verified-chip">✓ Проверен</span>' : ''}</div>
           </div>
           <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${j.id},event)" title="${isFav ? 'Убрать из избранного' : 'В избранное'}">${isFav ? '❤️' : '🤍'}</button>
         </div>
@@ -1691,10 +1698,6 @@
       data.forEach(j => {
         if (!jobs.find(x => x.id === j.id)) jobs.push(j);
       });
-      // Применяем верификацию перед рендером
-      if (companyProfile?.verified) {
-        jobs.forEach(j => { if (j.company === companyProfile.name) j.verified = true; });
-      }
       renderJobs(jobs);
     } catch(e) { console.warn('sbLoadJobs:', e); }
   }
