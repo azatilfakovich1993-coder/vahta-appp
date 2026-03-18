@@ -1691,6 +1691,10 @@
       data.forEach(j => {
         if (!jobs.find(x => x.id === j.id)) jobs.push(j);
       });
+      // Применяем верификацию перед рендером
+      if (companyProfile?.verified) {
+        jobs.forEach(j => { if (j.company === companyProfile.name) j.verified = true; });
+      }
       renderJobs(jobs);
     } catch(e) { console.warn('sbLoadJobs:', e); }
   }
