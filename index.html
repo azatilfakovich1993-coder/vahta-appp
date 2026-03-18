@@ -1846,8 +1846,12 @@
   userProfile    = lsLoad(LS.userProfile,    null);
 
   // init jobs on load
-  renderJobs(jobs);
   updateResponseBadges();
+  if (companyProfile && _sb) {
+    checkVerificationStatus().then(() => renderJobs(jobs));
+  } else {
+    renderJobs(jobs);
+  }
 
   // Supabase: загружаем публичные данные и подписываемся на изменения
   if (SB_ENABLED) {
@@ -3500,11 +3504,6 @@
   })();
 
   // Проверяем статус при загрузке (если есть ожидающий платёж)
-  if (companyProfile) {
-    checkVerificationStatus().then(() => {
-        renderJobs(jobs);
-    });
-}
 
   // ── toast ──
   let toastTimer;
