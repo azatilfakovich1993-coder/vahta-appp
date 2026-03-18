@@ -3071,7 +3071,24 @@
 
     document.getElementById('mgr-code-input').value = '';
     updateResponseBadges();
-    renderJobs(jobs);
+
+    // Проверяем верификацию компании из Supabase
+    if (_sb) {
+      _sb.from('company_verifications')
+        .select('verified')
+        .eq('code', code)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data && data.verified) {
+            companyProfile.verified = true;
+            jobs.forEach(j => { if (j.company === companyProfile.name) j.verified = true; });
+          }
+          renderJobs(jobs);
+        });
+    } else {
+      renderJobs(jobs);
+    }
+
     showToast(`✅ Вы вошли как менеджер — ${company.name}`);
     goTo('screen-employer');
   }
