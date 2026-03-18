@@ -3500,8 +3500,10 @@
   })();
 
   // Проверяем статус при загрузке (если есть ожидающий платёж)
-  if (companyProfile && !companyProfile?.verified) {
-    checkVerificationStatus();
+  if (companyProfile) {
+    checkVerificationStatus().then(() => {
+        renderJobs(jobs);
+    });
 }
 
   // ── toast ──
