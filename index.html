@@ -3500,9 +3500,9 @@
   })();
 
   // Проверяем статус при загрузке (если есть ожидающий платёж)
-  if (companyProfile?.verificationPending && !companyProfile?.verified) {
+  if (companyProfile && !companyProfile?.verified) {
     checkVerificationStatus();
-  }
+}
 
   // ── toast ──
   let toastTimer;
