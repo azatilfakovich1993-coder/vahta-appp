@@ -1695,9 +1695,15 @@
       const { data, error } = await _sb.from('vacancies').select('*').eq('archived', false).eq('paused', false);
       if (error) { console.warn('sbLoadJobs:', error.message); return; }
       if (!data || !data.length) return;
-      data.forEach(j => {
-        if (!jobs.find(x => x.id === j.id)) jobs.push(j);
+      data.forEach(row => {
+        // data поле содержит полный объект вакансии
+        const j = row.data ? { ...row.data, archived: row.archived, paused: row.paused } : row;
+        if (!jobs.find(x => String(x.id) === String(j.id))) jobs.push(j);
       });
+      // Применяем верификацию
+      if (companyProfile?.verified) {
+        jobs.forEach(j => { if (j.company === companyProfile.name) j.verified = true; });
+      }
       renderJobs(jobs);
     } catch(e) { console.warn('sbLoadJobs:', e); }
   }
@@ -1720,7 +1726,18 @@
   async function sbSaveJob(job) {
     if (!_sb) return;
     try {
-      const { error } = await _sb.from('vacancies').upsert(job, { onConflict: 'id' });
+      const row = {
+        id:             String(job.id),
+        data:           job,
+        companyId:      job.companyInfo?.code || companyProfile?.code || '',
+        archived:       job.archived  || false,
+        paused:         job.paused    || false,
+        workSchedule:   job.workSchedule   || '',
+        categoryCustom: job.categoryCustom || '',
+        contactName:    job.contactName    || '',
+        contactPhone:   job.contactPhone   || '',
+      };
+      const { error } = await _sb.from('vacancies').upsert(row, { onConflict: 'id' });
       if (error) console.warn('sbSaveJob:', error.message);
     } catch(e) { console.warn('sbSaveJob:', e); }
   }
