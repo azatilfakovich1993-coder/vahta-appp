@@ -1866,7 +1866,7 @@
   lsLoad(LS.favorites, []).forEach(id => favorites.add(id));
   Object.assign(jobResponses, lsLoad(LS.jobResponses, {}));
   const _loadedResponses = lsLoad(LS.myResponses, []);
-myResponses.push(..._loadedResponses);
+myResponses.push(..._loadedResponses.slice().reverse());
   companyProfile = lsLoad(LS.companyProfile, null);
   userProfile    = lsLoad(LS.userProfile,    null);
 
@@ -2591,6 +2591,7 @@ myResponses.push(..._loadedResponses);
       resps.forEach((r, i) => all.push({ ...r, jobId: Number(jobId), jobTitle, _idx: i }));
     });
     // Фильтрация по табу
+    all.reverse();
     const filtered = erTab === 'all' ? all
       : erTab === 'pending'  ? all.filter(r => r.status === 'pending')
       : erTab === 'accepted' ? all.filter(r => r.status === 'accepted')
