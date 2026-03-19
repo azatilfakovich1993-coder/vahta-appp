@@ -1698,7 +1698,7 @@
       data.forEach(row => {
         // data поле содержит полный объект вакансии
         const j = row.data ? { ...row.data, archived: row.archived, paused: row.paused } : row;
-        if (!jobs.find(x => String(x.id) === String(j.id))) jobs.push(j);
+        if (!j.archived && !j.paused && !jobs.find(x => String(x.id) === String(j.id))) jobs.push(j);
       });
       // Применяем верификацию
       if (companyProfile?.verified) {
@@ -1865,7 +1865,8 @@
 
   lsLoad(LS.favorites, []).forEach(id => favorites.add(id));
   Object.assign(jobResponses, lsLoad(LS.jobResponses, {}));
-  myResponses.push(...lsLoad(LS.myResponses, []));
+  const _loadedResponses = lsLoad(LS.myResponses, []);
+myResponses.push(..._loadedResponses);
   companyProfile = lsLoad(LS.companyProfile, null);
   userProfile    = lsLoad(LS.userProfile,    null);
 
@@ -2540,6 +2541,7 @@
   }
 
   function archiveMyJob(idx) {
+  if (!confirm('Переместить вакансию в архив?')) return;
   const jobId = myJobs[idx].id;
   myJobs[idx].archived = true;
   const jIdx = jobs.findIndex(j => j.id === jobId);
