@@ -2249,7 +2249,8 @@
 
   // Сохранить резюме в Supabase
   async function sbSaveResume(resume, id) {
-    if (!_sb || resume.published === false) return;
+    if (resume.published === false) return;
+    if (!_sb) { showToast('⚠️ Supabase не подключён — резюме видно только вам'); return; }
     try {
       const row = {
         id,
@@ -2257,13 +2258,23 @@
         name:       resume.name       || '',
         specialty:  resume.specialty  || '',
         region:     resume.region     || '',
-        salary:     resume.salary     || 0,
+        salary:     Number(resume.salary) || 0,
         telegram:   resume.telegram   || '',
-        data:       { ...resume, photo: '' }   // фото не храним в Supabase (слишком большое)
+        phone:      resume.phone      || '',
+        exp:        resume.exp        || '',
+        category:   resume.category   || '',
+        about:      resume.about      || '',
+        data:       JSON.stringify({ ...resume, photo: '' })
       };
       const { error } = await _sb.from('resumes').upsert(row, { onConflict: 'id' });
-      if (error) console.warn('sbSaveResume:', error.message);
-    } catch(e) { console.warn('sbSaveResume:', e); }
+      if (error) {
+        console.warn('sbSaveResume error:', error.message);
+        showToast('⚠️ Резюме не синхронизировано: ' + error.message);
+      }
+    } catch(e) {
+      console.warn('sbSaveResume exception:', e);
+      showToast('⚠️ Ошибка сохранения резюме');
+    }
   }
 
   // Удалить резюме из Supabase
