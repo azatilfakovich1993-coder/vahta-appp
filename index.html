@@ -1903,7 +1903,7 @@
     if (id === 'screen-favorites')            renderFavorites();
     if (id === 'screen-my-responses')         renderMyResponses();
     if (id === 'screen-employer-responses')   renderAllEmployerResponses();
-    if (id === 'screen-resume-db')   { rdbCatFilter = 'all'; document.querySelectorAll('#screen-resume-db .chip').forEach((c,i) => c.classList.toggle('active', i===0)); filterResumeDb(); }
+    if (id === 'screen-resume-db')   { rdbCatFilter = 'all'; document.querySelectorAll('#screen-resume-db .chip').forEach((c,i) => c.classList.toggle('active', i===0)); filterResumeDb(); sbLoadResumes().then(() => filterResumeDb()); }
 
     // Менеджер не может редактировать профиль компании — перенаправляем
     if (id === 'screen-company-profile' && activeCompanyCode) {
@@ -2200,7 +2200,7 @@
       data.forEach(row => {
         // data поле содержит полный объект вакансии
         const j = row.data ? { ...row.data, archived: row.archived, paused: row.paused } : row;
-        if (!j.archived && !j.paused && !jobs.find(x => String(x.id) === String(j.id))) jobs.push(j);
+        if (!j.archived && !j.paused && !jobs.find(x => String(x.id) === String(j.id))) jobs.unshift(j);
       });
       // Применяем верификацию
       if (companyProfile?.verified) {
@@ -2217,9 +2217,12 @@
       const { data, error } = await _sb.from('resumes').select('*').eq('published', true);
       if (error) { console.warn('sbLoadResumes:', error.message); return; }
       if (!data || !data.length) return;
-      // Добавляем в базу резюме только те, которых ещё нет
       data.forEach(r => {
-        if (!resumeDbData.find(x => x.id === r.id)) resumeDbData.push(r);
+        // поддерживаем оба формата: data-колонка (новый) и прямые поля (старый)
+        const resume = (r.data && typeof r.data === 'object') ? { ...r.data, id: r.id } : r;
+        const existIdx = resumeDbData.findIndex(x => x.id === resume.id);
+        if (existIdx === -1) resumeDbData.unshift(resume);
+        else resumeDbData[existIdx] = resume;
       });
     } catch(e) { console.warn('sbLoadResumes:', e); }
   }
@@ -2248,7 +2251,17 @@
   async function sbSaveResume(resume, id) {
     if (!_sb || resume.published === false) return;
     try {
-      const { error } = await _sb.from('resumes').upsert({ ...resume, id }, { onConflict: 'id' });
+      const row = {
+        id,
+        published:  true,
+        name:       resume.name       || '',
+        specialty:  resume.specialty  || '',
+        region:     resume.region     || '',
+        salary:     resume.salary     || 0,
+        telegram:   resume.telegram   || '',
+        data:       { ...resume, photo: '' }   // фото не храним в Supabase (слишком большое)
+      };
+      const { error } = await _sb.from('resumes').upsert(row, { onConflict: 'id' });
       if (error) console.warn('sbSaveResume:', error.message);
     } catch(e) { console.warn('sbSaveResume:', e); }
   }
@@ -2947,7 +2960,7 @@ myResponses.push(..._loadedResponses.slice().reverse());
 
     const isNew = crEditIndex === null;
     if (isNew) {
-      resumes.push(resume);
+      resumes.unshift(resume);
     } else {
       resumes[crEditIndex] = resume;
     }
@@ -3371,11 +3384,11 @@ myResponses.push(..._loadedResponses.slice().reverse());
     favorites.forEach(id => {
       const j = jobs.find(x => x.id === id);
       if (j) {
-        items.push(j);
+        items.unshift(j);
       } else {
         // Вакансия удалена из публичного списка — ищем в архиве работодателя
         const archived = myJobs.find(x => x.id === id);
-        if (archived) items.push({ ...archived, _isClosed: true });
+        if (archived) items.unshift({ ...archived, _isClosed: true });
       }
     });
     if (!items.length) {
